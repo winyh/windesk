@@ -1,8 +1,10 @@
-# Tauri + React + Typescript
+# Winbase
+
+Tauri + React + Typescript
 
 This template should help get you started developing with Tauri, React and Typescript in Vite.
 
-## Recommended IDE Setup
+## IDE Setup
 
 - [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
 
@@ -21,3 +23,11 @@ This template should help get you started developing with Tauri, React and Types
 ## 依赖
 
 `cnpm i`
+
+## 文档
+
+- [Rust 中文](https://www.rust-lang.org/zh-CN/)
+- [Tauri 中文](https://tauri.app/zh-cn/)
+- [Vite 构建](https://cn.vitejs.dev/)
+- [React 前端](https://zh-hans.react.dev/)
+- [Zustand 状态库](https://zustand-demo.pmnd.rs/)
