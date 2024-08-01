@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="33px" height="36px" viewBox="0 0 33 36" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="background: #FFFFFF;">
+    <title>Logo@2x</title>
+    <defs>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#F6361B" offset="0%"></stop>
+            <stop stop-color="#CC1D11" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Tenant-租户-控制台" transform="translate(-34.000000, -20.000000)" fill="url(#linearGradient-1)" fill-rule="nonzero">
+            <g id="Logo" transform="translate(34.000000, 20.000000)">
+                <path d="M15,10 L15,30 C15,33.2383969 12.4344251,35.8775718 9.22493826,35.9958615 L9,36 L9,10 L15,10 Z M6,10 L6,26 L5.77506174,25.9958615 C2.56557489,25.8775718 1.7202611e-15,23.2383969 1.7202611e-15,20 L1.7202611e-15,20 L1.7202611e-15,10 L6,10 Z M27,10 L27.2249383,10.0041385 C30.4344251,10.1224282 33,12.7616031 33,16 L33,16 L33,26 L27,26 L27,10 Z M24,1.55197212e-15 L24,26 L18,26 L18,6 C18,2.76160306 20.5655749,0.122428238 23.7750617,0.00413847205 L24,1.55197212e-15 Z" id="形状结合"></path>
+            </g>
+        </g>
+    </g>
+</svg>

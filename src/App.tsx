@@ -2,6 +2,12 @@ import { useState } from "react";
 import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/tauri";
 import Layout from "@/component/Layout";
+import { RouterProvider } from "react-router-dom";
+import { ConfigProvider } from "antd";
+import "dayjs/locale/zh-cn";
+import zhCN from "antd/locale/zh_CN";
+import theme from "/config/theme";
+import router from "@/routes/index";
 import { isTauri } from "./utils/index"
 import "./App.css";
 
@@ -20,9 +26,11 @@ function App() {
   }
 
   return (
-    <Layout>
-          22
-    </Layout>
+
+    <ConfigProvider locale={zhCN} theme={theme}>
+      <RouterProvider router={router}></RouterProvider>
+    </ConfigProvider>
+
     // <div className="container">
     //   <h1>Welcome to Tauri!</h1>
     //   <Button>Welcome to Antd!</Button>

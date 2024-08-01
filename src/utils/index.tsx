@@ -1,5 +1,10 @@
 const isTauri = () => {
-    return window && window.__TAURI_IPC__
-}
+  return window && window.__TAURI_IPC__;
+};
 
-export { isTauri }
+const getCurrentYear = () => {
+  const date = new Date();
+  return date.getFullYear();
+};
+
+export { isTauri, getCurrentYear };
