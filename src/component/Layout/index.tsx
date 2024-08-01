@@ -40,6 +40,7 @@ import {
 } from "@ant-design/icons";
 import { theme } from "antd";
 import screenfull from "screenfull";
+import { invoke } from "@tauri-apps/api/tauri";
 import useStore from "@/store/index";
 import { isTauri, getCurrentYear } from "@/utils/index";
 import winbaseLogo from "/winbase.png";
@@ -213,12 +214,19 @@ const LayoutBase = () => {
     }
   }, []);
 
-  const onFullScreen = () => {
-    if (screenfull.isEnabled) {
-      screenfull.toggle();
+  const onFullScreen = async () => {
+    // tauri 写法
+    if (isTauri()) {
+      console.log("isTauri", { isFull });
       setIsFull((isFull) => !isFull);
+      await invoke("switch_fullscreen", { isFullscreen: isFull });
     } else {
-      console.error("无法全屏");
+      if (screenfull.isEnabled) {
+        screenfull.toggle();
+        setIsFull((isFull) => !isFull);
+      } else {
+        console.error("无法全屏");
+      }
     }
   };
 
