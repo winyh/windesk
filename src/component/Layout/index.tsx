@@ -248,6 +248,11 @@ const LayoutBase = () => {
     setOpenKeys(openKeys);
   };
 
+  const goAgent = () => {
+    console.log("AI 助手");
+    navigate(`${BASE_URL}agent`);
+  };
+
   return (
     <Layout
       style={{
@@ -309,6 +314,7 @@ const LayoutBase = () => {
         <Header
           style={{
             background: colorBgContainer,
+            padding: "0 24px",
           }}
           className="winbase-header"
         >
@@ -400,10 +406,7 @@ const LayoutBase = () => {
               </Tooltip>
             </div>
           ) : null}
-          <FloatButton
-            onClick={() => console.log("AI 助手")}
-            icon={<FireTwoTone />}
-          />
+          <FloatButton onClick={goAgent} icon={<FireTwoTone />} />
         </Content>
         <Footer
           style={{
