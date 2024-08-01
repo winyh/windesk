@@ -2,7 +2,7 @@ import { useState } from "react";
 import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/tauri";
 import { Button } from "antd";
-import { isTauri } from "./utils/index"
+import { isTauri } from "./utils/index";
 import "./App.css";
 
 function App() {
@@ -11,11 +11,11 @@ function App() {
 
   async function greet() {
     // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-    if(isTauri()){
-      console.log({window})
+    if (isTauri()) {
+      console.log({ window });
       setGreetMsg(await invoke("greet", { name }));
     } else {
-      setGreetMsg(`${name}, 你好, 当前为web环境，无法与桌面Rust交互`)
+      setGreetMsg(`${name}, 你好, 当前为web环境，无法与桌面Rust交互`);
     }
   }
 

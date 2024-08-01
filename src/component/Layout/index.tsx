@@ -1,25 +1,48 @@
-import { useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Outlet, Link } from "react-router-dom";
-import { Layout, Button, Menu, Space, Dropdown, Flex, Typography } from "antd";
 import {
+  Layout,
+  Button,
+  Menu,
+  Space,
+  Dropdown,
+  Flex,
+  Typography,
+  Breadcrumb,
+  Tooltip,
+  FloatButton,
+  Divider,
+  Select,
+} from "antd";
+import {
+  PlusOutlined,
   AppstoreOutlined,
   DashboardOutlined,
   LineChartOutlined,
-  MailOutlined,
+  BellOutlined,
   SettingOutlined,
   ConsoleSqlOutlined,
   GroupOutlined,
   FunctionOutlined,
+  SunOutlined,
   FireOutlined,
+  FireTwoTone,
   CloudServerOutlined,
   SafetyCertificateOutlined,
   UserOutlined,
   StarOutlined,
+  MoonOutlined,
+  CloseOutlined,
   LogoutOutlined,
   GithubOutlined,
+  FullscreenOutlined,
+  FullscreenExitOutlined,
 } from "@ant-design/icons";
-import { getCurrentYear } from "@/utils/index";
-import winbaseLogo from "/public/winbase.png";
+import { theme } from "antd";
+import screenfull from "screenfull";
+import useStore from "@/store/index";
+import { isTauri, getCurrentYear } from "@/utils/index";
+import winbaseLogo from "/winbase.png";
 import "./index.css";
 
 const { Header, Footer, Sider, Content } = Layout;
@@ -35,11 +58,6 @@ const items = [
     key: "tenant",
     icon: <GroupOutlined />,
     label: "租户管理",
-  },
-  {
-    key: "admin",
-    icon: <SafetyCertificateOutlined />,
-    label: "用户管理",
   },
   {
     key: "application",
@@ -64,7 +82,7 @@ const items = [
   {
     key: "agent",
     icon: <FireOutlined />,
-    label: "AI助手",
+    label: "AI 助手",
   },
   {
     key: "analysis",
@@ -72,61 +90,36 @@ const items = [
     label: "分析监控",
   },
   {
+    key: "authority",
+    icon: <SafetyCertificateOutlined />,
+    label: "权限管理",
+    children: [
+      {
+        path: "admin",
+        label: "用户管理",
+      },
+      {
+        path: "role",
+        label: "角色管理",
+      },
+      {
+        path: "menu",
+        label: "菜单管理",
+      },
+      {
+        path: "organization",
+        label: "组织机构",
+      },
+      {
+        path: "position",
+        label: "岗位管理",
+      },
+    ],
+  },
+  {
     key: "system",
     icon: <SettingOutlined />,
     label: "系统配置",
-  },
-  {
-    key: "sub1",
-    label: "多级菜单",
-    icon: <MailOutlined />,
-    children: [
-      {
-        key: "5",
-        label: "Option 5",
-      },
-      {
-        key: "6",
-        label: "Option 6",
-      },
-      {
-        key: "7",
-        label: "Option 7",
-      },
-      {
-        key: "8",
-        label: "Option 8",
-      },
-    ],
-  },
-  {
-    key: "sub2",
-    label: "子菜单",
-    icon: <AppstoreOutlined />,
-    children: [
-      {
-        key: "9",
-        label: "Option 9",
-      },
-      {
-        key: "10",
-        label: "Option 10",
-      },
-      {
-        key: "sub3",
-        label: "Submenu",
-        children: [
-          {
-            key: "11",
-            label: "Option 11",
-          },
-          {
-            key: "12",
-            label: "Option 12",
-          },
-        ],
-      },
-    ],
   },
 ];
 
@@ -142,6 +135,12 @@ const accountItems = [
   },
   {
     type: "divider",
+  },
+  {
+    key: "message",
+    icon: <BellOutlined />,
+    label: "消息通知",
+    onClick: () => goProfile(),
   },
   {
     key: "profile",
@@ -169,38 +168,113 @@ const accountItems = [
   },
 ];
 
-const siderStyle = {
-  color: "#fff",
-  overflow: "auto",
-  height: "100vh",
-};
-
-const layoutStyle = {
-  overflow: "hidden",
-  width: "100%",
-  maxWidth: "100%",
-  height: "100%",
-};
+let index = 0;
 
 const LayoutBase = () => {
+  const {
+    token: { colorBgContainer, colorText },
+  } = theme.useToken();
+
+  const themeMode = useStore((state) => state.themeMode);
+  const [mode, setMode] = useState<any>(themeMode);
+  const [isFull, setIsFull] = useState(false);
+  const [isContentFull, setIsContentFull] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+
+  const [applications, setApplications] = useState(["应用A", "应用B"]);
+  const [name, setName] = useState("");
+  const inputRef = useRef(null);
+  const toggleTheme = useStore((state) => state.toggleTheme);
+
+  const addItem = (e) => {
+    e.preventDefault();
+    setApplications([...applications, name || `新应用 ${index++}`]);
+    setName("");
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 0);
+  };
+
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
   };
+
+  useEffect(() => {
+    if (!isTauri() && screenfull.isEnabled) {
+      screenfull.on("change", () => {
+        console.log("Am I fullscreen?", screenfull.isFullscreen ? "Yes" : "No");
+        if (!screenfull.isFullscreen) {
+          setIsFull(false);
+          setIsContentFull(false);
+        }
+      });
+
+      return () => screenfull.off("change", () => {});
+    }
+  }, []);
+
+  const onFullScreen = () => {
+    if (screenfull.isEnabled) {
+      screenfull.toggle();
+      setIsFull((isFull) => !isFull);
+    } else {
+      console.error("无法全屏");
+    }
+  };
+
+  const onContentFullScreen = () => {
+    const content = document.getElementById("content");
+    if (screenfull.isEnabled) {
+      screenfull.toggle(content as HTMLElement);
+      setIsContentFull((isContentFull) => !isContentFull);
+    } else {
+      console.error("无法全屏");
+    }
+  };
+
+  const onSwitchMode = () => {
+    let newMode = mode === "light" ? "dark" : "light";
+    localStorage.setItem("themeMode", newMode);
+    setMode(newMode);
+    toggleTheme(newMode);
+  };
+
   return (
-    <Layout style={layoutStyle}>
+    <Layout
+      style={{
+        overflow: "hidden",
+        width: "100%",
+        maxWidth: "100%",
+        height: "100%",
+        background: colorBgContainer,
+      }}
+    >
       <Sider
-        style={siderStyle}
+        style={{
+          overflow: "auto",
+          height: "100vh",
+          background: colorBgContainer,
+        }}
         collapsible
         collapsed={collapsed}
         onCollapse={toggleCollapsed}
       >
         <div className="winbase-logo">
           <img src={winbaseLogo} height={36} width={33} alt="" />{" "}
-          {collapsed ? "" : <span className="winbase-name">winbase</span>}
+          {collapsed ? (
+            ""
+          ) : (
+            <span
+              className="winbase-name"
+              style={{
+                color: colorText,
+              }}
+            >
+              winbase
+            </span>
+          )}
         </div>
         <Menu
-          theme="dark"
           defaultSelectedKeys={["1"]}
           defaultOpenKeys={[]}
           mode="inline"
@@ -214,20 +288,113 @@ const LayoutBase = () => {
               items: accountItems,
             }}
           >
-            <Button
-              type="text"
-              style={{ color: "gray" }}
-              icon={<UserOutlined />}
-            >
+            <Button type="text" icon={<UserOutlined />}>
               {collapsed ? "" : "账户信息"}
             </Button>
           </Dropdown>
         </div>
       </Sider>
       <Layout>
-        <Header></Header>
-        <Content>
+        <Header
+          style={{
+            background: colorBgContainer,
+          }}
+          className="winbase-header"
+        >
+          <Flex justify="space-between" align="center">
+            <div className="left">
+              <Space size="middle">
+                <Select
+                  showSearch
+                  style={{
+                    width: 180,
+                  }}
+                  defaultValue="应用A"
+                  placeholder="请选择应用"
+                  dropdownRender={(menu) => (
+                    <>
+                      {menu}
+                      <Divider
+                        style={{
+                          margin: "8px 0",
+                        }}
+                      />
+                      <Button
+                        type="text"
+                        block
+                        icon={<PlusOutlined />}
+                        onClick={addItem}
+                      >
+                        新增应用
+                      </Button>
+                    </>
+                  )}
+                  options={applications.map((item) => ({
+                    label: item,
+                    value: item,
+                  }))}
+                />
+
+                <Breadcrumb
+                  items={[
+                    {
+                      title: "权限管理",
+                    },
+                    {
+                      title: "组织机构",
+                    },
+                  ]}
+                />
+              </Space>
+            </div>
+
+            <div className="right">
+              <Space>
+                <Tooltip title="切换模式">
+                  <Button
+                    type="text"
+                    icon={mode === "light" ? <MoonOutlined /> : <SunOutlined />}
+                    onClick={onSwitchMode}
+                  ></Button>
+                </Tooltip>
+
+                <Tooltip title={isFull ? "退出全屏" : "全屏显示"}>
+                  <Button
+                    type="text"
+                    icon={
+                      isFull ? (
+                        <FullscreenExitOutlined />
+                      ) : (
+                        <FullscreenOutlined />
+                      )
+                    }
+                    onClick={onFullScreen}
+                  ></Button>
+                </Tooltip>
+              </Space>
+            </div>
+          </Flex>
+        </Header>
+        <Content id="content">
           <Outlet />
+
+          {isContentFull ? (
+            <div
+              className="exit-content-fullscreen"
+              onClick={onContentFullScreen}
+            >
+              <Tooltip title="退出全屏">
+                <CloseOutlined
+                  className="exit-content-icon"
+                  style={{ color: "#fff", fontSize: "18px" }}
+                />
+              </Tooltip>
+            </div>
+          ) : null}
+          <FloatButton
+            onClick={() => console.log("AI 助手")}
+            icon={<FireTwoTone />}
+          />
         </Content>
         <Footer>
           <Flex justify="center" align="center">

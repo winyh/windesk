@@ -17,6 +17,13 @@ import Result500 from "@/page/result/500";
 import Login from "@/page/login";
 import Register from "@/page/register";
 
+/* 权限管理 */
+import Admin from "@/page/authority/admin";
+import Role from "@/page/authority/role";
+import Menu from "@/page/authority/menu";
+import Organization from "@/page/authority/organization";
+import Position from "@/page/authority/position";
+
 const basename = import.meta.env.BASE_URL;
 
 const routes = [
@@ -31,6 +38,31 @@ const routes = [
       {
         path: "tenant",
         element: <Tenant />,
+      },
+      {
+        path: "authority",
+        children: [
+          {
+            path: "admin",
+            element: <Admin />,
+          },
+          {
+            path: "role",
+            element: <Role />,
+          },
+          {
+            path: "menu",
+            element: <Menu />,
+          },
+          {
+            path: "organization",
+            element: <Organization />,
+          },
+          {
+            path: "position",
+            element: <Position />,
+          },
+        ],
       },
       {
         path: "application",
