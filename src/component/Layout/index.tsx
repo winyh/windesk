@@ -41,6 +41,7 @@ import {
 import { theme } from "antd";
 import screenfull from "screenfull";
 import { invoke } from "@tauri-apps/api/tauri";
+import { listen } from "@tauri-apps/api/event";
 import useStore from "@/store/index";
 import { isTauri, getCurrentYear } from "@/utils/index";
 import winbaseLogo from "/winbase.png";
@@ -212,14 +213,24 @@ const LayoutBase = () => {
 
       return () => screenfull.off("change", () => {});
     }
+    onListenTauriWindow();
   }, []);
+
+  const onListenTauriWindow = async () => {
+    // Listen for the "fullscreen-changed" event
+    listen("fullscreen-changed", (event) => {
+      const isFullscreen = event.payload;
+      console.log(`Tauri Fullscreen state changed: ${isFullscreen}`);
+      setIsFull(isFullscreen);
+    });
+  };
 
   const onFullScreen = async () => {
     // tauri 写法
     if (isTauri()) {
       console.log("isTauri", { isFull });
       setIsFull((isFull) => !isFull);
-      await invoke("switch_fullscreen", { isFullscreen: isFull });
+      await invoke("switch_fullscreen");
     } else {
       if (screenfull.isEnabled) {
         screenfull.toggle();
