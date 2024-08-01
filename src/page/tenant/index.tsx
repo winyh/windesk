@@ -1,5 +1,5 @@
-const Tenant = () => {   
-    return <div>Tenant</div>
-}
+const Tenant = () => {
+  return <div>Tenant</div>;
+};
 
-export default Tenant
+export default Tenant;

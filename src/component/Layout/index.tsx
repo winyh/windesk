@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
-import { Outlet, Link } from "react-router-dom";
+import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
+
 import {
   Layout,
   Button,
@@ -16,19 +17,9 @@ import {
 } from "antd";
 import {
   PlusOutlined,
-  AppstoreOutlined,
-  DashboardOutlined,
-  LineChartOutlined,
   BellOutlined,
-  SettingOutlined,
-  ConsoleSqlOutlined,
-  GroupOutlined,
-  FunctionOutlined,
   SunOutlined,
-  FireOutlined,
   FireTwoTone,
-  CloudServerOutlined,
-  SafetyCertificateOutlined,
   UserOutlined,
   StarOutlined,
   MoonOutlined,
@@ -43,140 +34,37 @@ import screenfull from "screenfull";
 import { invoke } from "@tauri-apps/api/tauri";
 import { listen } from "@tauri-apps/api/event";
 import useStore from "@/store/index";
-import { isTauri, getCurrentYear } from "@/utils/index";
+import { logoutService } from "@/service/index";
+import {
+  isTauri,
+  getCurrentYear,
+  findCurrentPathKey,
+  findObjByKey,
+  routes2menu,
+} from "@/utils/index";
+import { childRoutes } from "@/routes/index";
 import winbaseLogo from "/winbase.png";
 import "./index.css";
 
+const { BASE_URL } = import.meta.env;
+
 const { Header, Footer, Sider, Content } = Layout;
 const { Text } = Typography;
-
-const items = [
-  {
-    key: "dashboard",
-    icon: <DashboardOutlined />,
-    label: "控制台",
-  },
-  {
-    key: "tenant",
-    icon: <GroupOutlined />,
-    label: "租户管理",
-  },
-  {
-    key: "application",
-    icon: <AppstoreOutlined />,
-    label: "应用管理",
-  },
-  {
-    key: "database",
-    icon: <ConsoleSqlOutlined />,
-    label: "数据库",
-  },
-  {
-    key: "function",
-    icon: <FunctionOutlined />,
-    label: "云函数",
-  },
-  {
-    key: "storage",
-    icon: <CloudServerOutlined />,
-    label: "文件存储",
-  },
-  {
-    key: "agent",
-    icon: <FireOutlined />,
-    label: "AI 助手",
-  },
-  {
-    key: "analysis",
-    icon: <LineChartOutlined />,
-    label: "分析监控",
-  },
-  {
-    key: "authority",
-    icon: <SafetyCertificateOutlined />,
-    label: "权限管理",
-    children: [
-      {
-        path: "admin",
-        label: "用户管理",
-      },
-      {
-        path: "role",
-        label: "角色管理",
-      },
-      {
-        path: "menu",
-        label: "菜单管理",
-      },
-      {
-        path: "organization",
-        label: "组织机构",
-      },
-      {
-        path: "position",
-        label: "岗位管理",
-      },
-    ],
-  },
-  {
-    key: "system",
-    icon: <SettingOutlined />,
-    label: "系统配置",
-  },
-];
-
-const accountItems = [
-  {
-    key: "info",
-    label: "2712192471@qq.com",
-    icon: (
-      <>
-        <span></span>
-      </>
-    ),
-  },
-  {
-    type: "divider",
-  },
-  {
-    key: "message",
-    icon: <BellOutlined />,
-    label: "消息通知",
-    onClick: () => goProfile(),
-  },
-  {
-    key: "profile",
-    icon: <UserOutlined />,
-    label: "个人中心",
-    onClick: () => goProfile(),
-  },
-  {
-    type: "divider",
-  },
-  {
-    key: "personal",
-    icon: <StarOutlined />,
-    label: "主题配置",
-    onClick: () => goPersonal(),
-  },
-  {
-    type: "divider",
-  },
-  {
-    key: "login",
-    icon: <LogoutOutlined />,
-    label: "退出登录",
-    onClick: () => logout(),
-  },
-];
 
 let index = 0;
 
 const LayoutBase = () => {
   const {
-    token: { colorBgContainer, colorText },
+    token: { colorBgContainer, colorText, borderRadiusLG },
   } = theme.useToken();
 
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const [menuItems, setMenuItems] = useState([]);
+  const [breadcrumbItems, setBreadcrumbItems] = useState<any>([]);
+  const [openKeys, setOpenKeys] = useState<any>([]);
+  const [selectedKeys, setSelectedKeys] = useState<any>([]);
   const themeMode = useStore((state) => state.themeMode);
   const [mode, setMode] = useState<any>(themeMode);
   const [isFull, setIsFull] = useState(false);
@@ -187,6 +75,70 @@ const LayoutBase = () => {
   const [name, setName] = useState("");
   const inputRef = useRef(null);
   const toggleTheme = useStore((state) => state.toggleTheme);
+
+  const logout = async () => {
+    try {
+      const { data, status } = await logoutService();
+      if (status) {
+        localStorage.removeItem("token");
+        messageApi.open({
+          type: "loading",
+          content: "即将退出登录!",
+          duration: 0,
+        });
+        setTimeout(() => {
+          navigate("/login");
+        }, 1000);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const accountItems = [
+    {
+      key: "info",
+      label: "2712192471@qq.com",
+      icon: (
+        <>
+          <span></span>
+        </>
+      ),
+    },
+    {
+      type: "divider",
+    },
+    {
+      key: "message",
+      icon: <BellOutlined />,
+      label: "消息通知",
+      onClick: () => goProfile(),
+    },
+    {
+      key: "profile",
+      icon: <UserOutlined />,
+      label: "个人中心",
+      onClick: () => goProfile(),
+    },
+    {
+      type: "divider",
+    },
+    {
+      key: "personal",
+      icon: <StarOutlined />,
+      label: "主题配置",
+      onClick: () => goPersonal(),
+    },
+    {
+      type: "divider",
+    },
+    {
+      key: "login",
+      icon: <LogoutOutlined />,
+      label: "退出登录",
+      onClick: () => logout(),
+    },
+  ];
 
   const addItem = (e) => {
     e.preventDefault();
@@ -200,6 +152,32 @@ const LayoutBase = () => {
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
   };
+
+  useEffect(() => {
+    // console.log(`路由变化监听：${location.pathname}`);
+    const menus = routes2menu(childRoutes);
+    setMenuItems(menus);
+    let keyPaths = location.pathname.split("/").filter((i) => i);
+
+    let breads: any[] = [];
+    var linkPath = "";
+    keyPaths.map((key, index) => {
+      linkPath = `${BASE_URL}${linkPath}/${key}`.replace(/\/\/+/g, "/");
+      const { label } = findObjByKey(menus, key, "key");
+      let curentPath = linkPath;
+      breads.push({
+        title: <Link to={`${curentPath}`}>{label}</Link>,
+        onClick: () => {
+          console.log(999, `${curentPath}`);
+          navigate(`${curentPath}`);
+        },
+      });
+    });
+    console.log({ keyPaths });
+    setOpenKeys(keyPaths); // 初始展开
+    setSelectedKeys(keyPaths); // 更新左侧导航选中
+    setBreadcrumbItems(breads); // 更新面包屑
+  }, [location.pathname]);
 
   useEffect(() => {
     if (!isTauri() && screenfull.isEnabled) {
@@ -258,6 +236,18 @@ const LayoutBase = () => {
     toggleTheme(newMode);
   };
 
+  const onHandleMenuClick = ({ keyPath }) => {
+    const pathReverse = keyPath.reverse();
+    const path = pathReverse.join("/");
+    setSelectedKeys(pathReverse);
+    navigate(`${BASE_URL}${path}`); // 处理路由跳转
+  };
+
+  const onOpenChange = (openKeys) => {
+    console.log({ openKeys });
+    setOpenKeys(openKeys);
+  };
+
   return (
     <Layout
       style={{
@@ -294,10 +284,12 @@ const LayoutBase = () => {
           )}
         </div>
         <Menu
-          defaultSelectedKeys={["1"]}
-          defaultOpenKeys={[]}
           mode="inline"
-          items={items}
+          items={menuItems}
+          openKeys={openKeys}
+          selectedKeys={selectedKeys}
+          onSelect={onHandleMenuClick}
+          onOpenChange={onOpenChange}
         />
 
         <div className="slider-bottom">
@@ -354,16 +346,7 @@ const LayoutBase = () => {
                   }))}
                 />
 
-                <Breadcrumb
-                  items={[
-                    {
-                      title: "权限管理",
-                    },
-                    {
-                      title: "组织机构",
-                    },
-                  ]}
-                />
+                <Breadcrumb items={breadcrumbItems} />
               </Space>
             </div>
 
@@ -394,7 +377,14 @@ const LayoutBase = () => {
             </div>
           </Flex>
         </Header>
-        <Content id="content">
+        <Content
+          id="content"
+          style={{
+            padding: 24,
+            background: colorBgContainer,
+            borderRadius: borderRadiusLG,
+          }}
+        >
           <Outlet />
 
           {isContentFull ? (
@@ -415,7 +405,11 @@ const LayoutBase = () => {
             icon={<FireTwoTone />}
           />
         </Content>
-        <Footer>
+        <Footer
+          style={{
+            background: colorBgContainer,
+          }}
+        >
           <Flex justify="center" align="center">
             <Space>
               <Text>

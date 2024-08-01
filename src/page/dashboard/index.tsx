@@ -8,8 +8,7 @@ const Dashboard = () => {
 
   async function greet() {
     // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-    if (!isTauri()) {
-      console.log({ window });
+    if (isTauri()) {
       setGreetMsg(await invoke("greet", { name }));
     } else {
       setGreetMsg(`${name}, 你好, 当前为web环境，无法与桌面Rust交互`);
