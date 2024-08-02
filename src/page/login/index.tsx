@@ -1,27 +1,18 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Card,
-  Button,
-  Checkbox,
-  Form,
-  Input,
-  notification,
-  theme,
-  Avatar,
-  Image,
-} from "antd";
+import { Card, Button, Form, Input, theme, Image, App } from "antd";
 import { getAdminService, loginService } from "@/service/index";
-import logo from "@/assets/img/logo.svg";
+import { TranslationOutlined } from "@ant-design/icons";
+import logo from "@/assets/img/winbase.png";
 import "./style.css";
 
 const Login = () => {
   const navigate = useNavigate();
-  const [noticeApi, contextHolder] = notification.useNotification();
+  const { notification } = App.useApp();
   const [loading, setLoading] = useState(false);
 
   const {
-    token: { colorPrimary },
+    token: { colorPrimary, colorBgContainer },
   } = theme.useToken();
 
   useEffect(() => {}, []);
@@ -31,7 +22,7 @@ const Login = () => {
       setLoading(true);
       const { data, status, msg } = await loginService(values);
       if (status) {
-        noticeApi.success({
+        notification.success({
           message: "系统提醒",
           description: "登录成功! 即将跳转到系统首页",
         });
@@ -42,7 +33,7 @@ const Login = () => {
         }, 1000);
       } else {
         setLoading(false);
-        noticeApi.warning({
+        notification.warning({
           message: "系统提醒",
           description: `${msg} 登录异常，请联系管理员!`,
         });
@@ -56,13 +47,18 @@ const Login = () => {
     console.log("Failed:", errorInfo);
   };
   return (
-    <div className="login-bg">
+    <div className="login-bg" style={{ background: colorBgContainer }}>
+      <div className="language">
+        <Button icon={<TranslationOutlined />}>中文 / English</Button>
+      </div>
       <div className="login">
-        {contextHolder}
         <Card
+          style={{
+            borderRadius: 12,
+          }}
           title={
             <div style={{ textAlign: "center", margin: "8px 0" }}>
-              <Image src={logo} height={70} width={117} preview={false} />
+              <Image src={logo} preview={false} />
             </div>
           }
         >

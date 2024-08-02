@@ -1,21 +1,25 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, Button, Checkbox, Form, Input, notification, Image } from "antd";
+import { Card, Button, Form, Input, Image, App, theme } from "antd";
 import { registerService } from "@/service/index";
-import logo from "@/assets/img/logo.svg";
+import logo from "@/assets/img/winbase.png";
 import "./style.css";
 
 const Register = () => {
   const navigate = useNavigate();
-  const [noticeApi, contextHolder] = notification.useNotification();
+  const { notification } = App.useApp();
   const [loading, setLoading] = useState(false);
+
+  const {
+    token: { colorPrimary, colorBgContainer },
+  } = theme.useToken();
 
   const onFinish = async (values) => {
     try {
       setLoading(true);
       let { data, status, msg } = await registerService(values);
       if (status) {
-        noticeApi.success({
+        notification.success({
           message: "系统提醒",
           description: "注册成功! 即将跳转到登录页",
         });
@@ -25,7 +29,7 @@ const Register = () => {
         }, 500);
       } else {
         setLoading(false);
-        noticeApi.warning({
+        notification.warning({
           message: "系统提醒",
           description: `${msg}. 注册异常，请联系管理员!`,
         });
@@ -40,13 +44,15 @@ const Register = () => {
   };
 
   return (
-    <div className="login-bg">
+    <div className="login-bg" style={{ background: colorBgContainer }}>
       <div className="login">
-        {contextHolder}
         <Card
+          style={{
+            borderRadius: 12,
+          }}
           title={
             <div style={{ textAlign: "center", margin: "8px 0" }}>
-              <Image src={logo} height={70} width={117} preview={false} />
+              <Image src={logo} preview={false} />
             </div>
           }
         >
