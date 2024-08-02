@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Button, Input, Space } from "antd";
 import { invoke } from "@tauri-apps/api/tauri";
 import { isTauri } from "@/utils/index";
 
@@ -24,12 +25,14 @@ const Dashboard = () => {
           greet();
         }}
       >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
+        <Space>
+          <Input
+            id="greet-input"
+            onChange={(e) => setName(e.currentTarget.value)}
+            placeholder="Enter a name..."
+          />
+          <Button htmlType="submit">Greet</Button>
+        </Space>
       </form>
 
       <p>{greetMsg}</p>

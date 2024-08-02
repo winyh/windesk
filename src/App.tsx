@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { RouterProvider } from "react-router-dom";
-import { ConfigProvider } from "antd";
+import { ConfigProvider, App as AntApp, theme as config } from "antd";
 import useStore from "@/store/index";
 import "dayjs/locale/zh-cn";
 import zhCN from "antd/locale/zh_CN";
-import { theme as config } from "antd";
 import themeToken from "@/config/theme";
 import router from "@/routes/index";
 import "./App.css";
@@ -24,7 +23,9 @@ function App() {
 
   return (
     <ConfigProvider locale={zhCN} theme={theme}>
-      <RouterProvider router={router}></RouterProvider>
+      <AntApp>
+        <RouterProvider router={router}></RouterProvider>
+      </AntApp>
     </ConfigProvider>
   );
 }
