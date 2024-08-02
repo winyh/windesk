@@ -29,7 +29,7 @@ const { Search } = Input;
 const Database = () => {
   const antdThemeMode = useStore((state) => state.themeMode);
   const [mode, setMode] = useState("table");
-  const [themeMode, setThemeMode] = useState("dark");
+  const [themeMode, setThemeMode] = useState();
   const data = ["user", "article", "role", "admin", "category"];
 
   useEffect(() => {

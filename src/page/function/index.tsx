@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef } from "react";
-import { Row, Col, List, Input, Button, Dropdown, theme } from "antd";
+import { Row, Col, List, Input, Button, Dropdown, Flex, Space } from "antd";
 import {
   PlusOutlined,
   MoreOutlined,
   EditOutlined,
   DeleteOutlined,
   SettingOutlined,
+  CodeOutlined,
+  SaveOutlined,
 } from "@ant-design/icons";
 import useStore from "@/store/index";
 import WinCode from "@/component/Code";
@@ -14,7 +16,7 @@ const { Search } = Input;
 import "./index.css";
 
 const Function = () => {
-  const [themeMode, setThemeMode] = useState("dark");
+  const [themeMode, setThemeMode] = useState();
   const antdThemeMode = useStore((state) => state.themeMode);
   useEffect(() => {
     setThemeMode(antdThemeMode);
@@ -77,11 +79,18 @@ const Function = () => {
         />
       </Col>
       <Col span={20} style={{ height: "100%" }}>
-        <WinCode
-          initialValue="const name = winbase"
-          onChange={onCodeChange}
-          theme={themeMode}
-        />
+        <Flex vertical gap={24} style={{ height: "100%" }}>
+          <Space size="middle">
+            <Button icon={<SaveOutlined />}>保存函数</Button>
+            <Button icon={<CodeOutlined />}>执行函数</Button>
+          </Space>
+
+          <WinCode
+            initialValue="const name = winbase"
+            onChange={onCodeChange}
+            theme={themeMode}
+          />
+        </Flex>
       </Col>
     </Row>
   );

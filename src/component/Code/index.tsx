@@ -13,7 +13,7 @@ const Code = ({
   initialValue,
   onChange,
   options,
-  theme = "dark",
+  theme,
 }) => {
   const editorRef = useRef(null);
 
