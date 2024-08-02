@@ -113,7 +113,7 @@ const mockRoutes = () => {
                   icon: ""
                 },
                 {
-                  label: "组织机构",
+                  label: "组织部门",
                   key: "organization",
                   path: "organization",
                   element: "@/page/permission/organization/index",

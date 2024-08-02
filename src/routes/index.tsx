@@ -40,6 +40,9 @@ import Menu from "@/page/authority/menu";
 import Organization from "@/page/authority/organization";
 import Position from "@/page/authority/position";
 
+/* 系统设置 */
+import Dictionary from "@/page/system/dictionary";
+
 const basename = import.meta.env.BASE_URL;
 
 const childRoutes = [
@@ -163,7 +166,7 @@ const childRoutes = [
         path: "organization",
         element: <Organization />,
         meta: {
-          label: "组织机构",
+          label: "组织部门",
           key: "organization",
           hide_in_menu: false,
         },
@@ -181,13 +184,23 @@ const childRoutes = [
   },
   {
     path: "system",
-    element: <System />,
     meta: {
       label: "系统配置",
       icon: <DashboardOutlined />,
       key: "system",
       hide_in_menu: false,
     },
+    children: [
+      {
+        path: "dictionary",
+        element: <Dictionary />,
+        meta: {
+          label: "字典管理",
+          key: "dictionary",
+          hide_in_menu: false,
+        },
+      },
+    ],
   },
   {
     path: "403",

@@ -8,18 +8,14 @@ import {
   Button,
   Dropdown,
   Table,
+  Tag,
 } from "antd";
-import {
-  PlusOutlined,
-  MoreOutlined,
-  UserOutlined,
-  CodeOutlined,
-} from "@ant-design/icons";
+import { PlusOutlined, MoreOutlined, UserOutlined } from "@ant-design/icons";
 
 const { Search } = Input;
 
-const Database = () => {
-  const data = ["user", "article", "role", "admin", "category"];
+const Dictionary = () => {
+  const data = ["用户性别", "订单状态", "租户状态", "云存储", "数据库"];
 
   const items = [
     {
@@ -68,29 +64,34 @@ const Database = () => {
 
   const columns = [
     {
-      title: "文件名",
+      title: "字典项编码",
       dataIndex: "name",
       key: "name",
     },
     {
-      title: "文件ID",
+      title: "字典项标签",
       dataIndex: "hash",
       key: "hash",
     },
     {
-      title: "文件后缀",
+      title: "字典项键",
       dataIndex: "suffix",
       key: "suffix",
     },
     {
-      title: "大小",
+      title: "字典项值",
       dataIndex: "size",
       key: "size",
     },
     {
-      title: "类型",
+      title: "回显样式",
       dataIndex: "type",
       key: "type",
+    },
+    {
+      title: "备注",
+      dataIndex: "mark",
+      key: "mark",
     },
     {
       title: "状态",
@@ -111,12 +112,12 @@ const Database = () => {
 
   return (
     <Row gutter={24}>
-      <Col span={4}>
+      <Col span={6}>
         <List
-          header={<Search placeholder="搜索数据表" />}
+          header={<Search placeholder="搜索字典名称" />}
           footer={
             <Button type="text" block icon={<PlusOutlined />}>
-              新增数据表
+              新增字典
             </Button>
           }
           bordered
@@ -134,24 +135,21 @@ const Database = () => {
                 </Dropdown>,
               ]}
             >
-              {item}
+              <Flex justify="space-between" style={{ flex: 1 }}>
+                <span>{item}</span>
+                <Tag color="green">sys_user_sex</Tag>
+              </Flex>
             </List.Item>
           )}
         />
       </Col>
-      <Col span={20}>
+      <Col span={18}>
         <Flex vertical gap="middle">
-          <Flex justify="space-between">
-            <Space size="middle">
-              <Button icon={<CodeOutlined />}>SQL</Button>
-              <Button danger>批量删除</Button>
-              <Search placeholder="搜索数据" />
-            </Space>
-            <Space size="middle">
-              <Button>API / GraphQL</Button>
-              <Button icon={<PlusOutlined />}>新增记录</Button>
-            </Space>
-          </Flex>
+          <Space size="middle">
+            <Button icon={<PlusOutlined />}>新增字典项</Button>
+            <Button danger>批量删除</Button>
+            <Search placeholder="搜索字典项名称" />
+          </Space>
           <Table
             dataSource={dataSource}
             columns={columns}
@@ -170,4 +168,4 @@ const Database = () => {
   );
 };
 
-export default Database;
+export default Dictionary;

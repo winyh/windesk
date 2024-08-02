@@ -25,12 +25,12 @@ const Organization = () => {
 
   const columns = [
     {
-      title: "租户名称",
+      title: "部门名称",
       dataIndex: "name",
       key: "name",
     },
     {
-      title: "所属机构",
+      title: "上级组织",
       dataIndex: "hash",
       key: "hash",
     },
@@ -45,9 +45,9 @@ const Organization = () => {
       key: "size",
     },
     {
-      title: "应用数",
-      dataIndex: "type",
-      key: "type",
+      title: "邮箱",
+      dataIndex: "email",
+      key: "email",
     },
     {
       title: "状态",
@@ -60,7 +60,7 @@ const Organization = () => {
       key: "expire_at",
     },
     {
-      title: "操作",
+      title: "操作（新增子部门）",
       dataIndex: "action",
       key: "action",
     },
@@ -68,14 +68,13 @@ const Organization = () => {
   return (
     <Flex vertical gap="middle">
       <Space size="middle">
-        <Button icon={<PlusOutlined />}>录入租户</Button>
+        <Button icon={<PlusOutlined />}>新增组织部门</Button>
         <Button danger>批量删除</Button>
-        <Search placeholder="搜索租户" />
+        <Search placeholder="搜索组织部门" />
       </Space>
       <Table
         dataSource={dataSource}
         columns={columns}
-        virtual
         pagination={{
           position: ["bottomCenter"],
           showSizeChanger: true,

@@ -75,7 +75,6 @@ const Tenant = () => {
       <Table
         dataSource={dataSource}
         columns={columns}
-        virtual
         pagination={{
           position: ["bottomCenter"],
           showSizeChanger: true,

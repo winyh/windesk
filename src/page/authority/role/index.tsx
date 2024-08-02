@@ -1,4 +1,4 @@
-import { Table, Button, Space, Flex, Input } from "antd";
+import { Table, Button, Space, Flex, Input, Divider } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 
 const { Search } = Input;
@@ -25,29 +25,19 @@ const Role = () => {
 
   const columns = [
     {
-      title: "租户名称",
+      title: "角色名称",
       dataIndex: "name",
       key: "name",
     },
     {
-      title: "所属机构",
+      title: "角色编号",
       dataIndex: "hash",
       key: "hash",
     },
     {
-      title: "负责人",
+      title: "角色排序",
       dataIndex: "suffix",
       key: "suffix",
-    },
-    {
-      title: "联系方式",
-      dataIndex: "size",
-      key: "size",
-    },
-    {
-      title: "应用数",
-      dataIndex: "type",
-      key: "type",
     },
     {
       title: "状态",
@@ -55,14 +45,19 @@ const Role = () => {
       key: "status",
     },
     {
-      title: "到期时间",
-      dataIndex: "expire_at",
-      key: "expire_at",
-    },
-    {
       title: "操作",
       dataIndex: "action",
       key: "action",
+      render: (text) => (
+        <Space>
+          <span>菜单权限</span>
+          <Divider />
+          <span>数据权限</span>
+          <Divider />
+          <span>分配用户</span>
+          <Divider />
+        </Space>
+      ),
     },
   ];
   return (
@@ -75,7 +70,6 @@ const Role = () => {
       <Table
         dataSource={dataSource}
         columns={columns}
-        virtual
         pagination={{
           position: ["bottomCenter"],
           showSizeChanger: true,
