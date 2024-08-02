@@ -38,7 +38,6 @@ import { logoutService } from "@/service/index";
 import {
   isTauri,
   getCurrentYear,
-  findCurrentPathKey,
   findObjByKey,
   routes2menu,
 } from "@/utils/index";
@@ -163,7 +162,7 @@ const LayoutBase = () => {
     var linkPath = "";
     keyPaths.map((key, index) => {
       linkPath = `${BASE_URL}${linkPath}/${key}`.replace(/\/\/+/g, "/");
-      const { label } = findObjByKey(menus, key, "key");
+      const label = findObjByKey(menus, key, "key")?.label;
       let curentPath = linkPath;
       breads.push({
         title: <Link to={`${curentPath}`}>{label}</Link>,

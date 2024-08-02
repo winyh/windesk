@@ -76,7 +76,7 @@ const Admin = () => {
   return (
     <Flex vertical gap="middle">
       <Space size="middle">
-        <Button icon={<PlusOutlined />}>录入用户</Button>
+        <Button icon={<PlusOutlined />}>新增用户</Button>
         <Button danger>批量删除</Button>
         <Search placeholder="搜索用户" />
       </Space>

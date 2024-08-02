@@ -63,7 +63,7 @@ const Role = () => {
   return (
     <Flex vertical gap="middle">
       <Space size="middle">
-        <Button icon={<PlusOutlined />}>录入租户</Button>
+        <Button icon={<PlusOutlined />}>新增租户</Button>
         <Button danger>批量删除</Button>
         <Search placeholder="搜索租户" />
       </Space>

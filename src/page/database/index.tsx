@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   Col,
   Row,
@@ -8,40 +9,48 @@ import {
   Button,
   Dropdown,
   Table,
+  Segmented,
 } from "antd";
 import {
   PlusOutlined,
   MoreOutlined,
-  UserOutlined,
+  EditOutlined,
   CodeOutlined,
+  TableOutlined,
+  SendOutlined,
+  SettingOutlined,
+  DeleteOutlined,
 } from "@ant-design/icons";
+import useStore from "@/store/index";
+import WinCode from "@/component/Code";
 
 const { Search } = Input;
 
 const Database = () => {
+  const antdThemeMode = useStore((state) => state.themeMode);
+  const [mode, setMode] = useState("table");
+  const [themeMode, setThemeMode] = useState("dark");
   const data = ["user", "article", "role", "admin", "category"];
+
+  useEffect(() => {
+    setThemeMode(antdThemeMode);
+  }, [antdThemeMode]);
 
   const items = [
     {
       label: "修改",
       key: "1",
-      icon: <UserOutlined />,
+      icon: <EditOutlined />,
     },
     {
       label: "配置",
       key: "2",
-      icon: <UserOutlined />,
+      icon: <SettingOutlined />,
     },
     {
       label: "删除",
       key: "3",
-      icon: <UserOutlined />,
-      danger: true,
-    },
-    {
-      label: "禁用",
-      key: "4",
-      icon: <UserOutlined />,
+      icon: <DeleteOutlined />,
       danger: true,
       disabled: true,
     },
@@ -109,8 +118,16 @@ const Database = () => {
     },
   ];
 
+  const onModeChange = (value) => {
+    setMode(value);
+  };
+
+  const onCodeChange = (delta, content) => {
+    // console.log({ delta, content });
+  };
+
   return (
-    <Row gutter={24}>
+    <Row gutter={24} style={{ height: "100%" }}>
       <Col span={4}>
         <List
           header={<Search placeholder="搜索数据表" />}
@@ -140,30 +157,65 @@ const Database = () => {
         />
       </Col>
       <Col span={20}>
-        <Flex vertical gap="middle">
+        <Flex vertical gap="middle" style={{ height: "100%" }}>
           <Flex justify="space-between">
             <Space size="middle">
-              <Button icon={<CodeOutlined />}>SQL</Button>
-              <Button danger>批量删除</Button>
-              <Search placeholder="搜索数据" />
+              <Segmented
+                options={[
+                  {
+                    label: "Table",
+                    value: "table",
+                    icon: <TableOutlined />,
+                  },
+                  {
+                    label: "SQL",
+                    value: "sql",
+                    icon: <CodeOutlined />,
+                  },
+                ]}
+                value={mode}
+                onChange={onModeChange}
+              ></Segmented>
+              {mode === "table" ? (
+                <Space>
+                  <Button danger>批量删除</Button>
+                  <Search placeholder="搜索数据" />
+                </Space>
+              ) : null}
             </Space>
             <Space size="middle">
-              <Button>API / GraphQL</Button>
-              <Button icon={<PlusOutlined />}>新增记录</Button>
+              {mode === "table" ? (
+                <Space>
+                  <Button>API / GraphQL</Button>
+                  <Button icon={<PlusOutlined />}>新增记录</Button>
+                </Space>
+              ) : (
+                <Button icon={<SendOutlined />}>运行脚本</Button>
+              )}
             </Space>
           </Flex>
-          <Table
-            dataSource={dataSource}
-            columns={columns}
-            pagination={{
-              position: ["bottomCenter"],
-              showSizeChanger: true,
-              showQuickJumper: true,
-              onShowSizeChange: { onShowSizeChange },
-              defaultCurrent: 3,
-              total: 500,
-            }}
-          />
+          {mode === "table" ? (
+            <Table
+              dataSource={dataSource}
+              columns={columns}
+              pagination={{
+                position: ["bottomCenter"],
+                showSizeChanger: true,
+                showQuickJumper: true,
+                onShowSizeChange: { onShowSizeChange },
+                defaultCurrent: 3,
+                total: 500,
+              }}
+            />
+          ) : (
+            <WinCode
+              initialValue="SELECT * FROM users"
+              options={{ useWorker: false }}
+              mode="sql"
+              theme={themeMode}
+              onChange={onCodeChange}
+            />
+          )}
         </Flex>
       </Col>
     </Row>
