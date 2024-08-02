@@ -173,7 +173,7 @@ const LayoutBase = () => {
         },
       });
     });
-    console.log({ keyPaths });
+
     setOpenKeys(keyPaths); // 初始展开
     setSelectedKeys(keyPaths); // 更新左侧导航选中
     setBreadcrumbItems(breads); // 更新面包屑
