@@ -1,3 +1,7 @@
-.editing-area{
-    min-height: 500px;
+.winrich{
+    height: 100%;
+}
+
+.ql-container{
+    height: calc(100% - 42px);
 }

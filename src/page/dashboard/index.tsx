@@ -3,8 +3,6 @@ import { Button, Input, Space } from "antd";
 import { invoke } from "@tauri-apps/api/tauri";
 import { isTauri } from "@/utils/index";
 
-import WinRich from "@/component/Rich";
-
 const Dashboard = () => {
   const [greetMsg, setGreetMsg] = useState("");
   const [name, setName] = useState("");
@@ -19,7 +17,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div style={{ height: "100%" }}>
+    <div>
       <form
         className="row"
         onSubmit={(e) => {
@@ -38,8 +36,6 @@ const Dashboard = () => {
       </form>
 
       <p>{greetMsg}</p>
-
-      <WinRich />
     </div>
   );
 };

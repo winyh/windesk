@@ -48,6 +48,7 @@ const WinRich = ({ onChange }) => {
       value={value}
       onChange={onRichChange}
       modules={modules}
+      className="winrich"
     ></ReactQuill>
   );
 };

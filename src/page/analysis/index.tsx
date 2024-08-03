@@ -1,5 +1,7 @@
-const Analysis = () => {   
-    return <div>Analysis</div>
-}
+import WinRich from "@/component/Rich";
 
-export default Analysis
+const Analysis = () => {
+  return <WinRich />;
+};
+
+export default Analysis;
