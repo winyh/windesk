@@ -261,9 +261,6 @@ const Menu = () => {
         >
           <Flex vertical gap="middle">
             <Space size="middle" direction="vertical">
-              <Divider orientation="left" dashed>
-                基本设置
-              </Divider>
               <Row>
                 <Col span={4}>菜单类型：</Col>
                 <Col span={8}>

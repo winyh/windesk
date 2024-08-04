@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Table,
   Button,
@@ -20,11 +20,13 @@ import {
   KeyOutlined,
   VerifiedOutlined,
 } from "@ant-design/icons";
+import SuperForm from "@/component/SuperForm";
 import dayjs from "dayjs";
 
 const { Search } = Input;
 
 const Tenant = () => {
+  const formRef = useRef();
   const [dataSource, setDataSource] = useState([1]);
   const [open, setOpen] = useState(false);
   const [action, setAction] = useState(true);
@@ -45,6 +47,54 @@ const Tenant = () => {
     setOpen(false);
   };
 
+  const onFinish = (values) => {
+    formRef?.current?.form
+      .validateFields()
+      .then(async (values) => {})
+      .catch(() => {});
+  };
+
+  const onFinishFailed = (errorInfo) => {
+    console.log("Failed:", errorInfo);
+  };
+
+  const layout = {
+    labelCol: { span: 6 },
+    wrapperCol: { span: 18 },
+  };
+
+  const formData = [
+    {
+      label: "租户名称",
+      name: "name",
+      is: "Input",
+      itemSpan: 24,
+      placeholder: "请输入租户名称",
+    },
+    {
+      label: "负责人",
+      name: "code",
+      is: "Input",
+      itemSpan: 24,
+      placeholder: "请输入负责人",
+    },
+    {
+      label: "联系方式",
+      name: "description",
+      is: "Input",
+      itemSpan: 24,
+      placeholder: "请输入联系方式",
+    },
+    {
+      label: "状态",
+      name: "status",
+      itemSpan: 24,
+      placeholder: "请选择状态",
+      options: [],
+      is: "Select",
+    },
+  ];
+
   const showModal = () => {
     modal.confirm({
       title: "租户详情",
@@ -55,8 +105,9 @@ const Tenant = () => {
       width: "50%",
       content: (
         <div>
-          <p>some messages...some messages...</p>
-          <p>some messages...some messages...</p>
+          <p>Some contents...</p>
+          <p>Some contents...</p>
+          <p>Some contents...</p>
         </div>
       ),
       onOk() {
@@ -209,9 +260,16 @@ const Tenant = () => {
           </Flex>
         }
       >
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
+        <SuperForm
+          ref={formRef}
+          data={formData}
+          layout={layout}
+          limit={6}
+          rulesValid={false}
+          btnAction={false}
+          onFinish={onFinish}
+          onFinishFailed={onFinishFailed}
+        ></SuperForm>
       </Drawer>
     </>
   );

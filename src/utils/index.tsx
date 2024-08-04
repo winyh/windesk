@@ -56,10 +56,27 @@ const routes2menu = (routes) => {
   }, []);
 };
 
+/* 根据表单项目 label 计算按钮偏移量 */
+const computedWrapperCol = (labelCol) => {
+  const keys = Object.keys(labelCol);
+  let wrapperCol = {};
+  keys.map((key) => {
+    const offset = labelCol[key].span;
+    wrapperCol = {
+      ...wrapperCol,
+      [key]: {
+        offset,
+      },
+    };
+  });
+  return wrapperCol;
+};
+
 export {
   isTauri,
   getCurrentYear,
   findCurrentPathKey,
   findObjByKey,
   routes2menu,
+  computedWrapperCol,
 };
