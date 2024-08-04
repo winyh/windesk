@@ -161,7 +161,7 @@ const LayoutBase = () => {
     let breads: any[] = [];
     var linkPath = "";
     keyPaths.map((key, index) => {
-      linkPath = `${BASE_URL}${linkPath}/${key}`.replace(/\/\/+/g, "/");
+      linkPath = `${linkPath}/${key}`.replace(/\/\/+/g, "/");
       const label = findObjByKey(menus, key, "key")?.label;
       let curentPath = linkPath;
       breads.push({
@@ -239,17 +239,16 @@ const LayoutBase = () => {
     const pathReverse = keyPath.reverse();
     const path = pathReverse.join("/");
     setSelectedKeys(pathReverse);
-    navigate(`${BASE_URL}${path}`); // 处理路由跳转
+    navigate(`${path}`); // 处理路由跳转
   };
 
   const onOpenChange = (openKeys) => {
-    console.log({ openKeys });
     setOpenKeys(openKeys);
   };
 
   const goAgent = () => {
     console.log("AI 助手");
-    navigate(`${BASE_URL}agent`);
+    navigate(`/agent`);
   };
 
   return (

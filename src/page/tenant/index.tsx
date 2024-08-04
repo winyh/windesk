@@ -13,13 +13,7 @@ import {
   Popconfirm,
   App,
 } from "antd";
-import {
-  PlusOutlined,
-  EllipsisOutlined,
-  DeleteOutlined,
-  KeyOutlined,
-  VerifiedOutlined,
-} from "@ant-design/icons";
+import { PlusOutlined } from "@ant-design/icons";
 import SuperForm from "@/component/SuperForm";
 import dayjs from "dayjs";
 
@@ -27,35 +21,42 @@ const { Search } = Input;
 
 const Tenant = () => {
   const formRef = useRef();
-  const [dataSource, setDataSource] = useState([1]);
+  const [dataSource, setDataSource] = useState([
+    { id: 1, tenant_name: "唱响科技", leader: "常山" },
+  ]);
   const [open, setOpen] = useState(false);
   const [action, setAction] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
+  const [record, setRecord] = useState({});
   const [selectedRows, setSelectedRows] = useState([]);
   const { modal } = App.useApp();
+
+  const onSearch = (value) => {
+    console.log(value);
+  };
 
   const onShowSizeChange = (current, pageSize) => {
     console.log(current, pageSize);
   };
 
-  const showDrawer = (bool) => {
+  const showDrawer = (bool, record) => {
     setAction(bool);
     setOpen(true);
+    console.log({ record });
+    setRecord(record);
   };
   const onClose = () => {
     setOpen(false);
   };
 
-  const onFinish = (values) => {
+  const onFinish = () => {
     formRef?.current?.form
       .validateFields()
-      .then(async (values) => {})
+      .then(async (values) => {
+        console.log({ values });
+      })
       .catch(() => {});
-  };
-
-  const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
   };
 
   const layout = {
@@ -66,21 +67,21 @@ const Tenant = () => {
   const formData = [
     {
       label: "租户名称",
-      name: "name",
+      name: "tenant_name",
       is: "Input",
       itemSpan: 24,
       placeholder: "请输入租户名称",
     },
     {
       label: "负责人",
-      name: "code",
+      name: "leader",
       is: "Input",
       itemSpan: 24,
       placeholder: "请输入负责人",
     },
     {
       label: "联系方式",
-      name: "description",
+      name: "mobile",
       is: "Input",
       itemSpan: 24,
       placeholder: "请输入联系方式",
@@ -122,18 +123,18 @@ const Tenant = () => {
   const columns = [
     {
       title: "租户名称",
-      dataIndex: "name",
-      key: "name",
+      dataIndex: "tenant_name",
+      key: "tenant_name",
     },
     {
       title: "负责人",
-      dataIndex: "suffix",
-      key: "suffix",
+      dataIndex: "leader",
+      key: "leader",
     },
     {
       title: "联系方式",
-      dataIndex: "size",
-      key: "size",
+      dataIndex: "mobile",
+      key: "mobile",
     },
     {
       title: "应用数",
@@ -168,9 +169,13 @@ const Tenant = () => {
       title: "操作",
       dataIndex: "action",
       key: "action",
-      render: (text) => (
+      render: (text, record) => (
         <>
-          <Button type="text" size="small" onClick={() => showDrawer(false)}>
+          <Button
+            type="text"
+            size="small"
+            onClick={() => showDrawer(false, record)}
+          >
             编辑
           </Button>
           <Divider type="vertical" />
@@ -228,12 +233,17 @@ const Tenant = () => {
               <Button danger>批量删除</Button>
             </Popconfirm>
           ) : null}
-          <Search placeholder="搜索租户" loading={searchLoading} />
+          <Search
+            placeholder="搜索租户"
+            loading={searchLoading}
+            onSearch={onSearch}
+          />
         </Space>
         <Table
           rowSelection={{
             ...rowSelection,
           }}
+          rowKey={(record) => record.id}
           dataSource={dataSource}
           columns={columns}
           pagination={{
@@ -254,8 +264,10 @@ const Tenant = () => {
         footer={
           <Flex justify="flex-end">
             <Space>
-              <Button>取消</Button>
-              <Button type="primary">确认</Button>
+              <Button onClick={onClose}>取消</Button>
+              <Button type="primary" onClick={onFinish}>
+                确认
+              </Button>
             </Space>
           </Flex>
         }
@@ -265,10 +277,9 @@ const Tenant = () => {
           data={formData}
           layout={layout}
           limit={6}
+          initialValues={record}
           rulesValid={false}
           btnAction={false}
-          onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
         ></SuperForm>
       </Drawer>
     </>

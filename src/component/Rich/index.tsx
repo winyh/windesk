@@ -38,7 +38,7 @@ const WinRich = ({ onChange }) => {
   };
 
   useEffect(() => {
-    console.log(reactQuillRef.current);
+    // console.log(reactQuillRef.current);
   }, []);
 
   return (

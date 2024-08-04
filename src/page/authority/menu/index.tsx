@@ -16,6 +16,8 @@ import {
   Segmented,
   Switch,
   TreeSelect,
+  Drawer,
+  Collapse,
 } from "antd";
 
 import {
@@ -34,6 +36,14 @@ const Menu = () => {
   const [value, setValue] = useState();
   const [menuType, setMenuType] = useState("directory");
   const [externalLink, setExternalLink] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  const showDrawer = () => {
+    setOpen(true);
+  };
+  const onClose = () => {
+    setOpen(false);
+  };
 
   const data = ["user", "article", "role", "admin", "category"];
 
@@ -102,6 +112,102 @@ const Menu = () => {
         },
       ],
     },
+    {
+      title: "云函数",
+      key: "0-4",
+      children: [
+        {
+          title: "leaf 1-0",
+          key: "0-3-0",
+          isLeaf: true,
+        },
+        {
+          title: "leaf 1-1",
+          key: "0-3-1",
+          isLeaf: true,
+        },
+      ],
+    },
+    {
+      title: "文件存储",
+      key: "0-5",
+      children: [
+        {
+          title: "leaf 1-0",
+          key: "0-3-0",
+          isLeaf: true,
+        },
+        {
+          title: "leaf 1-1",
+          key: "0-3-1",
+          isLeaf: true,
+        },
+      ],
+    },
+    {
+      title: "AI助手",
+      key: "0-6",
+      children: [
+        {
+          title: "leaf 1-0",
+          key: "0-3-0",
+          isLeaf: true,
+        },
+        {
+          title: "leaf 1-1",
+          key: "0-3-1",
+          isLeaf: true,
+        },
+      ],
+    },
+    {
+      title: "分析监控",
+      key: "0-7",
+      children: [
+        {
+          title: "leaf 1-0",
+          key: "0-3-0",
+          isLeaf: true,
+        },
+        {
+          title: "leaf 1-1",
+          key: "0-3-1",
+          isLeaf: true,
+        },
+      ],
+    },
+    {
+      title: "权限管理",
+      key: "0-8",
+      children: [
+        {
+          title: "leaf 1-0",
+          key: "0-3-0",
+          isLeaf: true,
+        },
+        {
+          title: "leaf 1-1",
+          key: "0-3-1",
+          isLeaf: true,
+        },
+      ],
+    },
+    {
+      title: "系统配置",
+      key: "0-9",
+      children: [
+        {
+          title: "leaf 1-0",
+          key: "0-3-0",
+          isLeaf: true,
+        },
+        {
+          title: "leaf 1-1",
+          key: "0-3-1",
+          isLeaf: true,
+        },
+      ],
+    },
   ];
 
   const items = [
@@ -127,6 +233,114 @@ const Menu = () => {
       icon: <UserOutlined />,
       danger: true,
       disabled: true,
+    },
+  ];
+
+  const text = (
+    <p
+      style={{
+        paddingLeft: 24,
+      }}
+    >
+      A dog is a type of domesticated animal. Known for its loyalty and
+      faithfulness, it can be found as a welcome guest in many households across
+      the world.
+    </p>
+  );
+
+  const collapseItems = [
+    {
+      key: "1",
+      label: "菜单类型",
+      children: text,
+    },
+    {
+      key: "2",
+      label: "上级目录",
+      children: text,
+    },
+    {
+      key: "3",
+      label: "目录名称",
+      children: text,
+    },
+    {
+      key: "4",
+      label: "目录图标",
+      children: text,
+    },
+    {
+      key: "33",
+      label: "权限标识",
+      children: text,
+    },
+    {
+      key: "44",
+      label: "权限名称",
+      children: text,
+    },
+    {
+      key: "5",
+      label: "路由地址",
+      children: text,
+    },
+    {
+      key: "6",
+      label: "路由名称",
+      children: text,
+    },
+    {
+      key: "7",
+      label: "默认路由",
+      children: text,
+    },
+    {
+      key: "8",
+      label: "路由参数",
+      children: text,
+    },
+    {
+      key: "9",
+      label: "组件路径",
+      children: text,
+    },
+    {
+      key: "10",
+      label: "显示排序",
+      children: text,
+    },
+  ];
+
+  const collapseFnItems = [
+    {
+      key: "61",
+      label: "根路由",
+      children: text,
+    },
+    {
+      key: "71",
+      label: "目录状态",
+      children: text,
+    },
+    {
+      key: "81",
+      label: "显示状态",
+      children: text,
+    },
+    {
+      key: "91",
+      label: "是否缓存",
+      children: text,
+    },
+    {
+      key: "101",
+      label: "简化路由",
+      children: text,
+    },
+    {
+      key: "11",
+      label: "按钮状态",
+      children: text,
     },
   ];
 
@@ -225,7 +439,7 @@ const Menu = () => {
 
   return (
     <Row gutter={24}>
-      <Col span={4}>
+      <Col span={6}>
         <Card
           title={
             <Space>
@@ -245,16 +459,22 @@ const Menu = () => {
           />
         </Card>
       </Col>
-      <Col span={20}>
+      <Col span={18}>
         <Card
           title={
             <Flex justify="space-between">
               <Space size="middle">
                 <Button type="primary">保存修改</Button>
-                <Button danger>删除目录/菜单/按钮</Button>
+                <Button danger>
+                  删除{menuType === "directory" ? "目录" : ""}
+                  {menuType === "menu" ? "菜单" : ""}
+                  {menuType === "button" ? "按钮" : ""}
+                </Button>
               </Space>
               <Space size="middle">
-                <Button icon={<ExceptionOutlined />}>字段注释</Button>
+                <Button icon={<ExceptionOutlined />} onClick={showDrawer}>
+                  字段注释
+                </Button>
               </Space>
             </Flex>
           }
@@ -515,6 +735,21 @@ const Menu = () => {
               ) : null}
             </Space>
           </Flex>
+          <Drawer title="字段注释" onClose={onClose} open={open}>
+            <Collapse
+              items={collapseItems}
+              bordered={false}
+              defaultActiveKey={["1"]}
+            />
+            <Divider orientation="left" dashed>
+              功能设置
+            </Divider>
+            <Collapse
+              items={collapseFnItems}
+              bordered={false}
+              defaultActiveKey={["1"]}
+            />
+          </Drawer>
         </Card>
       </Col>
     </Row>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Table,
   Button,
@@ -9,25 +9,59 @@ import {
   Tag,
   Badge,
   Dropdown,
+  Drawer,
+  Popconfirm,
+  App,
 } from "antd";
 import {
   PlusOutlined,
   EllipsisOutlined,
   DeleteOutlined,
   KeyOutlined,
-  VerifiedOutlined,
 } from "@ant-design/icons";
+import SuperForm from "@/component/SuperForm";
 import dayjs from "dayjs";
 
 const { Search } = Input;
 
 const Admin = () => {
-  const [dataSource, setDataSource] = useState([1]);
+  const formRef = useRef();
+  const [dataSource, setDataSource] = useState([
+    { id: 1, username: "唱响科技", leader: "常山" },
+  ]);
+  const [open, setOpen] = useState(false);
+  const [action, setAction] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
+  const [record, setRecord] = useState({});
   const [selectedRows, setSelectedRows] = useState([]);
+  const { modal } = App.useApp();
+
+  const onSearch = (value) => {
+    console.log(value);
+  };
 
   const onShowSizeChange = (current, pageSize) => {
     console.log(current, pageSize);
+  };
+
+  const showDrawer = (bool, record) => {
+    setAction(bool);
+    setOpen(true);
+    console.log({ record });
+    setRecord(record);
+  };
+  const onClose = () => {
+    setOpen(false);
+  };
+
+  const onFinish = () => {
+    formRef?.current?.form
+      .validateFields()
+      .then(async (values) => {
+        console.log({ values });
+      })
+      .catch(() => {});
   };
 
   const menuItems = [
@@ -38,11 +72,6 @@ const Admin = () => {
       disabled: true,
     },
     {
-      label: "分配角色",
-      key: "2",
-      icon: <VerifiedOutlined />,
-    },
-    {
       label: "删除账户",
       key: "delete",
       icon: <DeleteOutlined />,
@@ -50,33 +79,132 @@ const Admin = () => {
     },
   ];
 
+  const layout = {
+    labelCol: { span: 6 },
+    wrapperCol: { span: 18 },
+  };
+
+  const formData = [
+    {
+      label: "账户名称",
+      name: "username",
+      is: "Input",
+      itemSpan: 24,
+      placeholder: "请输入账户名称",
+    },
+    {
+      label: "用户昵称",
+      name: "nick_name",
+      is: "Input",
+      itemSpan: 24,
+      placeholder: "请输入用户昵称",
+    },
+    {
+      label: "联系方式",
+      name: "mobile",
+      is: "Input",
+      itemSpan: 24,
+      placeholder: "请输入联系方式",
+    },
+    {
+      label: "邮箱",
+      name: "email",
+      is: "Input",
+      itemSpan: 24,
+      placeholder: "请输入邮箱",
+    },
+    {
+      label: "组织部门",
+      name: "organization",
+      is: "Input",
+      itemSpan: 24,
+      placeholder: "请输入组织部门",
+    },
+    {
+      label: "岗位",
+      name: "position",
+      is: "Input",
+      itemSpan: 24,
+      placeholder: "请输入岗位",
+    },
+    {
+      label: "角色",
+      name: "role",
+      is: "Input",
+      itemSpan: 24,
+      placeholder: "请输入角色",
+    },
+    {
+      label: "状态",
+      name: "status",
+      itemSpan: 24,
+      placeholder: "请选择状态",
+      options: [],
+      is: "Select",
+    },
+  ];
+
+  const showModal = () => {
+    modal.confirm({
+      title: "用户详情",
+      closable: true,
+      maskClosable: true,
+      icon: <span></span>,
+      open: isModalOpen,
+      width: "50%",
+      content: (
+        <div>
+          <p>Some contents...</p>
+          <p>Some contents...</p>
+          <p>Some contents...</p>
+        </div>
+      ),
+      onOk() {
+        setIsModalOpen(false);
+      },
+      onCancel() {
+        setIsModalOpen(false);
+      },
+    });
+  };
+
   const columns = [
     {
-      title: "用户名称",
-      dataIndex: "name",
-      key: "name",
+      title: "账户名称",
+      dataIndex: "username",
+      key: "username",
     },
     {
-      title: "组织部门",
-      dataIndex: "hash",
-      key: "hash",
-    },
-    {
-      title: "岗位",
-      dataIndex: "suffix",
-      key: "suffix",
+      title: "用户昵称",
+      dataIndex: "nick_name",
+      key: "nick_name",
     },
     {
       title: "联系方式",
-      dataIndex: "size",
-      key: "size",
+      dataIndex: "mobile",
+      key: "mobile",
+    },
+    {
+      title: "邮箱",
+      dataIndex: "email",
+      key: "email",
+    },
+    {
+      title: "组织部门",
+      dataIndex: "organization",
+      key: "organization",
+    },
+    {
+      title: "岗位",
+      dataIndex: "position",
+      key: "position",
     },
     {
       title: "角色",
-      dataIndex: "type",
-      key: "type",
+      dataIndex: "role",
+      key: "role",
       render: () => {
-        return <Tag color="green">222</Tag>;
+        return <Tag color="green">管理员</Tag>;
       },
     },
     {
@@ -88,9 +216,9 @@ const Admin = () => {
       },
     },
     {
-      title: "到期时间",
-      dataIndex: "expire_at",
-      key: "expire_at",
+      title: "注册时间",
+      dataIndex: "created_at",
+      key: "created_at",
       render: () => {
         return <span>{dayjs().format("YYYY-MM-DD HH:mm:ss")}</span>;
       },
@@ -101,11 +229,15 @@ const Admin = () => {
       key: "action",
       render: (text) => (
         <>
-          <Button type="text" size="small">
+          <Button
+            type="text"
+            size="small"
+            onClick={() => showDrawer(false, record)}
+          >
             编辑
           </Button>
           <Divider type="vertical" />
-          <Button type="text" size="small">
+          <Button type="text" size="small" onClick={showModal}>
             详情
           </Button>
           <Divider type="vertical" />
@@ -139,29 +271,78 @@ const Admin = () => {
     }),
   };
 
+  const onConfirm = () => {};
+
+  const onCancel = () => {};
+
   return (
-    <Flex vertical gap="middle">
-      <Space size="middle">
-        <Button icon={<PlusOutlined />}>新增用户</Button>
-        {selectedRows.length > 0 ? <Button danger>批量删除</Button> : null}
-        <Search placeholder="搜索用户" loading={searchLoading} />
-      </Space>
-      <Table
-        rowSelection={{
-          ...rowSelection,
-        }}
-        dataSource={dataSource}
-        columns={columns}
-        pagination={{
-          position: ["bottomCenter"],
-          showSizeChanger: true,
-          showQuickJumper: true,
-          onShowSizeChange: { onShowSizeChange },
-          defaultCurrent: 3,
-          total: 500,
-        }}
-      />
-    </Flex>
+    <>
+      <Flex vertical gap="middle">
+        <Space size="middle">
+          <Button icon={<PlusOutlined />} onClick={() => showDrawer(true)}>
+            新增用户
+          </Button>
+          {selectedRows.length > 0 ? (
+            <Popconfirm
+              title="系统提醒"
+              description="您确认要删除用户吗?"
+              onConfirm={onConfirm}
+              onCancel={onCancel}
+              okText="确认"
+              cancelText="取消"
+            >
+              <Button danger>批量删除</Button>
+            </Popconfirm>
+          ) : null}
+          <Search
+            placeholder="搜索用户"
+            loading={searchLoading}
+            onSearch={onSearch}
+          />
+        </Space>
+        <Table
+          rowSelection={{
+            ...rowSelection,
+          }}
+          rowKey={(record) => record.id}
+          dataSource={dataSource}
+          columns={columns}
+          pagination={{
+            position: ["bottomCenter"],
+            showSizeChanger: true,
+            showQuickJumper: true,
+            onShowSizeChange: { onShowSizeChange },
+            defaultCurrent: 3,
+            total: 500,
+          }}
+        />
+      </Flex>
+
+      <Drawer
+        title={`${action ? "新增" : "编辑"}用户`}
+        onClose={onClose}
+        open={open}
+        footer={
+          <Flex justify="flex-end">
+            <Space>
+              <Button onClick={onClose}>取消</Button>
+              <Button type="primary" onClick={onFinish}>
+                确认
+              </Button>
+            </Space>
+          </Flex>
+        }
+      >
+        <SuperForm
+          ref={formRef}
+          data={formData}
+          layout={layout}
+          initialValues={record}
+          rulesValid={false}
+          btnAction={false}
+        ></SuperForm>
+      </Drawer>
+    </>
   );
 };
 
