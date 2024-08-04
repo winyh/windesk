@@ -1,15 +1,22 @@
 import { useEffect, useState } from "react";
 import { RouterProvider } from "react-router-dom";
-import { ConfigProvider, App as AntApp, theme as config } from "antd";
+import {
+  ConfigProvider,
+  App as AntApp,
+  theme as config,
+  Watermark,
+} from "antd";
 import useStore from "@/store/index";
 import "dayjs/locale/zh-cn";
 import zhCN from "antd/locale/zh_CN";
 import themeToken from "@/config/theme";
 import router from "@/routes/index";
 import "./App.css";
+import customConfig from "@/config/config.json";
 
 function App() {
   const [theme, setTheme] = useState(themeToken);
+  const [watermark, setWatermark] = useState({});
   const themeMode = useStore((state) => state.themeMode);
 
   useEffect(() => {
@@ -21,11 +28,22 @@ function App() {
     });
   }, [themeMode]);
 
+  useEffect(() => {
+    setWatermark(customConfig.watermark);
+  }, [customConfig]);
+
   return (
     <ConfigProvider locale={zhCN} theme={theme}>
-      <AntApp>
-        <RouterProvider router={router}></RouterProvider>
-      </AntApp>
+      <Watermark
+        content={watermark.content}
+        height={watermark.height}
+        width={watermark.width}
+        image={watermark.image}
+      >
+        <AntApp>
+          <RouterProvider router={router}></RouterProvider>
+        </AntApp>
+      </Watermark>
     </ConfigProvider>
   );
 }

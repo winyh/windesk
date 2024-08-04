@@ -21,6 +21,7 @@ import {
   Input,
   Segmented,
   Tooltip,
+  Badge,
 } from "antd";
 
 const { Search } = Input;
@@ -112,26 +113,29 @@ const Application = () => {
           <Search placeholder="搜索应用名称" />
         </Space>
         <Flex gap="middle" align="start" wrap>
-          <Card
-            title="应用A"
-            loading={loading}
-            actions={actions}
-            style={{
-              minWidth: 300,
-            }}
-          >
-            <Card.Meta
-              avatar={
-                <Avatar src="https://api.dicebear.com/7.x/miniavs/svg?seed=1" />
-              }
-              description={
-                <>
-                  <p>This is the description</p>
-                  <p>This is the description</p>
-                </>
-              }
-            />
-          </Card>
+          <Badge.Ribbon text="默认">
+            <Card
+              title="应用A"
+              loading={loading}
+              actions={actions}
+              style={{
+                minWidth: 300,
+              }}
+            >
+              <Card.Meta
+                avatar={
+                  <Avatar src="https://api.dicebear.com/7.x/miniavs/svg?seed=1" />
+                }
+                description={
+                  <>
+                    <p>This is the description</p>
+                    <p>This is the description</p>
+                  </>
+                }
+              />
+            </Card>
+          </Badge.Ribbon>
+
           <Card
             title="应用B"
             loading={loading}
