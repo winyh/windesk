@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   Col,
   Row,
@@ -11,6 +11,7 @@ import {
   Table,
   Segmented,
   Popconfirm,
+  Drawer,
 } from "antd";
 import {
   PlusOutlined,
@@ -23,26 +24,52 @@ import {
   DeleteOutlined,
 } from "@ant-design/icons";
 import useStore from "@/store/index";
+import SuperForm from "@/component/SuperForm";
 import WinCode from "@/component/Code";
 
 const { Search } = Input;
 
 const Database = () => {
+  const formRef = useRef();
   const antdThemeMode = useStore((state) => state.themeMode);
   const [mode, setMode] = useState("table");
   const [selectedRows, setSelectedRows] = useState([]);
   const [themeMode, setThemeMode] = useState();
+  const [open, setOpen] = useState(false);
+  const [action, setAction] = useState(true);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [record, setRecord] = useState({});
   const data = ["user", "article", "role", "admin", "category"];
 
   useEffect(() => {
     setThemeMode(antdThemeMode);
   }, [antdThemeMode]);
 
+  const showDrawer = (bool, record) => {
+    setAction(bool);
+    setOpen(true);
+    console.log({ record });
+    setRecord(record);
+  };
+  const onClose = () => {
+    setOpen(false);
+  };
+
+  const onFinish = () => {
+    formRef?.current?.form
+      .validateFields()
+      .then(async (values) => {
+        console.log({ values });
+      })
+      .catch(() => {});
+  };
+
   const items = [
     {
       label: "修改",
       key: "1",
       icon: <EditOutlined />,
+      onClick: () => showDrawer(false, {}),
     },
     {
       label: "配置",
@@ -71,6 +98,28 @@ const Database = () => {
   const onShowSizeChange = (current, pageSize) => {
     console.log(current, pageSize);
   };
+
+  const layout = {
+    labelCol: { span: 6 },
+    wrapperCol: { span: 18 },
+  };
+
+  const formData = [
+    {
+      label: "数据表名称",
+      name: "table_name",
+      is: "Input",
+      itemSpan: 24,
+      placeholder: "请输入数据表名称",
+    },
+    {
+      label: "数据表描述",
+      name: "description",
+      is: "Input.TextArea",
+      itemSpan: 24,
+      placeholder: "请输入数据表描述",
+    },
+  ];
 
   const dataSource = [
     {
@@ -146,9 +195,14 @@ const Database = () => {
     <Row gutter={24} style={{ height: "100%" }}>
       <Col span={4}>
         <List
-          header={<Search placeholder="搜索数据表" />}
+          header={<Search placeholder="搜索数据表" loading={searchLoading} />}
           footer={
-            <Button type="text" block icon={<PlusOutlined />}>
+            <Button
+              type="text"
+              block
+              icon={<PlusOutlined />}
+              onClick={() => showDrawer(true)}
+            >
               新增数据表
             </Button>
           }
@@ -197,7 +251,7 @@ const Database = () => {
                   {selectedRows.length > 0 ? (
                     <Popconfirm
                       title="系统提醒"
-                      description="您确认要删除租户吗?"
+                      description="您确认要删除数据表吗?"
                       onConfirm={onConfirm}
                       onCancel={onCancel}
                       okText="确认"
@@ -249,6 +303,31 @@ const Database = () => {
           )}
         </Flex>
       </Col>
+      <Drawer
+        title={`${action ? "新增" : "编辑"}数据表`}
+        onClose={onClose}
+        open={open}
+        footer={
+          <Flex justify="flex-end">
+            <Space>
+              <Button onClick={onClose}>取消</Button>
+              <Button type="primary" onClick={onFinish}>
+                确认
+              </Button>
+            </Space>
+          </Flex>
+        }
+      >
+        <SuperForm
+          ref={formRef}
+          data={formData}
+          layout={layout}
+          limit={6}
+          initialValues={record}
+          rulesValid={false}
+          btnAction={false}
+        ></SuperForm>
+      </Drawer>
     </Row>
   );
 };

@@ -412,7 +412,7 @@ const Storage = () => {
         rowSelection={{
           ...rowSelection,
         }}
-        rowKey={(record) => record.id}
+        rowKey={(record) => record.key}
         dataSource={dataSource}
         columns={columns}
         pagination={{

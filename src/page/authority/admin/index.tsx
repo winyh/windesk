@@ -12,12 +12,16 @@ import {
   Drawer,
   Popconfirm,
   App,
+  Alert,
+  Typography,
 } from "antd";
+const { Paragraph, Text } = Typography;
 import {
   PlusOutlined,
   EllipsisOutlined,
   DeleteOutlined,
   KeyOutlined,
+  ReloadOutlined,
 } from "@ant-design/icons";
 import SuperForm from "@/component/SuperForm";
 import dayjs from "dayjs";
@@ -26,10 +30,13 @@ const { Search } = Input;
 
 const Admin = () => {
   const formRef = useRef();
+  const formPwdRef = useRef();
   const [dataSource, setDataSource] = useState([
     { id: 1, username: "唱响科技", leader: "常山" },
   ]);
   const [open, setOpen] = useState(false);
+  const [resetOpen, setResetOpen] = useState(false);
+  const [pwdOpen, setPwdOpen] = useState(false);
   const [action, setAction] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
@@ -64,12 +71,69 @@ const Admin = () => {
       .catch(() => {});
   };
 
+  const showPwdDrawer = (bool) => {
+    setPwdOpen(true);
+  };
+
+  const onPwdClose = () => {
+    setPwdOpen(false);
+  };
+
+  const onPwdFinish = () => {
+    formPwdRef?.current?.form
+      .validateFields()
+      .then(async (values) => {
+        console.log({ values });
+      })
+      .catch(() => {});
+  };
+
+  const onConfirmReset = () => {
+    modal.success({
+      title: "重置密码成功",
+      icon: <span></span>,
+      content: (
+        <Flex gap={24} vertical justify="center" style={{ height: 120 }}>
+          <Text type="warning">新密码只显示一次，请牢记新密码</Text>
+          <Alert
+            message="Success Tips"
+            type="success"
+            showIcon
+            action={<Text copyable={{ text: "26888888" }} />}
+          />
+        </Flex>
+      ),
+      okText: "确认",
+    });
+  };
+
   const menuItems = [
     {
-      label: "重置密码",
+      label: "修改密码",
       key: "1",
       icon: <KeyOutlined />,
-      disabled: true,
+      onClick: showPwdDrawer,
+    },
+    {
+      label: (
+        <Popconfirm
+          title="系统提醒"
+          description="您确认要重置密码?"
+          onConfirm={onConfirmReset}
+        >
+          重置密码
+        </Popconfirm>
+      ),
+      key: "2",
+      icon: (
+        <Popconfirm
+          title="系统提醒"
+          description="您确认要重置密码?"
+          onConfirm={onConfirmReset}
+        >
+          <ReloadOutlined />
+        </Popconfirm>
+      ),
     },
     {
       label: "删除账户",
@@ -141,6 +205,30 @@ const Admin = () => {
       placeholder: "请选择状态",
       options: [],
       is: "Select",
+    },
+  ];
+
+  const formPwdData = [
+    {
+      label: "原密码",
+      name: "password",
+      is: "Input.Password",
+      itemSpan: 24,
+      placeholder: "请输入原密码",
+    },
+    {
+      label: "新密码",
+      name: "new_password",
+      is: "Input.Password",
+      itemSpan: 24,
+      placeholder: "请输入新密码",
+    },
+    {
+      label: "确认密码",
+      name: "confirm_password",
+      is: "Input.Password",
+      itemSpan: 24,
+      placeholder: "请确认密码",
     },
   ];
 
@@ -339,6 +427,29 @@ const Admin = () => {
           layout={layout}
           initialValues={record}
           rulesValid={false}
+          btnAction={false}
+        ></SuperForm>
+      </Drawer>
+
+      <Drawer
+        title="修改密码"
+        onClose={onPwdClose}
+        open={pwdOpen}
+        footer={
+          <Flex justify="flex-end">
+            <Space>
+              <Button onClick={onPwdClose}>取消</Button>
+              <Button type="primary" onClick={onPwdFinish}>
+                确认
+              </Button>
+            </Space>
+          </Flex>
+        }
+      >
+        <SuperForm
+          ref={formPwdRef}
+          data={formPwdData}
+          layout={layout}
           btnAction={false}
         ></SuperForm>
       </Drawer>

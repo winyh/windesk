@@ -160,6 +160,13 @@ const Application = () => {
       placeholder: "请输入应用描述",
     },
     {
+      label: "应用域名",
+      name: "domain",
+      is: "Input",
+      itemSpan: 24,
+      placeholder: "请输入自定义域名",
+    },
+    {
       label: "数据库源",
       name: "database",
       is: "Select",
@@ -281,7 +288,7 @@ const Application = () => {
 
   setTimeout(() => {
     setLoading(false);
-  }, 1000);
+  }, 500);
 
   const showModal = () => {
     modal.confirm({
