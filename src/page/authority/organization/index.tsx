@@ -31,7 +31,6 @@ const Organization = () => {
   ]);
   const [open, setOpen] = useState(false);
   const [action, setAction] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
   const [record, setRecord] = useState({});
   const [selectedRows, setSelectedRows] = useState([]);
@@ -129,30 +128,6 @@ const Organization = () => {
     },
   ];
 
-  const showModal = () => {
-    modal.confirm({
-      title: "组织详情",
-      closable: true,
-      maskClosable: true,
-      icon: <span></span>,
-      open: isModalOpen,
-      width: "50%",
-      content: (
-        <div>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-        </div>
-      ),
-      onOk() {
-        setIsModalOpen(false);
-      },
-      onCancel() {
-        setIsModalOpen(false);
-      },
-    });
-  };
-
   const columns = [
     {
       title: "组织名称",
@@ -219,7 +194,11 @@ const Organization = () => {
             编辑
           </Button>
           <Divider type="vertical" />
-          <Button type="text" size="small" onClick={showModal}>
+          <Button
+            type="text"
+            size="small"
+            onClick={() => showDrawer(false, record)}
+          >
             新增子组织
           </Button>
           <Divider type="vertical" />

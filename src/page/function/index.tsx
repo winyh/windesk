@@ -22,7 +22,13 @@ const Function = () => {
     setThemeMode(antdThemeMode);
   }, [antdThemeMode]);
 
-  const data = ["user", "article", "role", "admin", "category"];
+  const data = [
+    "getUserList",
+    "refreshToken",
+    "findRole",
+    "adminFnCall",
+    "categoryList",
+  ];
 
   const items = [
     {

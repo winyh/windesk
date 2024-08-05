@@ -171,10 +171,6 @@ const Position = () => {
             编辑
           </Button>
           <Divider type="vertical" />
-          <Button type="text" size="small" onClick={showModal}>
-            详情
-          </Button>
-          <Divider type="vertical" />
           <Popconfirm
             title="系统提醒"
             description="您确认要删除岗位吗?"

@@ -8,7 +8,7 @@ import {
   Divider,
   Tag,
   Badge,
-  Dropdown,
+  Tree,
   Drawer,
   Popconfirm,
   App,
@@ -24,6 +24,7 @@ import SuperForm from "@/component/SuperForm";
 import dayjs from "dayjs";
 
 const { Search } = Input;
+const { DirectoryTree } = Tree;
 
 const Role = () => {
   const formRef = useRef();
@@ -75,13 +76,16 @@ const Role = () => {
       label: "分配用户",
       key: "1",
       icon: <UserAddOutlined />,
-      disabled: true,
+      onClick: () => {
+        showModal();
+      },
     },
     {
       label: "删除角色",
       key: "delete",
       icon: <DeleteOutlined />,
       danger: true,
+      disabled: true,
     },
   ];
 
@@ -89,6 +93,176 @@ const Role = () => {
     labelCol: { span: 6 },
     wrapperCol: { span: 18 },
   };
+
+  const onSelect = (keys, info) => {
+    console.log("Trigger Select", keys, info);
+  };
+  const onExpand = (keys, info) => {
+    console.log("Trigger Expand", keys, info);
+  };
+
+  const treeData = [
+    {
+      title: "控制台",
+      key: "0-0",
+      children: [
+        {
+          title: "leaf 0-0",
+          key: "0-0-0",
+          isLeaf: true,
+        },
+        {
+          title: "leaf 0-1",
+          key: "0-0-1",
+          isLeaf: true,
+        },
+      ],
+    },
+    {
+      title: "租户管理",
+      key: "0-1",
+      children: [
+        {
+          title: "leaf 1-0",
+          key: "0-1-0",
+          isLeaf: true,
+        },
+        {
+          title: "leaf 1-1",
+          key: "0-1-1",
+          isLeaf: true,
+        },
+      ],
+    },
+    {
+      title: "应用管理",
+      key: "0-2",
+      children: [
+        {
+          title: "leaf 1-0",
+          key: "0-2-0",
+          isLeaf: true,
+        },
+        {
+          title: "leaf 1-1",
+          key: "0-2-1",
+          isLeaf: true,
+        },
+      ],
+    },
+    {
+      title: "数据库",
+      key: "0-3",
+      children: [
+        {
+          title: "leaf 1-0",
+          key: "0-3-0",
+          isLeaf: true,
+        },
+        {
+          title: "leaf 1-1",
+          key: "0-3-1",
+          isLeaf: true,
+        },
+      ],
+    },
+    {
+      title: "云函数",
+      key: "0-4",
+      children: [
+        {
+          title: "leaf 1-0",
+          key: "0-3-0",
+          isLeaf: true,
+        },
+        {
+          title: "leaf 1-1",
+          key: "0-3-1",
+          isLeaf: true,
+        },
+      ],
+    },
+    {
+      title: "文件存储",
+      key: "0-5",
+      children: [
+        {
+          title: "leaf 1-0",
+          key: "0-3-0",
+          isLeaf: true,
+        },
+        {
+          title: "leaf 1-1",
+          key: "0-3-1",
+          isLeaf: true,
+        },
+      ],
+    },
+    {
+      title: "AI助手",
+      key: "0-6",
+      children: [
+        {
+          title: "leaf 1-0",
+          key: "0-3-0",
+          isLeaf: true,
+        },
+        {
+          title: "leaf 1-1",
+          key: "0-3-1",
+          isLeaf: true,
+        },
+      ],
+    },
+    {
+      title: "分析监控",
+      key: "0-7",
+      children: [
+        {
+          title: "leaf 1-0",
+          key: "0-3-0",
+          isLeaf: true,
+        },
+        {
+          title: "leaf 1-1",
+          key: "0-3-1",
+          isLeaf: true,
+        },
+      ],
+    },
+    {
+      title: "权限管理",
+      key: "0-8",
+      children: [
+        {
+          title: "leaf 1-0",
+          key: "0-3-0",
+          isLeaf: true,
+        },
+        {
+          title: "leaf 1-1",
+          key: "0-3-1",
+          isLeaf: true,
+        },
+      ],
+    },
+    {
+      title: "系统配置",
+      key: "0-9",
+      children: [
+        {
+          title: "leaf 1-0",
+          key: "0-3-0",
+          isLeaf: true,
+        },
+        {
+          title: "leaf 1-1",
+          key: "0-3-1",
+          isLeaf: true,
+        },
+      ],
+    },
+  ];
 
   const formData = [
     {
@@ -120,11 +294,22 @@ const Role = () => {
       options: [],
       is: "Select",
     },
+    {
+      label: "分配权限",
+      name: "auth",
+      itemSpan: 24,
+      is: "Tree.DirectoryTree",
+      multiple: true,
+      defaultExpandAll: true,
+      treeData: treeData,
+      onSelect: onSelect,
+      onExpand: onExpand,
+    },
   ];
 
   const showModal = () => {
     modal.confirm({
-      title: "角色详情",
+      title: "用户列表",
       closable: true,
       maskClosable: true,
       icon: <span></span>,
@@ -185,24 +370,22 @@ const Role = () => {
           </Button>
           <Divider type="vertical" />
           <Button type="text" size="small" onClick={showModal}>
-            分配权限
+            分配用户
           </Button>
           <Divider type="vertical" />
 
-          <Dropdown
-            menu={{
-              items: menuItems,
-            }}
+          <Popconfirm
+            title="系统提醒"
+            description="您确认要删除岗位吗?"
+            onConfirm={onConfirm}
+            onCancel={onCancel}
+            okText="确认"
+            cancelText="取消"
           >
-            <Button
-              type="text"
-              size="small"
-              iconPosition="end"
-              icon={<EllipsisOutlined />}
-            >
-              更多
+            <Button type="text" size="small" danger>
+              删除
             </Button>
-          </Dropdown>
+          </Popconfirm>
         </>
       ),
     },

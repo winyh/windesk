@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from "react";
 import {
   Col,
   Row,
@@ -9,12 +10,15 @@ import {
   Dropdown,
   Table,
   Tag,
+  Popconfirm,
 } from "antd";
 import { PlusOutlined, MoreOutlined, UserOutlined } from "@ant-design/icons";
 
 const { Search } = Input;
 
 const Dictionary = () => {
+  const [selectedRows, setSelectedRows] = useState([]);
+
   const data = ["用户性别", "订单状态", "租户状态", "云存储", "数据库"];
 
   const items = [
@@ -110,6 +114,20 @@ const Dictionary = () => {
     },
   ];
 
+  const rowSelection = {
+    onChange: (selectedRowKeys, selectedRows) => {
+      setSelectedRows(selectedRows);
+    },
+    getCheckboxProps: (record) => ({
+      disabled: record.name === "Disabled User",
+      name: record.name,
+    }),
+  };
+
+  const onConfirm = () => {};
+
+  const onCancel = () => {};
+
   return (
     <Row gutter={24}>
       <Col span={6}>
@@ -147,10 +165,25 @@ const Dictionary = () => {
         <Flex vertical gap="middle">
           <Space size="middle">
             <Button icon={<PlusOutlined />}>新增字典项</Button>
-            <Button danger>批量删除</Button>
+            {selectedRows.length > 0 ? (
+              <Popconfirm
+                title="系统提醒"
+                description="您确认要删除租户吗?"
+                onConfirm={onConfirm}
+                onCancel={onCancel}
+                okText="确认"
+                cancelText="取消"
+              >
+                <Button danger>批量删除</Button>
+              </Popconfirm>
+            ) : null}
             <Search placeholder="搜索字典项名称" />
           </Space>
           <Table
+            rowSelection={{
+              ...rowSelection,
+            }}
+            rowKey={(record) => record.id}
             dataSource={dataSource}
             columns={columns}
             pagination={{

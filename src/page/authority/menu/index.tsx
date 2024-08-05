@@ -464,7 +464,7 @@ const Menu = () => {
           title={
             <Flex justify="space-between">
               <Space size="middle">
-                <Button type="primary">保存修改</Button>
+                <Button type="primary">保存菜单</Button>
                 <Button danger>
                   删除{menuType === "directory" ? "目录" : ""}
                   {menuType === "menu" ? "菜单" : ""}

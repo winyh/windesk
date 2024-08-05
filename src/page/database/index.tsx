@@ -10,6 +10,7 @@ import {
   Dropdown,
   Table,
   Segmented,
+  Popconfirm,
 } from "antd";
 import {
   PlusOutlined,
@@ -29,6 +30,7 @@ const { Search } = Input;
 const Database = () => {
   const antdThemeMode = useStore((state) => state.themeMode);
   const [mode, setMode] = useState("table");
+  const [selectedRows, setSelectedRows] = useState([]);
   const [themeMode, setThemeMode] = useState();
   const data = ["user", "article", "role", "admin", "category"];
 
@@ -55,6 +57,16 @@ const Database = () => {
       disabled: true,
     },
   ];
+
+  const rowSelection = {
+    onChange: (selectedRowKeys, selectedRows) => {
+      setSelectedRows(selectedRows);
+    },
+    getCheckboxProps: (record) => ({
+      disabled: record.name === "Disabled User",
+      name: record.name,
+    }),
+  };
 
   const onShowSizeChange = (current, pageSize) => {
     console.log(current, pageSize);
@@ -126,6 +138,10 @@ const Database = () => {
     // console.log({ delta, content });
   };
 
+  const onConfirm = () => {};
+
+  const onCancel = () => {};
+
   return (
     <Row gutter={24} style={{ height: "100%" }}>
       <Col span={4}>
@@ -178,7 +194,18 @@ const Database = () => {
               ></Segmented>
               {mode === "table" ? (
                 <Space>
-                  <Button danger>批量删除</Button>
+                  {selectedRows.length > 0 ? (
+                    <Popconfirm
+                      title="系统提醒"
+                      description="您确认要删除租户吗?"
+                      onConfirm={onConfirm}
+                      onCancel={onCancel}
+                      okText="确认"
+                      cancelText="取消"
+                    >
+                      <Button danger>批量删除</Button>
+                    </Popconfirm>
+                  ) : null}
                   <Search placeholder="搜索数据" />
                 </Space>
               ) : null}
@@ -196,6 +223,10 @@ const Database = () => {
           </Flex>
           {mode === "table" ? (
             <Table
+              rowSelection={{
+                ...rowSelection,
+              }}
+              rowKey={(record) => record.key}
               dataSource={dataSource}
               columns={columns}
               pagination={{

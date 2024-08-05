@@ -35,6 +35,7 @@ const Code = ({
 
       // 设置其他编辑器选项
       editor.setOptions({
+        useWorker: false, // fix Failed to execute 'importScripts' on 'WorkerGlobalScope'
         enableBasicAutocompletion: true,
         enableLiveAutocompletion: true,
         showLineNumbers: true,
