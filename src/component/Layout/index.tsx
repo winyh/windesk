@@ -27,6 +27,7 @@ import {
   CloseOutlined,
   LogoutOutlined,
   GithubOutlined,
+  SolutionOutlined,
   FullscreenOutlined,
   FullscreenExitOutlined,
 } from "@ant-design/icons";
@@ -130,8 +131,8 @@ const LayoutBase = () => {
     },
     {
       key: "profile",
-      icon: <UserOutlined />,
-      label: "个人中心",
+      icon: <SolutionOutlined />,
+      label: "账户设置",
       onClick: () => goProfile(),
     },
     {

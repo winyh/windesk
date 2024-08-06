@@ -171,6 +171,7 @@ const Application = () => {
       name: "database",
       is: "Select",
       itemSpan: 24,
+      options: [],
       placeholder: "请选择数据库",
     },
     {
