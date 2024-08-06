@@ -10,7 +10,15 @@ import {
   Tabs,
   Flex,
   Typography,
+  Avatar,
 } from "antd";
+
+import {
+  ReadOutlined,
+  GithubOutlined,
+  RocketOutlined,
+} from "@ant-design/icons";
+
 import useStore from "@/store/index";
 import hljs from "highlight.js/lib/core";
 import javascript from "highlight.js/lib/languages/javascript";
@@ -19,10 +27,15 @@ import python from "highlight.js/lib/languages/python";
 import { invoke } from "@tauri-apps/api/tauri";
 import { isTauri } from "@/utils/index";
 
+import reactLogo from "@/assets/react.svg";
+import vueLogo from "@/assets/vue.svg";
+import angularLogo from "@/assets/angular.svg";
+
 hljs.registerLanguage("javascript", javascript);
 hljs.registerLanguage("python", python);
 
 const { Text } = Typography;
+const { Meta } = Card;
 
 const { BASE_URL } = import.meta.env;
 
@@ -74,7 +87,11 @@ const Dashboard = () => {
     {
       label: "Node",
       key: "node",
-      children: "Node",
+      children: (
+        <pre>
+          <code className="language-js">const developer = "winyh"</code>
+        </pre>
+      ),
     },
     {
       label: "Python",
@@ -172,6 +189,77 @@ const Dashboard = () => {
               items={tabContent}
               onChange={onChange}
             />
+
+            <Flex gap={48}>
+              <Card
+                actions={[
+                  <Button type="text" size="small" icon={<RocketOutlined />}>
+                    开始开发
+                  </Button>,
+                ]}
+              >
+                <Flex gap={24} vertical>
+                  <Meta
+                    avatar={<img src={reactLogo} />}
+                    description="基于React开始开发"
+                  />
+                  <Flex gap={24} justify="space-between">
+                    <Button type="text" size="small" icon={<ReadOutlined />}>
+                      文档
+                    </Button>
+                    <Button type="text" size="small" icon={<GithubOutlined />}>
+                      示例
+                    </Button>
+                  </Flex>
+                </Flex>
+              </Card>
+
+              <Card
+                actions={[
+                  <Button type="text" size="small" icon={<RocketOutlined />}>
+                    开始开发
+                  </Button>,
+                ]}
+              >
+                <Flex gap={24} vertical>
+                  <Meta
+                    avatar={<img src={vueLogo} />}
+                    description="基于Vue开始开发"
+                  />
+                  <Flex gap={24} justify="space-between">
+                    <Button type="text" size="small" icon={<ReadOutlined />}>
+                      文档
+                    </Button>
+                    <Button type="text" size="small" icon={<GithubOutlined />}>
+                      示例
+                    </Button>
+                  </Flex>
+                </Flex>
+              </Card>
+
+              <Card
+                actions={[
+                  <Button type="text" size="small" icon={<RocketOutlined />}>
+                    开始开发
+                  </Button>,
+                ]}
+              >
+                <Flex gap={24} vertical>
+                  <Meta
+                    avatar={<img src={angularLogo} />}
+                    description="基于Angular开始开发"
+                  />
+                  <Flex gap={24} justify="space-between">
+                    <Button type="text" size="small" icon={<ReadOutlined />}>
+                      文档
+                    </Button>
+                    <Button type="text" size="small" icon={<GithubOutlined />}>
+                      示例
+                    </Button>
+                  </Flex>
+                </Flex>
+              </Card>
+            </Flex>
           </Card>
         </Col>
         <Col span={6}></Col>

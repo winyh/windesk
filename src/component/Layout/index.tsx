@@ -14,6 +14,7 @@ import {
   FloatButton,
   Divider,
   Select,
+  App,
 } from "antd";
 import {
   PlusOutlined,
@@ -40,6 +41,7 @@ import {
   getCurrentYear,
   findObjByKey,
   routes2menu,
+  getMenuSome,
 } from "@/utils/index";
 import { childRoutes } from "@/routes/index";
 import winbaseLogo from "/winbase.png";
@@ -59,6 +61,7 @@ const LayoutBase = () => {
 
   const location = useLocation();
   const navigate = useNavigate();
+  const { message } = App.useApp();
 
   const [menuItems, setMenuItems] = useState([]);
   const [breadcrumbItems, setBreadcrumbItems] = useState<any>([]);
@@ -80,7 +83,7 @@ const LayoutBase = () => {
       const { data, status } = await logoutService();
       if (status) {
         localStorage.removeItem("token");
-        messageApi.open({
+        message.open({
           type: "loading",
           content: "即将退出登录!",
           duration: 0,
@@ -92,6 +95,18 @@ const LayoutBase = () => {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const goMessage = () => {
+    navigate(`${BASE_URL}user/message`);
+  };
+
+  const goProfile = () => {
+    navigate(`${BASE_URL}user/profile`);
+  };
+
+  const themeConfig = () => {
+    navigate(`${BASE_URL}user/theme`);
   };
 
   const accountItems = [
@@ -111,7 +126,7 @@ const LayoutBase = () => {
       key: "message",
       icon: <BellOutlined />,
       label: "消息通知",
-      onClick: () => goProfile(),
+      onClick: () => goMessage(),
     },
     {
       key: "profile",
@@ -126,7 +141,7 @@ const LayoutBase = () => {
       key: "personal",
       icon: <StarOutlined />,
       label: "主题配置",
-      onClick: () => goPersonal(),
+      onClick: () => themeConfig(),
     },
     {
       type: "divider",
@@ -158,16 +173,16 @@ const LayoutBase = () => {
     setMenuItems(menus);
     let keyPaths = location.pathname.split("/").filter((i) => i);
 
+    let someMenu = getMenuSome(childRoutes);
     let breads: any[] = [];
     var linkPath = "";
     keyPaths.map((key, index) => {
       linkPath = `${linkPath}/${key}`.replace(/\/\/+/g, "/");
-      const label = findObjByKey(menus, key, "key")?.label;
+      const label = findObjByKey(someMenu, key, "key")?.label;
       let curentPath = linkPath;
       breads.push({
         title: <Link to={`${curentPath}`}>{label}</Link>,
         onClick: () => {
-          console.log(999, `${curentPath}`);
           navigate(`${curentPath}`);
         },
       });
@@ -247,7 +262,6 @@ const LayoutBase = () => {
   };
 
   const goAgent = () => {
-    console.log("AI 助手");
     navigate(`/agent`);
   };
 

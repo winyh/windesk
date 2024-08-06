@@ -40,7 +40,7 @@ const { Search } = Input;
 const Application = () => {
   const formRef = useRef();
   const [appType, setAppType] = useState("create");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [action, setAction] = useState(true);
   const [record, setRecord] = useState({});
   const { message, modal } = App.useApp();
@@ -286,10 +286,6 @@ const Application = () => {
     ];
   };
 
-  setTimeout(() => {
-    setLoading(false);
-  }, 500);
-
   const showModal = () => {
     modal.confirm({
       title: "导入应用",
@@ -376,7 +372,7 @@ const Application = () => {
                 }}
               >
                 <Card.Meta
-                  avatar={<Avatar src={item.logo} />}
+                  avatar={<img src={item.logo} />}
                   description={
                     <Paragraph
                       ellipsis={{

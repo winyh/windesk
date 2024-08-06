@@ -9,6 +9,7 @@ import {
   GroupOutlined,
   FunctionOutlined,
   FireOutlined,
+  UserOutlined,
   CloudServerOutlined,
   SafetyCertificateOutlined,
 } from "@ant-design/icons";
@@ -22,7 +23,6 @@ import Function from "@/page/function";
 import Storage from "@/page/storage";
 import Agent from "@/page/agent";
 import Analysis from "@/page/analysis";
-import System from "@/page/system";
 
 /* 结果页 */
 import Result403 from "@/page/result/403";
@@ -32,6 +32,9 @@ import Result500 from "@/page/result/500";
 /* 账户页 */
 import Login from "@/page/login";
 import Register from "@/page/register";
+import Profile from "@/page/user/profile";
+import CustomeTheme from "@/page/user/theme";
+import Message from "@/page/user/message";
 
 /* 权限管理 */
 import Admin from "@/page/authority/admin";
@@ -42,6 +45,7 @@ import Position from "@/page/authority/position";
 
 /* 系统设置 */
 import Dictionary from "@/page/system/dictionary";
+import System from "@/page/system";
 
 const basename = import.meta.env.BASE_URL;
 
@@ -198,6 +202,44 @@ const childRoutes = [
           label: "字典管理",
           key: "dictionary",
           hide_in_menu: false,
+        },
+      },
+    ],
+  },
+  {
+    path: "user",
+    meta: {
+      label: "账户管理",
+      icon: <UserOutlined />,
+      key: "user",
+      hide_in_menu: true,
+    },
+    children: [
+      {
+        path: "message",
+        element: <Message />,
+        meta: {
+          label: "消息通知",
+          key: "message",
+          hide_in_menu: true,
+        },
+      },
+      {
+        path: "profile",
+        element: <Profile />,
+        meta: {
+          label: "个人中心",
+          key: "profile",
+          hide_in_menu: true,
+        },
+      },
+      {
+        path: "theme",
+        element: <CustomeTheme />,
+        meta: {
+          label: "主题配置",
+          key: "theme",
+          hide_in_menu: true,
         },
       },
     ],

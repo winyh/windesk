@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="36px" height="32px" viewBox="0 0 128 110" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>vue@2x</title>
+    <g id="页面-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="vue" fill-rule="nonzero">
+            <path d="M78.8,0 L64,25.4 L49.2,0 L0,0 L64,110 L128,0 C128,0 78.8,0 78.8,0 Z" id="路径" fill="#42B883"></path>
+            <polygon id="路径" fill="#35495E" points="78.8 0 64 25.4 49.2 0 25.6 0 64 66 102.4 0"></polygon>
+        </g>
+    </g>
+</svg>

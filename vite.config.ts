@@ -4,7 +4,7 @@ import path from "path"
 
 // https://vitejs.dev/config/
 export default defineConfig(async ({mode}) => ({
-  base: mode === "development" ? "/" : "/winsax/", // https://cn.vitejs.dev/guide/static-deploy#github-pages
+  // base: mode === "development" ? "/" : "/winsax/", // https://cn.vitejs.dev/guide/static-deploy#github-pages
   plugins: [react()],
   resolve: {
     alias: {

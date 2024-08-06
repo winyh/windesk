@@ -56,6 +56,31 @@ const routes2menu = (routes) => {
   }, []);
 };
 
+// 隐藏菜单不过滤
+const getMenuSome = (routes) => {
+  return routes.reduce((acc, route) => {
+    const { meta, children } = route;
+    if (meta && meta.key && meta.label) {
+      const menuItem = {
+        key: meta.key,
+        icon: meta.icon,
+        label: meta.label,
+      };
+
+      if (children && children.length > 0) {
+        const subMenuItems = getMenuSome(children);
+        if (subMenuItems.length > 0) {
+          menuItem.children = subMenuItems;
+        }
+      }
+
+      acc.push(menuItem);
+    }
+
+    return acc;
+  }, []);
+};
+
 /* 根据表单项目 label 计算按钮偏移量 */
 const computedWrapperCol = (labelCol) => {
   const keys = Object.keys(labelCol);
@@ -78,5 +103,6 @@ export {
   findCurrentPathKey,
   findObjByKey,
   routes2menu,
+  getMenuSome,
   computedWrapperCol,
 };

@@ -141,22 +141,25 @@ const Dictionary = () => {
           bordered
           dataSource={data}
           renderItem={(item) => (
-            <List.Item
-              actions={[
-                <Dropdown
-                  menu={{
-                    items,
-                  }}
-                  placement="bottomLeft"
-                >
-                  <Button type="text" icon={<MoreOutlined />}></Button>
-                </Dropdown>,
-              ]}
-            >
-              <Flex justify="space-between" style={{ flex: 1 }}>
-                <span>{item}</span>
-                <Tag color="green">sys_user_sex</Tag>
-              </Flex>
+            <List.Item key={item}>
+              <List.Item.Meta
+                title={
+                  <Flex justify="space-between">
+                    <div>{item}</div>
+                    <div style={{ width: 100 }}>
+                      <Tag color="green">sys_user_sex</Tag>
+                    </div>
+                  </Flex>
+                }
+              />
+              <Dropdown
+                menu={{
+                  items,
+                }}
+                placement="bottomLeft"
+              >
+                <Button type="text" icon={<MoreOutlined />}></Button>
+              </Dropdown>
             </List.Item>
           )}
         />

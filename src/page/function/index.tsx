@@ -67,19 +67,16 @@ const Function = () => {
           bordered
           dataSource={data}
           renderItem={(item) => (
-            <List.Item
-              actions={[
-                <Dropdown
-                  menu={{
-                    items,
-                  }}
-                  placement="bottomLeft"
-                >
-                  <Button type="text" icon={<MoreOutlined />}></Button>
-                </Dropdown>,
-              ]}
-            >
-              {item}
+            <List.Item key={item}>
+              <List.Item.Meta title={item} />
+              <Dropdown
+                menu={{
+                  items,
+                }}
+                placement="bottomLeft"
+              >
+                <Button type="text" icon={<MoreOutlined />}></Button>
+              </Dropdown>
             </List.Item>
           )}
         />
