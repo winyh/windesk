@@ -46,6 +46,9 @@ import Position from "@/page/authority/position";
 /* 系统设置 */
 import Dictionary from "@/page/system/dictionary";
 import Setting from "@/page/system/setting";
+import Log from "@/page/system/log";
+import Area from "@/page/system/area";
+import Cache from "@/page/system/cache";
 
 const basename = import.meta.env.BASE_URL;
 
@@ -210,6 +213,33 @@ const childRoutes = [
         meta: {
           label: "应用配置",
           key: "setting",
+          hide_in_menu: false,
+        },
+      },
+      {
+        path: "log",
+        element: <Log />,
+        meta: {
+          label: "日志信息",
+          key: "log",
+          hide_in_menu: false,
+        },
+      },
+      {
+        path: "area",
+        element: <Area />,
+        meta: {
+          label: "区域管理",
+          key: "area",
+          hide_in_menu: false,
+        },
+      },
+      {
+        path: "cache",
+        element: <Cache />,
+        meta: {
+          label: "缓存管理",
+          key: "cache",
           hide_in_menu: false,
         },
       },

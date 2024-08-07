@@ -295,7 +295,7 @@ const Role = () => {
       is: "Select",
     },
     {
-      label: "分配权限",
+      label: "分配权限", // 单独封装一个组件-加入全选/不选-展开/收起按钮
       name: "auth",
       itemSpan: 24,
       is: "Tree.DirectoryTree",

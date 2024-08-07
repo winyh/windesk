@@ -148,6 +148,7 @@ const Admin = () => {
     wrapperCol: { span: 18 },
   };
 
+  // 系统默认生成密码，所以没有密码-确认密码录入框
   const formData = [
     {
       label: "账户名称",

@@ -13,7 +13,7 @@ import {
   Popconfirm,
   App,
 } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined, ControlOutlined } from "@ant-design/icons";
 import SuperForm from "@/component/SuperForm";
 import dayjs from "dayjs";
 
@@ -119,6 +119,14 @@ const Organization = () => {
       placeholder: "请输入邮箱",
     },
     {
+      label: "排序",
+      name: "sort",
+      is: "InputNumber",
+      itemSpan: 24,
+      style: { width: "100%" },
+      placeholder: "请输入排序",
+    },
+    {
       label: "状态",
       name: "status",
       itemSpan: 24,
@@ -163,6 +171,11 @@ const Organization = () => {
       title: "邮箱",
       dataIndex: "email",
       key: "email",
+    },
+    {
+      title: "排序",
+      dataIndex: "sort",
+      key: "sort",
     },
     {
       title: "状态",
@@ -240,6 +253,7 @@ const Organization = () => {
           <Button icon={<PlusOutlined />} onClick={() => showDrawer(true)}>
             新增组织
           </Button>
+          <Button icon={<ControlOutlined />}>展开折叠</Button>
           {selectedRows.length > 0 ? (
             <Popconfirm
               title="系统提醒"

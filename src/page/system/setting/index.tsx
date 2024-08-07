@@ -67,6 +67,12 @@ const Setting = () => {
       placeholder: "请输入端口",
     },
     {
+      label: "数据库名",
+      name: "username",
+      is: "Input",
+      placeholder: "请输入数据库名",
+    },
+    {
       label: "用户名",
       name: "username",
       is: "Input",

@@ -224,6 +224,7 @@ const Storage = () => {
                 <Descriptions.Item label="大小">270KB</Descriptions.Item>
                 <Descriptions.Item label="后缀">.jpg</Descriptions.Item>
                 <Descriptions.Item label="文件描述">描述信息</Descriptions.Item>
+                <Descriptions.Item label="文件分类">商品主图</Descriptions.Item>
                 <Descriptions.Item label="创建日期">
                   2024-05-08 18:00:22
                 </Descriptions.Item>
@@ -232,6 +233,9 @@ const Storage = () => {
               <Form layout="vertical" form={form}>
                 <Form.Item label="文件名">
                   <Input placeholder="请输入文件名" />
+                </Form.Item>
+                <Form.Item label="文件分类">
+                  <Input placeholder="请输入文件分类" />
                 </Form.Item>
                 <Form.Item label="Alt">
                   <Input placeholder="请输入文件占位符" />

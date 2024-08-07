@@ -190,7 +190,7 @@ const Dashboard = () => {
               onChange={onChange}
             />
 
-            <Flex gap={48}>
+            <Flex gap={48} wrap>
               <Card
                 actions={[
                   <Button type="text" size="small" icon={<RocketOutlined />}>

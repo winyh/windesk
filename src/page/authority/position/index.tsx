@@ -92,6 +92,14 @@ const Position = () => {
       placeholder: "请输入岗位描述",
     },
     {
+      label: "排序",
+      name: "sort",
+      is: "InputNumber",
+      itemSpan: 24,
+      style: { width: "100%" },
+      placeholder: "请输入排序",
+    },
+    {
       label: "状态",
       name: "status",
       itemSpan: 24,
@@ -140,6 +148,11 @@ const Position = () => {
       title: "岗位描述",
       dataIndex: "description",
       key: "description",
+    },
+    {
+      title: "排序",
+      dataIndex: "sort",
+      key: "sort",
     },
     {
       title: "状态",
