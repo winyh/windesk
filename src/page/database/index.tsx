@@ -23,7 +23,6 @@ import {
   SettingOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
-import useStore from "@/store/index";
 import SuperForm from "@/component/SuperForm";
 import WinCode from "@/component/Code";
 
@@ -31,19 +30,13 @@ const { Search } = Input;
 
 const Database = () => {
   const formRef = useRef();
-  const antdThemeMode = useStore((state) => state.themeMode);
   const [mode, setMode] = useState("table");
   const [selectedRows, setSelectedRows] = useState([]);
-  const [themeMode, setThemeMode] = useState();
   const [open, setOpen] = useState(false);
   const [action, setAction] = useState(true);
   const [searchLoading, setSearchLoading] = useState(false);
   const [record, setRecord] = useState({});
   const data = ["user", "article", "role", "admin", "category"];
-
-  useEffect(() => {
-    setThemeMode(antdThemeMode);
-  }, [antdThemeMode]);
 
   const showDrawer = (bool, record) => {
     setAction(bool);
@@ -294,7 +287,6 @@ const Database = () => {
               initialValue="SELECT * FROM users"
               options={{ useWorker: false }}
               mode="sql"
-              theme={themeMode}
               onChange={onCodeChange}
             />
           )}

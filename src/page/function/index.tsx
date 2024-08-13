@@ -9,19 +9,12 @@ import {
   CodeOutlined,
   SaveOutlined,
 } from "@ant-design/icons";
-import useStore from "@/store/index";
 import WinCode from "@/component/Code";
 
 const { Search } = Input;
 import "./index.css";
 
 const Function = () => {
-  const [themeMode, setThemeMode] = useState();
-  const antdThemeMode = useStore((state) => state.themeMode);
-  useEffect(() => {
-    setThemeMode(antdThemeMode);
-  }, [antdThemeMode]);
-
   const data = [
     "getUserList",
     "refreshToken",
@@ -91,7 +84,6 @@ const Function = () => {
           <WinCode
             initialValue="const name = winbase"
             onChange={onCodeChange}
-            theme={themeMode}
           />
         </Flex>
       </Col>

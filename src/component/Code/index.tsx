@@ -8,20 +8,17 @@ import "ace-builds/src-noconflict/mode-json";
 import "ace-builds/src-noconflict/ext-language_tools";
 import "./index.css";
 
-const Code = ({
-  mode = "javascript",
-  initialValue,
-  onChange,
-  options,
-  theme,
-}) => {
+import useStore from "@/store/index";
+
+const Code = ({ mode = "javascript", initialValue, onChange, options }) => {
   const editorRef = useRef(null);
+  const antdThemeMode = useStore((state) => state.themeMode);
 
   useEffect(() => {
     if (editorRef.current) {
       const editor = ace.edit(editorRef.current);
 
-      if (theme === "dark") {
+      if (antdThemeMode === "dark") {
         editor.setTheme("ace/theme/monokai");
       } else {
         editor.setTheme("ace/theme/tomorrow");
@@ -51,7 +48,7 @@ const Code = ({
         onChange && onChange(delta, content);
       });
     }
-  }, [theme]);
+  }, [antdThemeMode]);
 
   return (
     <div
