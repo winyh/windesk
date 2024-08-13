@@ -251,7 +251,7 @@ const LayoutBase = () => {
     toggleTheme(newMode);
   };
 
-  const onHandleMenuClick = ({ keyPath }) => {
+  const onMenuClick = ({ keyPath }) => {
     const pathReverse = keyPath.reverse();
     const path = pathReverse.join("/");
     setSelectedKeys(pathReverse);
@@ -306,7 +306,7 @@ const LayoutBase = () => {
           items={menuItems}
           openKeys={openKeys}
           selectedKeys={selectedKeys}
-          onSelect={onHandleMenuClick}
+          onSelect={onMenuClick}
           onOpenChange={onOpenChange}
         />
 

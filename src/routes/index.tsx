@@ -229,7 +229,7 @@ const childRoutes = [
         path: "area",
         element: <Area />,
         meta: {
-          label: "区域管理",
+          label: "行政区划",
           key: "area",
           hide_in_menu: false,
         },
