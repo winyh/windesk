@@ -35,15 +35,16 @@ const Database = () => {
   const [open, setOpen] = useState(false);
   const [action, setAction] = useState(true);
   const [searchLoading, setSearchLoading] = useState(false);
+  const [dataSearchLoading, setDataSearchLoading] = useState(false);
   const [record, setRecord] = useState({});
   const data = ["user", "article", "role", "admin", "category"];
 
   const showDrawer = (bool, record) => {
     setAction(bool);
     setOpen(true);
-    console.log({ record });
     setRecord(record);
   };
+
   const onClose = () => {
     setOpen(false);
   };
@@ -172,6 +173,12 @@ const Database = () => {
     },
   ];
 
+  const onSearch = () => {
+    setSearchLoading(false);
+  };
+
+  const onDataSearch = () => {};
+
   const onModeChange = (value) => {
     setMode(value);
   };
@@ -188,7 +195,13 @@ const Database = () => {
     <Row gutter={24} style={{ height: "100%" }}>
       <Col span={4}>
         <List
-          header={<Search placeholder="搜索数据表" loading={searchLoading} />}
+          header={
+            <Search
+              placeholder="搜索数据表"
+              loading={searchLoading}
+              onSearch={onSearch}
+            />
+          }
           footer={
             <Button
               type="text"
@@ -250,7 +263,11 @@ const Database = () => {
                       <Button danger>批量删除</Button>
                     </Popconfirm>
                   ) : null}
-                  <Search placeholder="搜索数据" />
+                  <Search
+                    placeholder="搜索数据"
+                    loading={dataSearchLoading}
+                    onSearch={onDataSearch}
+                  />
                 </Space>
               ) : null}
             </Space>

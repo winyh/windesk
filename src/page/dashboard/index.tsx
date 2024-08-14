@@ -41,8 +41,42 @@ const { BASE_URL } = import.meta.env;
 
 const Dashboard = () => {
   const [greetMsg, setGreetMsg] = useState("");
+  const [appInfo, setAppInfo] = useState({});
+  const [stackList, setStackList] = useState([]);
   const [activeKey, setActiveKey] = useState("js");
   const [name, setName] = useState("");
+
+  useEffect(() => {
+    setAppInfo({
+      appId: "1",
+      appUrl: "https://cwbtvnofqvimqiyznkbt.winbase.io",
+      appKey: "I6IkpXVCJ9.pc3Mim4cCI6.dDAfslwOQyAXsM",
+    });
+
+    setStackList([
+      {
+        id: "1",
+        logo: reactLogo,
+        description: "基于React开始开发",
+        doc: "",
+        example: "",
+      },
+      {
+        id: "2",
+        logo: vueLogo,
+        description: "基于Vue开始开发",
+        doc: "",
+        example: "",
+      },
+      {
+        id: "3",
+        logo: angularLogo,
+        description: "基于Angular开始开发",
+        doc: "",
+        example: "",
+      },
+    ]);
+  }, []);
 
   async function greet() {
     // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
@@ -52,6 +86,14 @@ const Dashboard = () => {
       setGreetMsg(`${name}, 你好, 当前为web环境，无法与桌面Rust交互`);
     }
   }
+
+  const onStart = (stack) => {};
+
+  const goDoc = (stack) => {};
+
+  const goExample = (stack) => {
+    console.log({ stack });
+  };
 
   const tabContent = [
     {
@@ -114,14 +156,11 @@ const Dashboard = () => {
               <Flex gap={24} justify="space-between">
                 <span>应用URL</span>
                 <Space>
-                  <Input
-                    defaultValue="https://cwbtvnofqvimqiyznkbt.winbase.io"
-                    style={{ width: 300 }}
-                  />
+                  <Input value={appInfo.appUrl} style={{ width: 300 }} />
                   <Button>
                     <Text
                       copyable={{
-                        text: "https://cwbtvnofqvimqiyznkbt.winbase.io",
+                        text: appInfo.appUrl,
                       }}
                     />
                   </Button>
@@ -130,14 +169,11 @@ const Dashboard = () => {
               <Flex gap={24} justify="space-between">
                 <span>访问密钥</span>
                 <Space>
-                  <Input
-                    defaultValue="I6IkpXVCJ9.pc3Mim4cCI6.dDAfslwOQyAXsM"
-                    style={{ width: 300 }}
-                  />
+                  <Input value={appInfo.appKey} style={{ width: 300 }} />
                   <Button>
                     <Text
                       copyable={{
-                        text: "I6IkpXVCJ9.pc3Mim4cCI6.dDAfslwOQyAXsM",
+                        text: appInfo.appKey,
                       }}
                     />
                   </Button>
@@ -154,74 +190,48 @@ const Dashboard = () => {
             />
 
             <Flex gap={48} wrap>
-              <Card
-                actions={[
-                  <Button type="text" size="small" icon={<RocketOutlined />}>
-                    开始开发
-                  </Button>,
-                ]}
-              >
-                <Flex gap={24} vertical>
-                  <Meta
-                    avatar={<img src={reactLogo} />}
-                    description="基于React开始开发"
-                  />
-                  <Flex gap={24} justify="space-between">
-                    <Button type="text" size="small" icon={<ReadOutlined />}>
-                      文档
-                    </Button>
-                    <Button type="text" size="small" icon={<GithubOutlined />}>
-                      示例
-                    </Button>
-                  </Flex>
-                </Flex>
-              </Card>
-
-              <Card
-                actions={[
-                  <Button type="text" size="small" icon={<RocketOutlined />}>
-                    开始开发
-                  </Button>,
-                ]}
-              >
-                <Flex gap={24} vertical>
-                  <Meta
-                    avatar={<img src={vueLogo} />}
-                    description="基于Vue开始开发"
-                  />
-                  <Flex gap={24} justify="space-between">
-                    <Button type="text" size="small" icon={<ReadOutlined />}>
-                      文档
-                    </Button>
-                    <Button type="text" size="small" icon={<GithubOutlined />}>
-                      示例
-                    </Button>
-                  </Flex>
-                </Flex>
-              </Card>
-
-              <Card
-                actions={[
-                  <Button type="text" size="small" icon={<RocketOutlined />}>
-                    开始开发
-                  </Button>,
-                ]}
-              >
-                <Flex gap={24} vertical>
-                  <Meta
-                    avatar={<img src={angularLogo} />}
-                    description="基于Angular开始开发"
-                  />
-                  <Flex gap={24} justify="space-between">
-                    <Button type="text" size="small" icon={<ReadOutlined />}>
-                      文档
-                    </Button>
-                    <Button type="text" size="small" icon={<GithubOutlined />}>
-                      示例
-                    </Button>
-                  </Flex>
-                </Flex>
-              </Card>
+              {stackList.map((item) => {
+                return (
+                  <Card
+                    key={item.id}
+                    actions={[
+                      <Button
+                        type="text"
+                        size="small"
+                        icon={<RocketOutlined />}
+                        onClick={() => onStart(item)}
+                      >
+                        开始开发
+                      </Button>,
+                    ]}
+                  >
+                    <Flex gap={24} vertical>
+                      <Meta
+                        avatar={<img src={item.logo} />}
+                        description={item.description}
+                      />
+                      <Flex gap={24} justify="space-between">
+                        <Button
+                          type="text"
+                          size="small"
+                          icon={<ReadOutlined />}
+                          onClick={() => goDoc(item)}
+                        >
+                          文档
+                        </Button>
+                        <Button
+                          type="text"
+                          size="small"
+                          icon={<GithubOutlined />}
+                          onClick={() => goExample(item)}
+                        >
+                          示例
+                        </Button>
+                      </Flex>
+                    </Flex>
+                  </Card>
+                );
+              })}
             </Flex>
           </Card>
         </Col>

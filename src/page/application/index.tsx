@@ -54,6 +54,11 @@ const Application = () => {
     console.log({ record });
     setRecord(record);
   };
+
+  const onDesign = (item) => {
+    console.log({ item });
+  };
+
   const onClose = () => {
     setOpen(false);
   };
@@ -269,7 +274,7 @@ const Application = () => {
   const actions = (item) => {
     return [
       <Tooltip key="design" title="应用设计">
-        <DesktopOutlined />
+        <DesktopOutlined onClick={() => onDesign(item)} />
       </Tooltip>,
       <Tooltip key="setting" title="应用修改">
         <EditOutlined onClick={() => showDrawer(false, item)} />

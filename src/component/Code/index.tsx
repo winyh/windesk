@@ -48,7 +48,7 @@ const Code = ({ mode = "javascript", initialValue, onChange, options }) => {
         onChange && onChange(delta, content);
       });
     }
-  }, [antdThemeMode]);
+  }, [antdThemeMode, initialValue]);
 
   return (
     <div

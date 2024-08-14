@@ -41,6 +41,7 @@ const Storage = () => {
   const [selectedRows, setSelectedRows] = useState([]);
   const [open, setOpen] = useState(false);
   const [action, setAction] = useState(true);
+  const [searchLoading, setSearchLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [record, setRecord] = useState({});
   const [folders, setFolders] = useState(["文件夹A", "文件夹B"]);
@@ -328,6 +329,8 @@ const Storage = () => {
     }),
   };
 
+  const onSearch = () => {};
+
   const onConfirm = () => {};
 
   const onCancel = () => {};
@@ -409,7 +412,11 @@ const Storage = () => {
             <Button danger>批量删除</Button>
           </Popconfirm>
         ) : null}
-        <Search placeholder="搜索文件" />
+        <Search
+          placeholder="搜索文件"
+          onSearch={onSearch}
+          loading={searchLoading}
+        />
       </Space>
 
       <Table
