@@ -10,7 +10,6 @@ import {
   Tabs,
   Flex,
   Typography,
-  Avatar,
 } from "antd";
 
 import {
@@ -19,7 +18,8 @@ import {
   RocketOutlined,
 } from "@ant-design/icons";
 
-import useStore from "@/store/index";
+import HighLight from "@/component/HighLight";
+
 import hljs from "highlight.js/lib/core";
 import javascript from "highlight.js/lib/languages/javascript";
 import python from "highlight.js/lib/languages/python";
@@ -43,27 +43,6 @@ const Dashboard = () => {
   const [greetMsg, setGreetMsg] = useState("");
   const [activeKey, setActiveKey] = useState("js");
   const [name, setName] = useState("");
-  const antdThemeMode = useStore((state) => state.themeMode);
-
-  useEffect(() => {
-    let linkTarget = document.getElementById("hljs");
-    let github = "github";
-    if (antdThemeMode === "dark") {
-      github = "github-dark";
-    }
-
-    if (linkTarget) {
-      document.head.removeChild(linkTarget);
-    }
-
-    const linkElement = document.createElement("link");
-    linkElement.id = "hljs";
-    linkElement.rel = "stylesheet";
-    linkElement.href = `${BASE_URL}css/${github}.min.css`;
-    document.head.appendChild(linkElement);
-
-    hljs.highlightAll();
-  }, [antdThemeMode]);
 
   async function greet() {
     // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
@@ -79,47 +58,31 @@ const Dashboard = () => {
       label: "JavaScript",
       key: "js",
       children: (
-        <pre>
-          <code className="language-js">console.log('Hello, world!');</code>
-        </pre>
+        <HighLight language="js" code="console.log('Hello, world!');" />
       ),
     },
     {
       label: "Node",
       key: "node",
-      children: (
-        <pre>
-          <code className="language-js">const developer = "winyh"</code>
-        </pre>
-      ),
+      children: <HighLight language="js" code='const developer = "winyh"' />,
     },
     {
       label: "Python",
       key: "python",
       children: (
-        <pre>
-          <code className="language-python">
-            {`def all_unique(lst): 
-            x = [1, 1, 2, 2, 3, 2, 3, 4, 5, 6] 
-            y = [1, 2,
-            3, 4, 5] all_unique(x) # False{" "}`}
-          </code>
-        </pre>
+        <HighLight
+          language="python"
+          code={`def all_unique(lst): 
+          x = [1, 1, 2, 2, 3, 2, 3, 4, 5, 6] 
+          y = [1, 2,
+          3, 4, 5] all_unique(x) # False{" "}`}
+        />
       ),
     },
   ];
 
   const onChange = (activeKey) => {
     setActiveKey(activeKey);
-    onListen();
-  };
-
-  const onListen = () => {
-    requestAnimationFrame(() => {
-      Array.from(document.querySelectorAll("pre code")).forEach((block) => {
-        hljs.highlightBlock(block);
-      });
-    });
   };
 
   return (

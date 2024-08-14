@@ -30,8 +30,8 @@ import Result404 from "@/page/result/404";
 import Result500 from "@/page/result/500";
 
 /* 账户页 */
-import Login from "@/page/login";
-import Register from "@/page/register";
+import Login from "@/page/account/login";
+import Register from "@/page/account/register";
 import Profile from "@/page/user/profile";
 import CustomeTheme from "@/page/user/theme";
 import Message from "@/page/user/message";

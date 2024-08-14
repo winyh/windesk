@@ -170,6 +170,15 @@ const LayoutBase = () => {
 
   useEffect(() => {
     // console.log(`路由变化监听：${location.pathname}`);
+    if (location.pathname === "/") {
+      navigate("/dashboard");
+    } else {
+      onRouteChange();
+    }
+  }, [location.pathname]);
+
+  /* 路由变化监听 */
+  const onRouteChange = () => {
     const menus = routes2menu(childRoutes);
     setMenuItems(menus);
     let keyPaths = location.pathname.split("/").filter((i) => i);
@@ -177,7 +186,7 @@ const LayoutBase = () => {
     let someMenu = getMenuSome(childRoutes);
     let breads: any[] = [];
     var linkPath = "";
-    keyPaths.map((key, index) => {
+    keyPaths.map((key, _) => {
       linkPath = `${linkPath}/${key}`.replace(/\/\/+/g, "/");
       const label = findObjByKey(someMenu, key, "key")?.label;
       let curentPath = linkPath;
@@ -192,7 +201,7 @@ const LayoutBase = () => {
     setOpenKeys(keyPaths); // 初始展开
     setSelectedKeys(keyPaths); // 更新左侧导航选中
     setBreadcrumbItems(breads); // 更新面包屑
-  }, [location.pathname]);
+  };
 
   useEffect(() => {
     if (!isTauri() && screenfull.isEnabled) {

@@ -54,7 +54,14 @@ const Agent = () => {
         <Col span={16} style={{ background: colorBgLayout, height: "100%" }}>
           <ProChat
             loading={loading}
-            request={"/api/chat"}
+            request={async (messages) => {
+              const response = await fetch("/api/chat", {
+                method: "POST",
+                body: JSON.stringify({ messages: messages }),
+              });
+              const data = await response.json();
+              return new Response(data.output?.text);
+            }}
             config={{
               ...example.config,
               params: {
