@@ -45,7 +45,7 @@ import {
   routes2menu,
   getMenuSome,
 } from "@/utils/index";
-import { childRoutes } from "@/routes/index";
+import { childRoutes } from "@/route/index";
 import winbaseLogo from "/winbase.png";
 import "./index.css";
 

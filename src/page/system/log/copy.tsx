@@ -7,11 +7,14 @@ import "./index.less";
 
 const { BASE_URL } = import.meta.env;
 
-const Log = () => {
+const Entry = () => {
   const navigate = useNavigate();
-
   const goHome = () => {
     navigate(`${BASE_URL}dashboard`);
+  };
+
+  const onChange = (key) => {
+    console.log(key);
   };
 
   const onFinish = (values) => {};
@@ -25,7 +28,17 @@ const Log = () => {
     wrapperCol: { span: 18 },
   };
 
-  const formOperateData = [
+  // 记录全部用户信息就是的登录日志了
+  // 数据举例：
+  // 系统管理员（admin）
+  // 218.79.62.144
+  // 中国上海上海市 电信
+  // Chrome 87.0.4280.88
+  // Windows 10
+  // 2024-08-14 09:04:54
+  // 2024-08-14 09:05:33
+
+  const formData = [
     {
       label: "登录地点",
       name: "name",
@@ -46,84 +59,7 @@ const Log = () => {
     },
   ];
 
-  const operateColumns = [
-    {
-      title: "操作人",
-      dataIndex: "username",
-      key: "username",
-    },
-    {
-      title: "操作内容",
-      dataIndex: "action",
-      key: "action", // 用户退出、查询树列表、分页查询列表等
-    },
-    {
-      title: "所属模块",
-      dataIndex: "module",
-      key: "module", // 登录、用户管理、系统日志等
-    },
-    {
-      title: "操作 IP",
-      dataIndex: "ip",
-      key: "ip",
-    },
-    {
-      title: "操作地点",
-      dataIndex: "location",
-      key: "location",
-    },
-    {
-      title: "耗时",
-      dataIndex: "time_consume",
-      key: "time_consume", // 58ms、100ms、8ms
-    },
-    {
-      title: "浏览器",
-      dataIndex: "browser",
-      key: "browser",
-    },
-    {
-      title: "操作系统",
-      dataIndex: "os",
-      key: "os",
-    },
-    {
-      title: "状态",
-      dataIndex: "status",
-      key: "status", // 成功、失败
-    },
-    {
-      title: "操作",
-      dataIndex: "action",
-      key: "action",
-      fixed: "right",
-      width: 100,
-      render: (text, row) => <div>强制退出</div>,
-    },
-  ];
-
-  const formAccountData = [
-    {
-      label: "登录地点",
-      name: "name",
-      is: "Input",
-      placeholder: "请输入角色名称",
-    },
-    {
-      label: "用户名称",
-      name: "code",
-      is: "Input",
-      placeholder: "请输入角色编码",
-    },
-    {
-      label: "浏览器",
-      name: "description",
-      is: "Input",
-      placeholder: "请输入角色描述",
-    },
-  ];
-
-  const accountColumns = [
+  const columns = [
     {
       title: "会话编号",
       dataIndex: "code",
@@ -179,10 +115,6 @@ const Log = () => {
     },
   ];
 
-  const onChange = (key) => {
-    console.log(key);
-  };
-
   const tabItems = [
     {
       label: "操作日志",
@@ -190,7 +122,7 @@ const Log = () => {
       children: (
         <>
           <SuperForm
-            data={formOperateData}
+            data={formData}
             layout={layout}
             limit={6}
             rulesValid={false}
@@ -200,7 +132,7 @@ const Log = () => {
           ></SuperForm>
           <SuperTable
             queryUrl="/admin/records?current=1&pageSize=10"
-            columns={operateColumns}
+            columns={columns}
           />
         </>
       ),
@@ -208,26 +140,25 @@ const Log = () => {
     {
       label: "登录日志",
       key: "log",
-      children: (
-        <>
-          <SuperForm
-            data={formAccountData}
-            layout={layout}
-            limit={6}
-            rulesValid={false}
-            btnText="查询"
-            onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
-          ></SuperForm>
-          <SuperTable
-            queryUrl="/admin/records?current=1&pageSize=10"
-            columns={accountColumns}
-          />
-        </>
-      ),
+      children: "",
     },
   ];
 
-  return <Tabs onChange={onChange} type="card" items={tabItems} />;
+  return (
+    <>
+      <Tabs
+        onChange={onChange}
+        type="card"
+        items={new Array(3).fill(null).map((_, i) => {
+          const id = String(i + 1);
+          return {
+            label: `Tab ${id}`,
+            key: id,
+            children: `Content of Tab Pane ${id}`,
+          };
+        })}
+      />
+    </>
+  );
 };
-export default Log;
+export default Entry;

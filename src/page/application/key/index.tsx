@@ -6,7 +6,7 @@ const ApiKey = () => {
   return (
     <div>
       <div>分为租户KEY可以通过接口管理整个后台-应用KEY 可以管理单个应用</div>
-      <Button>创建KEY</Button> Token Name Created Status
+      <Button>创建KEY</Button> Token Name Created Status 有效期 N次/秒
       <Table />
     </div>
   );

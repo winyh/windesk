@@ -1,11 +1,11 @@
-import SuperForm from "@/component/SuperForm"
+import SuperForm from "@/component/SuperForm";
 import {
   DeleteOutlined,
   ExclamationCircleOutlined,
   PlusOutlined,
   DownloadOutlined,
-  NodeExpandOutlined
-} from "@ant-design/icons"
+  NodeExpandOutlined,
+} from "@ant-design/icons";
 import {
   Button,
   message,
@@ -13,14 +13,15 @@ import {
   Popconfirm,
   Space,
   Table,
-  Dropdown
-} from "antd"
-import dayjs from "dayjs"
-import React, { useEffect, useImperativeHandle, useRef, useState } from "react"
-import { comPost, comGet, comDel, comPut } from "@/request"
-import "./style.less"
+  Dropdown,
+  theme,
+} from "antd";
+import dayjs from "dayjs";
+import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
+import { comPost, comGet, comDel, comPut } from "@/request";
+import "./style.less";
 
-const { confirm } = Modal
+const { confirm } = Modal;
 
 /*
  * @desc 超级表格
@@ -77,59 +78,63 @@ const SuperTable = (
   },
   ref
 ) => {
-  const formRef = useRef()
-  const [visible, setVisible] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [messageApi, contextMessageHolder] = message.useMessage()
-  const [confirmLoading, setConfirmLoading] = useState(false)
-  const [type, setType] = useState(true)
-  const [record, setRecord] = useState({})
-  const [selectedRows, setSelectedRows] = useState([])
-  const [dataSource, setDataSource] = useState([])
+  const {
+    token: { colorBgContainer },
+  } = theme.useToken();
+  const formRef = useRef();
+  const [visible, setVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [messageApi, contextMessageHolder] = message.useMessage();
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [type, setType] = useState(true);
+  const [record, setRecord] = useState({});
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [dataSource, setDataSource] = useState([]);
   const [pagination, setPagination] = useState({
     showQuickJumper: true,
     current: 1,
     pageSize: 10,
     total: 10,
     onChange: (current, pageSize) => paginationHandle(current, pageSize),
-    onShowSizeChange: (current, pageSize) => paginationHandle(current, pageSize)
-  })
+    onShowSizeChange: (current, pageSize) =>
+      paginationHandle(current, pageSize),
+  });
 
   useImperativeHandle(ref, () => ({
-    reload
-  }))
+    reload,
+  }));
 
   /*
    * @desc 数据初始化
    * @params { params } object 查询参数
    */
   const getData = async (params = {}, callback) => {
-    setLoading(true)
-    callback ? callback(true) : null
-    const { status, data, msg } = await comGet(queryUrl, params)
+    setLoading(true);
+    callback ? callback(true) : null;
+    const { status, data, msg } = await comGet(queryUrl, params);
 
     if (status) {
       if (isPage) {
-        const { current, pageSize, total, list } = data
+        const { current, pageSize, total, list } = data;
         const newPagination = {
           ...pagination,
           current,
           pageSize,
-          total
-        }
-        setPagination(newPagination)
-        setDataSource(list)
+          total,
+        };
+        setPagination(newPagination);
+        setDataSource(list);
       } else {
-        setDataSource(data)
+        setDataSource(data);
       }
     }
-    setLoading(false)
-    callback ? callback(false) : null
-  }
+    setLoading(false);
+    callback ? callback(false) : null;
+  };
 
   useEffect(() => {
-    getData()
-  }, [])
+    getData();
+  }, []);
 
   /*
    * @desc 分页处理
@@ -137,12 +142,12 @@ const SuperTable = (
    * @params { pageSize } number 每页条数
    */
   const paginationHandle = (current, pageSize) => {
-    setSelectedRows([])
+    setSelectedRows([]);
     getData({
       current,
-      pageSize
-    })
-  }
+      pageSize,
+    });
+  };
 
   /*
    * @desc 单条删除
@@ -150,33 +155,33 @@ const SuperTable = (
    * @params { pageSize } number 每页条数
    */
   const delSingle = async (record) => {
-    const hide = messageApi.loading("正在删除")
+    const hide = messageApi.loading("正在删除");
     const res = await comDel(url, {
-      ids: record[rowKey]
-    })
+      ids: record[rowKey],
+    });
     if (res.status) {
-      hide()
-      messageApi.success("删除成功")
-      getData()
+      hide();
+      messageApi.success("删除成功");
+      getData();
     }
-  }
+  };
 
   const reload = () => {
-    getData()
-  }
+    getData();
+  };
 
   /*
    * @desc model 弹出
    */
   const showModal = () => {
-    setVisible(true)
-  }
+    setVisible(true);
+  };
 
   /*
    * @desc model确认
    */
   const handleOk = () => {
-    setConfirmLoading(true)
+    setConfirmLoading(true);
     formRef.current.form
       .validateFields()
       .then(async (values) => {
@@ -196,35 +201,35 @@ const SuperTable = (
         //   }
         // });
         /* 后面加的转换运算 */
-        var res = {}
+        var res = {};
         if (type) {
-          res = await comPost(url, values)
+          res = await comPost(url, values);
         } else {
-          values.id = record[rowKey]
-          res = await comPut(`${url}`, values)
+          values.id = record[rowKey];
+          res = await comPut(`${url}`, values);
         }
 
         if (res.status) {
-          messageApi.success(res.msg)
+          messageApi.success(res.msg);
         } else {
-          messageApi.error(res.msg)
+          messageApi.error(res.msg);
         }
 
-        setConfirmLoading(false)
-        setVisible(false)
-        getData()
+        setConfirmLoading(false);
+        setVisible(false);
+        getData();
       })
       .catch((errorInfo) => {
-        setConfirmLoading(false)
-      })
-  }
+        setConfirmLoading(false);
+      });
+  };
 
   /*
    * @desc model取消
    */
   const handleCancel = (e) => {
-    setVisible(false)
-  }
+    setVisible(false);
+  };
 
   /*
    * @desc 批量删除
@@ -238,73 +243,73 @@ const SuperTable = (
       okType: "danger",
       cancelText: "取消",
       onOk: async () => {
-        const hide = messageApi.loading("正在批量删除")
+        const hide = messageApi.loading("正在批量删除");
         const res = await comDel(delSomeUrl, {
-          ids: selectedRows.map((item) => item.id)
-        })
+          ids: selectedRows.map((item) => item.id),
+        });
         if (res.status) {
-          hide()
-          messageApi.success("批量删除成功")
-          getData()
+          hide();
+          messageApi.success("批量删除成功");
+          getData();
         }
       },
       onCancel() {
-        console.log("Cancel")
-      }
-    })
-  }
+        console.log("Cancel");
+      },
+    });
+  };
 
   const rowSelectionConfig = !rowSelection
     ? ""
     : {
         onChange: (selectedRowKeys, selectedRows) => {
-          setSelectedRows(selectedRows)
+          setSelectedRows(selectedRows);
           if (rowSelectionBk) {
-            rowSelectionBk(selectedRows)
+            rowSelectionBk(selectedRows);
           }
         },
         getCheckboxProps: (record) => ({
           disabled: record.name === "Disabled User",
-          name: record.name
+          name: record.name,
         }),
-        type: selectionType
-      }
+        type: selectionType,
+      };
 
   const setInitialValues = (record) => {
-    console.log({ record })
-    setRecord(record)
-  }
+    console.log({ record });
+    setRecord(record);
+  };
 
   const handleMenuClick = (e) => {
-    messageApi.info("Click on menu item.")
-    console.log("click", e)
-  }
+    messageApi.info("Click on menu item.");
+    console.log("click", e);
+  };
   const items = [
     {
       label: "action 01",
-      key: "1"
+      key: "1",
     },
     {
       label: "action 02",
-      key: "2"
+      key: "2",
     },
     {
       label: "action 03",
       key: "3",
-      danger: true
+      danger: true,
     },
     {
       label: "action 04",
       key: "4",
       danger: true,
-      disabled: true
-    }
-  ]
+      disabled: true,
+    },
+  ];
 
   const menuProps = {
     items,
-    onClick: () => alert(222)
-  }
+    onClick: () => alert(222),
+  };
 
   const TableTitle = () => (
     <div className="toolwin">
@@ -325,12 +330,12 @@ const SuperTable = (
                   key={index}
                   type={item.type || "default"}
                   onClick={() => {
-                    item.callFn(item.action)
+                    item.callFn(item.action);
                   }}
                 >
                   {item.text}
                 </Button>
-              )
+              );
             })}
           </Space>
         ) : null}
@@ -341,9 +346,9 @@ const SuperTable = (
               type="primary"
               icon={<PlusOutlined />}
               onClick={() => {
-                setType(true)
-                setRecord({})
-                showModal()
+                setType(true);
+                setRecord({});
+                showModal();
               }}
             >
               新增
@@ -364,7 +369,7 @@ const SuperTable = (
         )}
       </div>
     </div>
-  )
+  );
 
   const action = {
     title: "操作",
@@ -378,19 +383,19 @@ const SuperTable = (
                 <a
                   key={index}
                   onClick={() => {
-                    item.callFn(item.type, record)
+                    item.callFn(item.type, record);
                   }}
                 >
                   {item.text}
                 </a>
-              )
+              );
             })
           : null}
         <a
           onClick={() => {
-            setType(false)
-            setInitialValues(record)
-            showModal()
+            setType(false);
+            setInitialValues(record);
+            showModal();
           }}
         >
           修改
@@ -404,16 +409,16 @@ const SuperTable = (
           <a>删除</a>
         </Popconfirm>
       </Space>
-    )
-  }
+    ),
+  };
 
-  const newColumns = isAction ? columns.concat([action]) : columns
+  const newColumns = isAction ? columns.concat([action]) : columns;
 
-  const searchData = data.filter((item) => !item.hideInSearch)
+  const searchData = data.filter((item) => !item.hideInSearch);
 
   const formData = data.filter((item) =>
     type ? !item.hideInForm : !item.hideInUpdate
-  )
+  );
 
   /*
    * @desc 查询表单成功函数
@@ -425,29 +430,33 @@ const SuperTable = (
         if (values[item][0].$isDayjsObject && values[item][1].$isDayjsObject) {
           values[item] = [
             dayjs(values[item][0]).format("YYYY-MM-DD HH:mm:ss"),
-            dayjs(values[item][1]).format("YYYY-MM-DD HH:mm:ss")
-          ]
+            dayjs(values[item][1]).format("YYYY-MM-DD HH:mm:ss"),
+          ];
         }
       } else {
         if (values[item] && values[item].$isDayjsObject) {
-          values[item] = dayjs(values[item]).format("YYYY-MM-DD HH:mm:ss")
+          values[item] = dayjs(values[item]).format("YYYY-MM-DD HH:mm:ss");
         }
       }
-    })
+    });
 
-    getData(values, callback)
-  }
+    getData(values, callback);
+  };
 
   /*
    * @desc 查询表单重置函数
    */
   const onReset = () => {
-    getData()
-  }
+    getData();
+  };
 
   return (
-    <div className="superTable" ref={ref}>
-      <div className="searchWinForm">
+    <div
+      className="superTable"
+      ref={ref}
+      style={{ background: colorBgContainer }}
+    >
+      <div className="searchWinForm" style={{ background: colorBgContainer }}>
         <SuperForm
           ref={formRef}
           data={searchData}
@@ -458,7 +467,7 @@ const SuperTable = (
           onReset={onReset}
         ></SuperForm>
       </div>
-      <div className="showWinTable">
+      <div className="showWinTable" style={{ background: colorBgContainer }}>
         <TableTitle />
         <Table
           columns={newColumns}
@@ -493,7 +502,7 @@ const SuperTable = (
         ></SuperForm>
       </Modal>
     </div>
-  )
-}
+  );
+};
 
-export default React.forwardRef(SuperTable)
+export default React.forwardRef(SuperTable);

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { Card, Tabs } from "antd";
+import { Card, Flex, Tabs } from "antd";
+import { SettingOutlined } from "@ant-design/icons";
 import SuperForm from "@/component/SuperForm";
 
 const Setting = () => {
@@ -196,6 +197,43 @@ const Setting = () => {
       label: `地图设置`,
       key: "map",
       children: <div style={{ width: 500 }}>{form}</div>,
+    },
+    {
+      label: `三方登录`,
+      key: "oauth",
+      children: (
+        <Flex gap={24} wrap>
+          <Card
+            title="Gitee"
+            extra={<SettingOutlined />}
+            style={{
+              width: 300,
+            }}
+          >
+            <p>参考 https://pocketbase.io/demo/ Auth provider</p>
+          </Card>
+
+          <Card
+            title="Github"
+            extra={<SettingOutlined />}
+            style={{
+              width: 300,
+            }}
+          >
+            <p>参考 https://pocketbase.io/demo/ Auth provider</p>
+          </Card>
+
+          <Card
+            title="weixin"
+            extra={<SettingOutlined />}
+            style={{
+              width: 300,
+            }}
+          >
+            <p>参考 https://pocketbase.io/demo/ Auth provider</p>
+          </Card>
+        </Flex>
+      ),
     },
   ];
 

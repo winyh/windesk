@@ -10,7 +10,7 @@ import useStore from "@/store/index";
 import "dayjs/locale/zh-cn";
 import zhCN from "antd/locale/zh_CN";
 import themeToken from "@/config/theme";
-import router from "@/routes/index";
+import router from "@/route/index";
 import "./App.css";
 import customConfig from "@/config/config.json";
 

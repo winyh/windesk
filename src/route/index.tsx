@@ -50,10 +50,11 @@ import Position from "@/page/authority/position";
 
 /* 系统设置 */
 import Dictionary from "@/page/system/dictionary";
+import Parameter from "@/page/system/parameter";
 import Setting from "@/page/system/setting";
 import Log from "@/page/system/log";
-import Area from "@/page/system/area";
-import Cache from "@/page/system/cache";
+import Area from "@/page/system/area"; // 待开发-暂时屏蔽
+import Cache from "@/page/system/cache"; // 待开发-暂时屏蔽
 
 const basename = import.meta.env.BASE_URL;
 
@@ -241,6 +242,15 @@ const childRoutes = [
         },
       },
       {
+        path: "parameter",
+        element: <Parameter />,
+        meta: {
+          label: "参数管理",
+          key: "parameter",
+          hide_in_menu: false,
+        },
+      },
+      {
         path: "setting",
         element: <Setting />,
         meta: {
@@ -264,7 +274,7 @@ const childRoutes = [
         meta: {
           label: "行政区划",
           key: "area",
-          hide_in_menu: false,
+          hide_in_menu: true,
         },
       },
       {
@@ -273,7 +283,7 @@ const childRoutes = [
         meta: {
           label: "缓存管理",
           key: "cache",
-          hide_in_menu: false,
+          hide_in_menu: true,
         },
       },
     ],
