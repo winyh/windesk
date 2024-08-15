@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import { Link } from "react-router-dom";
 import {
   EditOutlined,
   DesktopOutlined,
@@ -11,6 +12,7 @@ import {
   PlusOutlined,
   ImportOutlined,
   InboxOutlined,
+  PushpinOutlined,
 } from "@ant-design/icons";
 import {
   Avatar,
@@ -101,6 +103,7 @@ const Application = () => {
     {
       id: "1",
       application_name: "应用A",
+      status: <Badge status="processing" text="运行中" />,
       description:
         "这是应用描述这是应用描述这是应用描述这是应用描述这是应用描述这是应用描述这是应用描述这是应用描述这是应用描述",
       logo: appLogo,
@@ -109,12 +112,14 @@ const Application = () => {
     {
       id: "2",
       application_name: "应用B",
+      status: <Badge status="default" text="已停用" />,
       description: "这是应用描述这是应用描述",
       logo: appLogo,
     },
     {
       id: "3",
       application_name: "应用C",
+      status: <Badge status="processing" text="运行中" />,
       description:
         "这是应用描述这是应用描述这是应用描述这是应用描述这是应用描述这是应用描述",
       logo: appLogo,
@@ -122,6 +127,7 @@ const Application = () => {
     {
       id: "4",
       application_name: "应用D",
+      status: <Badge status="processing" text="运行中" />,
       description:
         "这是应用描述这是应用描述这是应用描述这是应用描述这是应用描述这是应用描述",
       logo: appLogo,
@@ -129,6 +135,7 @@ const Application = () => {
     {
       id: "5",
       application_name: "应用E",
+      status: <Badge status="processing" text="运行中" />,
       description:
         "这是应用描述这是应用描述这是应用描述这是应用描述这是应用描述这是应用描述",
       logo: appLogo,
@@ -136,6 +143,7 @@ const Application = () => {
     {
       id: "6",
       application_name: "应用F",
+      status: <Badge status="processing" text="运行中" />,
       description:
         "这是应用描述这是应用描述这是应用描述这是应用描述这是应用描述这是应用描述",
       logo: appLogo,
@@ -143,6 +151,7 @@ const Application = () => {
     {
       id: "7",
       application_name: "应用G",
+      status: <Badge status="processing" text="运行中" />,
       description:
         "这是应用描述这是应用描述这是应用描述这是应用描述这是应用描述这是应用描述",
       logo: appLogo,
@@ -255,7 +264,7 @@ const Application = () => {
       {
         key: "default",
         label: "设为默认",
-        icon: <TagOutlined />,
+        icon: <PushpinOutlined />,
         onClick: () => onAppDefault(item),
       },
       {
@@ -376,26 +385,29 @@ const Application = () => {
                 style={{
                   width: 360,
                 }}
+                extra={item?.status}
               >
-                <Card.Meta
-                  avatar={<img src={item.logo} />}
-                  description={
-                    <Paragraph
-                      ellipsis={{
-                        rows: 4,
-                        expandable: false,
-                      }}
-                      style={{ minHeight: 80 }}
-                    >
-                      {item.description}
-                    </Paragraph>
-                  }
-                />
+                <Link to="/dashboard">
+                  <Card.Meta
+                    avatar={<img src={item.logo} />}
+                    description={
+                      <Paragraph
+                        ellipsis={{
+                          rows: 4,
+                          expandable: false,
+                        }}
+                        style={{ minHeight: 80 }}
+                      >
+                        {item.description}
+                      </Paragraph>
+                    }
+                  />
+                </Link>
               </Card>
             );
             if (item.isDefault) {
               return (
-                <Badge.Ribbon text="默认" key={item.id}>
+                <Badge.Ribbon text={<PushpinOutlined />} key={item.id}>
                   {child}
                 </Badge.Ribbon>
               );

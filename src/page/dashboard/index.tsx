@@ -13,6 +13,7 @@ import {
 } from "antd";
 
 import {
+  ApiOutlined,
   ReadOutlined,
   GithubOutlined,
   RocketOutlined,
@@ -20,19 +21,12 @@ import {
 
 import HighLight from "@/component/HighLight";
 
-import hljs from "highlight.js/lib/core";
-import javascript from "highlight.js/lib/languages/javascript";
-import python from "highlight.js/lib/languages/python";
-
 import { invoke } from "@tauri-apps/api/tauri";
 import { isTauri } from "@/utils/index";
 
 import reactLogo from "@/assets/react.svg";
 import vueLogo from "@/assets/vue.svg";
 import angularLogo from "@/assets/angular.svg";
-
-hljs.registerLanguage("javascript", javascript);
-hljs.registerLanguage("python", python);
 
 const { Text } = Typography;
 const { Meta } = Card;
@@ -100,7 +94,15 @@ const Dashboard = () => {
       label: "JavaScript",
       key: "js",
       children: (
-        <HighLight language="js" code="console.log('Hello, world!');" />
+        <HighLight
+          language="js"
+          code={`
+import { createClient } from '@winbase/winbase-js'
+
+const winbaseUrl = 'https://cwbtvnofqvimqiyznkbt.winbase.co'
+const winbaseKey = process.env.WINBASE_KEY
+const winbase = createClient(winbaseUrl, winbaseKey)`}
+        />
       ),
     },
     {
@@ -151,7 +153,14 @@ const Dashboard = () => {
           <p>{greetMsg}</p>
         </Col>
         <Col span={12}>
-          <Card title="应用访问方式">
+          <Card
+            title="应用访问方式"
+            extra={
+              <Button type="text" icon={<ApiOutlined />}>
+                APIKey
+              </Button>
+            }
+          >
             <Flex vertical gap={36}>
               <Flex gap={24} justify="space-between">
                 <span>应用URL</span>
@@ -189,6 +198,9 @@ const Dashboard = () => {
               onChange={onChange}
             />
 
+            <Divider orientation="left" orientationMargin={0}>
+              项目参考
+            </Divider>
             <Flex gap={48} wrap>
               {stackList.map((item) => {
                 return (

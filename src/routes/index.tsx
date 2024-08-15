@@ -17,7 +17,12 @@ import {
 import Layout from "@/component/Layout";
 import Dashboard from "@/page/dashboard";
 import Tenant from "@/page/tenant";
+
+/* 应用管理 */
 import Application from "@/page/application";
+import AppDetail from "@/page/application/detail";
+import AppKey from "@/page/application/key";
+
 import Database from "@/page/database";
 import Function from "@/page/function";
 import Storage from "@/page/storage";
@@ -75,13 +80,41 @@ const childRoutes = [
   },
   {
     path: "application",
-    element: <Application />,
     meta: {
       label: "应用管理",
       key: "application",
       icon: <AppstoreOutlined />,
       hide_in_menu: false,
     },
+    children: [
+      {
+        path: "list",
+        element: <Application />,
+        meta: {
+          label: "应用列表",
+          key: "appList",
+          hide_in_menu: true,
+        },
+      },
+      {
+        path: ":id",
+        element: <AppDetail />,
+        meta: {
+          label: "应用详情",
+          key: "appDetail",
+          hide_in_menu: true,
+        },
+      },
+      {
+        path: "key",
+        element: <AppKey />,
+        meta: {
+          label: "应用KEY",
+          key: "appKey",
+          hide_in_menu: true,
+        },
+      },
+    ],
   },
   {
     path: "database",

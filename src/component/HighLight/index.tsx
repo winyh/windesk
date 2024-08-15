@@ -7,9 +7,11 @@ import useStore from "@/store/index";
 import hljs from "highlight.js/lib/core";
 import javascript from "highlight.js/lib/languages/javascript";
 import python from "highlight.js/lib/languages/python";
+import json from "highlight.js/lib/languages/json";
 
 hljs.registerLanguage("javascript", javascript);
 hljs.registerLanguage("python", python);
+hljs.registerLanguage("json", json);
 
 const { BASE_URL } = import.meta.env;
 

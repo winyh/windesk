@@ -8,6 +8,7 @@ import {
   Space,
   Dropdown,
   Flex,
+  Drawer,
   Typography,
   Breadcrumb,
   Tooltip,
@@ -76,6 +77,8 @@ const LayoutBase = () => {
 
   const [applications, setApplications] = useState(["应用A", "应用B"]);
   const [name, setName] = useState("");
+  const [open, setOpen] = useState(false);
+
   const inputRef = useRef(null);
   const toggleTheme = useStore((state) => state.toggleTheme);
 
@@ -271,8 +274,12 @@ const LayoutBase = () => {
     setOpenKeys(openKeys);
   };
 
-  const goAgent = () => {
-    navigate(`/agent`);
+  const onCallAgent = () => {
+    setOpen(true);
+  };
+
+  const onAgentClose = () => {
+    setOpen(false);
   };
 
   return (
@@ -428,7 +435,23 @@ const LayoutBase = () => {
               </Tooltip>
             </div>
           ) : null}
-          <FloatButton onClick={goAgent} icon={<FireTwoTone />} />
+          <FloatButton onClick={onCallAgent} icon={<FireTwoTone />} />
+
+          <Drawer
+            title="AI助手"
+            onClose={onAgentClose}
+            open={open}
+            mask={false}
+            extra={
+              <Button type="primary" onClick={onAgentClose}>
+                关闭
+              </Button>
+            }
+          >
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+            <p>Some contents...</p>
+          </Drawer>
         </Content>
         <Footer
           style={{
