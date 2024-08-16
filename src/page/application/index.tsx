@@ -174,6 +174,13 @@ const Application = () => {
       placeholder: "请输入应用描述",
     },
     {
+      label: "应用标识",
+      name: "application_uuid",
+      is: "Input",
+      itemSpan: 24,
+      placeholder: "请输入应用标识",
+    },
+    {
       label: "应用域名",
       name: "domain",
       is: "Input",

@@ -55,6 +55,7 @@ instance.interceptors.response.use(
       notification.warning({
         message: "系统提醒",
         description: `${error.message}. 系统错误，请联系管理员!`,
+        maxCount: 1,
       });
     }
     return Promise.reject(error);

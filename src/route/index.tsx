@@ -22,6 +22,9 @@ import Tenant from "@/page/tenant";
 import Application from "@/page/application";
 import AppDetail from "@/page/application/detail";
 import AppKey from "@/page/application/key";
+import AppPage from "@/page/application/page";
+import AppNavigation from "@/page/application/navigation";
+import AppPublish from "@/page/application/publish";
 
 import Database from "@/page/database";
 import Function from "@/page/function";
@@ -89,30 +92,57 @@ const childRoutes = [
     },
     children: [
       {
-        path: "list",
+        path: "applist",
         element: <Application />,
         meta: {
           label: "应用列表",
-          key: "appList",
-          hide_in_menu: true,
+          key: "applist",
+          hide_in_menu: false,
         },
       },
+      // {
+      //   path: ":id",
+      //   element: <AppDetail />,
+      //   meta: {
+      //     label: "应用详情",
+      //     key: "appDetail",
+      //     hide_in_menu: false,
+      //   },
+      // },
       {
-        path: ":id",
-        element: <AppDetail />,
-        meta: {
-          label: "应用详情",
-          key: "appDetail",
-          hide_in_menu: true,
-        },
-      },
-      {
-        path: "key",
+        path: "appkey",
         element: <AppKey />,
         meta: {
           label: "应用KEY",
-          key: "appKey",
-          hide_in_menu: true,
+          key: "appkey",
+          hide_in_menu: false,
+        },
+      },
+      {
+        path: "apppage",
+        element: <AppPage />,
+        meta: {
+          label: "页面管理",
+          key: "apppage",
+          hide_in_menu: false,
+        },
+      },
+      {
+        path: "navigation",
+        element: <AppNavigation />,
+        meta: {
+          label: "导航管理",
+          key: "navigation",
+          hide_in_menu: false,
+        },
+      },
+      {
+        path: "publish",
+        element: <AppPublish />,
+        meta: {
+          label: "应用发布",
+          key: "publish",
+          hide_in_menu: false,
         },
       },
     ],
