@@ -1,5 +1,5 @@
 import axios from "axios";
-import { notification } from "antd";
+import { notification } from "@/store/hooks";
 
 // 生成请求实例
 const instance = axios.create({

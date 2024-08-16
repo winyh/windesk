@@ -19,6 +19,8 @@ import {
   RocketOutlined,
 } from "@ant-design/icons";
 
+import { message } from "@/store/hooks";
+
 import HighLight from "@/component/HighLight";
 
 import { invoke } from "@tauri-apps/api/tauri";
@@ -89,6 +91,10 @@ const Dashboard = () => {
     console.log({ stack });
   };
 
+  const onAppClick = () => {
+    message.success("测试 Antd Hooks");
+  };
+
   const tabContent = [
     {
       label: "JavaScript",
@@ -151,6 +157,8 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
           </form>
 
           <p>{greetMsg}</p>
+
+          <Button onClick={onAppClick}>App</Button>
         </Col>
         <Col span={12}>
           <Card

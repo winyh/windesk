@@ -6,9 +6,12 @@ import {
   theme as config,
   Watermark,
 } from "antd";
-import useStore from "@/store/index";
 import "dayjs/locale/zh-cn";
 import zhCN from "antd/locale/zh_CN";
+
+import useStore from "@/store/index";
+import AntdHooks from "@/store/hooks";
+
 import themeToken from "@/config/theme";
 import router from "@/route/index";
 import "./App.css";
@@ -41,6 +44,7 @@ function App() {
         image={watermark.image}
       >
         <AntApp>
+          <AntdHooks />
           <RouterProvider router={router}></RouterProvider>
         </AntApp>
       </Watermark>
