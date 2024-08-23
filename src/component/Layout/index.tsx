@@ -34,7 +34,7 @@ import {
 } from "@ant-design/icons";
 import { theme } from "antd";
 import screenfull from "screenfull";
-import { invoke } from "@tauri-apps/api/tauri";
+import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import useStore from "@/store/index";
 import { logoutService } from "@/service/index";
@@ -232,6 +232,7 @@ const LayoutBase = () => {
 
   const onFullScreen = async () => {
     // tauri 写法
+    console.log(isTauri(), "isTauri");
     if (isTauri()) {
       console.log("isTauri", { isFull });
       setIsFull((isFull) => !isFull);

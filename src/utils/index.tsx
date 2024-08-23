@@ -1,5 +1,5 @@
 const isTauri = () => {
-  return window && window.__TAURI_IPC__;
+  return Boolean(window?.__TAURI_INTERNALS__);
 };
 
 const getCurrentYear = () => {

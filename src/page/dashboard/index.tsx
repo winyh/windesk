@@ -23,7 +23,7 @@ import { message } from "@/store/hooks";
 
 import HighLight from "@/component/HighLight";
 
-import { invoke } from "@tauri-apps/api/tauri";
+import { invoke } from "@tauri-apps/api/core";
 import { isTauri } from "@/utils/index";
 
 import reactLogo from "@/assets/react.svg";
@@ -76,6 +76,7 @@ const Dashboard = () => {
 
   async function greet() {
     // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
+    setGreetMsg(await invoke("greet", { name }));
     if (isTauri()) {
       setGreetMsg(await invoke("greet", { name }));
     } else {
