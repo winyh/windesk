@@ -7,7 +7,7 @@ import {
   Flex,
   Space,
   Button,
-  Dropdown,
+  Select,
   Table,
   InputNumber,
   Divider,
@@ -31,6 +31,7 @@ import {
 
 const { Search } = Input;
 const { DirectoryTree } = Tree;
+const { Option } = Select;
 
 const Menu = () => {
   const [value, setValue] = useState();
@@ -252,62 +253,65 @@ const Menu = () => {
     {
       key: "1",
       label: "菜单类型",
-      children: text,
+      children: "菜单分为：目录、菜单、按钮三种类型。",
     },
     {
       key: "2",
       label: "上级目录",
-      children: text,
+      children: "无上级目录默认为空",
     },
     {
       key: "3",
       label: "目录名称",
-      children: text,
+      children: "目录名称",
     },
     {
       key: "4",
       label: "目录图标",
-      children: text,
+      children:
+        "目录图标，填写图标组件名称，需在 `src\router\router-icons.ts` 中导入并映射",
     },
     {
       key: "33",
       label: "权限标识",
-      children: text,
+      children: "权限标识，也是权限字符，比如 `system:menu:list` 唯一",
     },
     {
       key: "44",
       label: "权限名称",
-      children: text,
+      children: "权限名称 对应 权限标识 `中文名称`",
     },
     {
       key: "5",
       label: "路由地址",
-      children: text,
+      children: "路由地址，如：user",
     },
     {
       key: "6",
       label: "路由名称",
-      children: text,
+      children:
+        "对应路由配置文件中 `name` 只能是唯一性，配置 `http(s)://` 开头地址 则会新窗口打开",
     },
     {
       key: "7",
       label: "默认路由",
-      children: text,
+      children: "默认跳转路由地址，如：`/system/menu/menu` 多级路由情况下适用",
     },
     {
       key: "8",
       label: "路由参数",
-      children: text,
+      children: "默认携带参数",
     },
     {
       key: "9",
       label: "组件路径",
-      children: text,
+      children:
+        "访问的组件路径，如：`/system/menu/menu`，默认在`views`目录下，默认 `LAYOUT` 如果是多级菜单 `ParentLayout`",
     },
     {
       key: "10",
       label: "显示排序",
-      children: text,
+      children: "数字越小越靠前",
     },
   ];
 
@@ -315,32 +319,34 @@ const Menu = () => {
     {
       key: "61",
       label: "根路由",
-      children: text,
+      children: "如果使用 `顶部混合菜单`，必须传 true，否则左侧会显示异常",
     },
     {
       key: "71",
       label: "目录状态",
-      children: text,
+      children: "选择停用则路由将不会出现在侧边栏，也不能被访问",
     },
     {
       key: "81",
       label: "显示状态",
-      children: text,
+      children: "选择隐藏则路由将不会出现在侧边栏，但仍然可以访问",
     },
     {
       key: "91",
       label: "是否缓存",
-      children: text,
+      children:
+        "选择是则会被`keep-alive`缓存，需要匹配组件的`name`和地址保持一致",
     },
     {
       key: "101",
       label: "简化路由",
-      children: text,
+      children:
+        "取消自动计算根路由模式 开启之后，当菜单子菜单只有1个的时候，会直接显示子菜单",
     },
     {
       key: "11",
       label: "按钮状态",
-      children: text,
+      children: "选择停用则路由将不会出现在侧边栏，也不能被访问",
     },
   ];
 
@@ -588,6 +594,19 @@ const Menu = () => {
                 <Col span={4}>路由参数：</Col>
                 <Col span={8}>
                   <Input placeholder="请输入路由参数" />
+                </Col>
+              </Row>
+
+              <Row>
+                <Col span={4}>打开方式：</Col>
+                <Col span={8}>
+                  <Select
+                    placeholder="请输入路由参数"
+                    style={{ width: "100%" }}
+                  >
+                    <Option value="tab">页签</Option>
+                    <Option value="window">新窗口</Option>
+                  </Select>
                 </Col>
               </Row>
 
