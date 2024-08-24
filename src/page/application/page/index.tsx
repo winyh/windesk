@@ -93,6 +93,8 @@ const Page = () => {
     },
   ];
 
+  const ENGINE_HOST = import.meta.env.VITE_WIN_ENGINE_HOST;
+
   const columns = [
     {
       title: "页面名称",
@@ -123,10 +125,14 @@ const Page = () => {
       title: "操作",
       dataIndex: "action",
       key: "action",
-      render: (record) => {
+      render: (text, record) => {
+        console.log({ record });
         return (
           <Space>
-            <Link to="https://www.baidu.com" target="_blank">
+            <Link
+              to={`${ENGINE_HOST}/app/2/page/${record.uuid}/design`}
+              target="_blank"
+            >
               设计
             </Link>
             <Divider type="vertical" />

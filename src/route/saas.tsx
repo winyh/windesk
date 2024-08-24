@@ -60,60 +60,14 @@ const saasBaseRoutes = [
     },
   },
   {
-    path: "application",
+    path: "project",
+    element: <Application />,
     meta: {
       label: "应用管理",
-      key: "application",
+      key: "project",
       icon: <AppstoreOutlined />,
       hide_in_menu: false,
     },
-    children: [
-      {
-        path: "applist",
-        element: <Application />,
-        meta: {
-          label: "应用列表",
-          key: "applist",
-          hide_in_menu: false,
-        },
-      },
-      {
-        path: "appkey",
-        element: <AppKey />,
-        meta: {
-          label: "应用KEY",
-          key: "appkey",
-          hide_in_menu: false,
-        },
-      },
-      {
-        path: "apppage",
-        element: <AppPage />,
-        meta: {
-          label: "页面管理",
-          key: "apppage",
-          hide_in_menu: false,
-        },
-      },
-      {
-        path: "navigation",
-        element: <AppNavigation />,
-        meta: {
-          label: "导航管理",
-          key: "navigation",
-          hide_in_menu: false,
-        },
-      },
-      {
-        path: "publish",
-        element: <AppPublish />,
-        meta: {
-          label: "应用发布",
-          key: "publish",
-          hide_in_menu: false,
-        },
-      },
-    ],
   },
   {
     path: "authority",

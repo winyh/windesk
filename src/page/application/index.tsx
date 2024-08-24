@@ -394,7 +394,7 @@ const Application = () => {
                 }}
                 extra={item?.status}
               >
-                <Link to="/dashboard">
+                <Link to="/app/1/dashboard">
                   <Card.Meta
                     avatar={<img src={item.logo} />}
                     description={
