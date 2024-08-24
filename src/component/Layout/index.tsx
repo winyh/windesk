@@ -45,7 +45,7 @@ import {
   routes2menu,
   getMenuSome,
 } from "@/utils/index";
-import { childRoutes } from "@/route/index";
+import { saasRoutes, appRoutes, routes } from "@/route/index";
 import winbaseLogo from "/winbase.png";
 import "./index.css";
 
@@ -174,7 +174,7 @@ const LayoutBase = () => {
   useEffect(() => {
     // console.log(`路由变化监听：${location.pathname}`);
     if (location.pathname === "/") {
-      navigate("/dashboard");
+      navigate("/saas/dashboard");
     } else {
       onRouteChange();
     }
@@ -182,16 +182,21 @@ const LayoutBase = () => {
 
   /* 路由变化监听 */
   const onRouteChange = () => {
-    const menus = routes2menu(childRoutes);
+    let curentRoutes = saasRoutes;
+    if (location.pathname.includes("/app")) {
+      curentRoutes = appRoutes;
+    }
+    const menus = routes2menu(curentRoutes);
     setMenuItems(menus);
     let keyPaths = location.pathname.split("/").filter((i) => i);
 
-    let someMenu = getMenuSome(childRoutes);
+    let someMenu = getMenuSome(routes);
     let breads: any[] = [];
     var linkPath = "";
     keyPaths.map((key, _) => {
       linkPath = `${linkPath}/${key}`.replace(/\/\/+/g, "/");
       const label = findObjByKey(someMenu, key, "key")?.label;
+      console.log({ linkPath, label, someMenu });
       let curentPath = linkPath;
       breads.push({
         title: <Link to={`${curentPath}`}>{label}</Link>,

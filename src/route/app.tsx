@@ -1,22 +1,21 @@
 import {
+  DiffOutlined,
   AppstoreOutlined,
   DashboardOutlined,
   LineChartOutlined,
   ConsoleSqlOutlined,
-  GroupOutlined,
   FunctionOutlined,
   FireOutlined,
   UserOutlined,
+  SettingOutlined,
   CloudServerOutlined,
   SafetyCertificateOutlined,
 } from "@ant-design/icons";
 
 import Layout from "@/component/Layout";
 import Dashboard from "@/page/dashboard";
-import Tenant from "@/page/tenant";
 
 /* 应用管理 */
-import Application from "@/page/application";
 import AppDetail from "@/page/application/detail";
 import AppKey from "@/page/application/key";
 import AppPage from "@/page/application/page";
@@ -56,7 +55,7 @@ import Log from "@/page/system/log";
 import Area from "@/page/system/area"; // 待开发-暂时屏蔽
 import Cache from "@/page/system/cache"; // 待开发-暂时屏蔽
 
-const appRoutes = [
+const appBaseRoutes = [
   {
     path: "dashboard",
     element: <Dashboard />,
@@ -68,38 +67,21 @@ const appRoutes = [
     },
   },
   {
-    path: "application",
+    path: "self",
+    element: <AppPage />,
     meta: {
       label: "应用管理",
-      key: "application",
       icon: <AppstoreOutlined />,
+      key: "self",
       hide_in_menu: false,
     },
     children: [
-      // {
-      //   path: ":id",
-      //   element: <AppDetail />,
-      //   meta: {
-      //     label: "应用详情",
-      //     key: "appDetail",
-      //     hide_in_menu: false,
-      //   },
-      // },
       {
-        path: "appkey",
-        element: <AppKey />,
+        path: "publish",
+        element: <AppPublish />,
         meta: {
-          label: "应用KEY",
-          key: "appkey",
-          hide_in_menu: false,
-        },
-      },
-      {
-        path: "apppage",
-        element: <AppPage />,
-        meta: {
-          label: "页面管理",
-          key: "apppage",
+          label: "应用发布",
+          key: "publish",
           hide_in_menu: false,
         },
       },
@@ -113,13 +95,54 @@ const appRoutes = [
         },
       },
       {
-        path: "publish",
-        element: <AppPublish />,
+        path: "appkey",
+        element: <AppKey />,
         meta: {
-          label: "应用发布",
-          key: "publish",
+          label: "应用KEY",
+          key: "appkey",
           hide_in_menu: false,
         },
+      },
+    ],
+  },
+  {
+    path: "page",
+    element: <AppPage />,
+    meta: {
+      label: "页面管理",
+      icon: <DiffOutlined />,
+      key: "page",
+      hide_in_menu: false,
+    },
+    children: [
+      {
+        path: ":pageId",
+        element: <AppPage />,
+        meta: {
+          label: "页面详情",
+          key: "pageInfo",
+          hide_in_menu: false,
+        },
+      },
+      {
+        path: ":pageId/:tense",
+        element: <AppPage />,
+        meta: {
+          label: "页面时态",
+          key: "pageTense",
+          hide_in_menu: false,
+        },
+        children: [
+          {
+            path: ":action",
+            element: <AppPage />,
+            meta: {
+              label: "页面动作",
+              key: "pageAction",
+              hide_in_menu: false,
+            },
+          },
+        ],
       },
     ],
   },
@@ -232,8 +255,8 @@ const appRoutes = [
   {
     path: "system",
     meta: {
-      label: "系统配置",
-      icon: <DashboardOutlined />,
+      label: "应用配置",
+      icon: <SettingOutlined />,
       key: "system",
       hide_in_menu: false,
     },
@@ -361,6 +384,6 @@ const appRoutes = [
   },
 ];
 
-export { appRoutes };
+export { appBaseRoutes };
 
-export default appRoutes;
+export default appBaseRoutes;

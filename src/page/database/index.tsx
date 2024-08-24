@@ -18,6 +18,7 @@ import {
   Alert,
   Typography,
 } from "antd";
+import { useParams } from "react-router-dom";
 import {
   PlusOutlined,
   MoreOutlined,
@@ -37,6 +38,7 @@ const { Text } = Typography;
 
 const Database = () => {
   const formRef = useRef();
+  const { appId } = useParams();
   const [mode, setMode] = useState("table");
   const [selectedRows, setSelectedRows] = useState([]);
   const [open, setOpen] = useState(false);
@@ -48,6 +50,8 @@ const Database = () => {
   const [dataSearchLoading, setDataSearchLoading] = useState(false);
   const [record, setRecord] = useState({});
   const data = ["user", "article", "role", "admin", "category"];
+
+  console.log({ appId });
 
   const showDrawer = (bool, record) => {
     setAction(bool);

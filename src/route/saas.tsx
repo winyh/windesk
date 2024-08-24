@@ -1,33 +1,21 @@
 import {
   AppstoreOutlined,
   DashboardOutlined,
-  LineChartOutlined,
-  ConsoleSqlOutlined,
   GroupOutlined,
-  FunctionOutlined,
-  FireOutlined,
   UserOutlined,
-  CloudServerOutlined,
+  SettingOutlined,
   SafetyCertificateOutlined,
 } from "@ant-design/icons";
 
-import Layout from "@/component/Layout";
 import Dashboard from "@/page/dashboard";
 import Tenant from "@/page/tenant";
 
 /* 应用管理 */
 import Application from "@/page/application";
-import AppDetail from "@/page/application/detail";
 import AppKey from "@/page/application/key";
 import AppPage from "@/page/application/page";
 import AppNavigation from "@/page/application/navigation";
 import AppPublish from "@/page/application/publish";
-
-import Database from "@/page/database";
-import Function from "@/page/function";
-import Storage from "@/page/storage";
-import Agent from "@/page/agent";
-import Analysis from "@/page/analysis";
 
 /* 结果页 */
 import Result403 from "@/page/result/403";
@@ -35,8 +23,6 @@ import Result404 from "@/page/result/404";
 import Result500 from "@/page/result/500";
 
 /* 账户页 */
-import Login from "@/page/account/login";
-import Register from "@/page/account/register";
 import Profile from "@/page/user/profile";
 import CustomeTheme from "@/page/user/theme";
 import Message from "@/page/user/message";
@@ -49,19 +35,15 @@ import Organization from "@/page/authority/organization";
 import Position from "@/page/authority/position";
 
 /* 系统设置 */
-import Dictionary from "@/page/system/dictionary";
-import Parameter from "@/page/system/parameter";
-import Setting from "@/page/system/setting";
 import Log from "@/page/system/log";
 import Area from "@/page/system/area"; // 待开发-暂时屏蔽
-import Cache from "@/page/system/cache"; // 待开发-暂时屏蔽
 
-const saasRoutes = [
+const saasBaseRoutes = [
   {
     path: "dashboard",
     element: <Dashboard />,
     meta: {
-      label: "控制台",
+      label: "总览",
       icon: <DashboardOutlined />,
       key: "dashboard",
       hide_in_menu: false,
@@ -95,15 +77,6 @@ const saasRoutes = [
           hide_in_menu: false,
         },
       },
-      // {
-      //   path: ":id",
-      //   element: <AppDetail />,
-      //   meta: {
-      //     label: "应用详情",
-      //     key: "appDetail",
-      //     hide_in_menu: false,
-      //   },
-      // },
       {
         path: "appkey",
         element: <AppKey />,
@@ -143,59 +116,9 @@ const saasRoutes = [
     ],
   },
   {
-    path: "database",
-    element: <Database />,
-    meta: {
-      label: "数据库",
-      key: "database",
-      icon: <ConsoleSqlOutlined />,
-      hide_in_menu: false,
-    },
-  },
-  {
-    path: "function",
-    element: <Function />,
-    meta: {
-      label: "云函数",
-      key: "function",
-      icon: <FunctionOutlined />,
-      hide_in_menu: false,
-    },
-  },
-  {
-    path: "storage",
-    element: <Storage />,
-    meta: {
-      label: "文件存储",
-      key: "storage",
-      icon: <CloudServerOutlined />,
-      hide_in_menu: false,
-    },
-  },
-  {
-    path: "agent",
-    element: <Agent />,
-    meta: {
-      label: "AI 助手",
-      key: "agent",
-      icon: <FireOutlined />,
-      hide_in_menu: false,
-    },
-  },
-  {
-    path: "analysis",
-    element: <Analysis />,
-    meta: {
-      label: "分析监控",
-      key: "analysis",
-      icon: <LineChartOutlined />,
-      hide_in_menu: false,
-    },
-  },
-  {
     path: "authority",
     meta: {
-      label: "权限管理",
+      label: "平台权限",
       key: "authority",
       icon: <SafetyCertificateOutlined />,
       hide_in_menu: false,
@@ -252,38 +175,11 @@ const saasRoutes = [
     path: "system",
     meta: {
       label: "系统配置",
-      icon: <DashboardOutlined />,
+      icon: <SettingOutlined />,
       key: "system",
       hide_in_menu: false,
     },
     children: [
-      {
-        path: "dictionary",
-        element: <Dictionary />,
-        meta: {
-          label: "字典管理",
-          key: "dictionary",
-          hide_in_menu: false,
-        },
-      },
-      {
-        path: "parameter",
-        element: <Parameter />,
-        meta: {
-          label: "参数管理",
-          key: "parameter",
-          hide_in_menu: false,
-        },
-      },
-      {
-        path: "setting",
-        element: <Setting />,
-        meta: {
-          label: "应用配置",
-          key: "setting",
-          hide_in_menu: false,
-        },
-      },
       {
         path: "log",
         element: <Log />,
@@ -294,21 +190,12 @@ const saasRoutes = [
         },
       },
       {
-        path: "area",
+        path: "common",
         element: <Area />,
         meta: {
-          label: "行政区划",
-          key: "area",
-          hide_in_menu: true,
-        },
-      },
-      {
-        path: "cache",
-        element: <Cache />,
-        meta: {
-          label: "缓存管理",
-          key: "cache",
-          hide_in_menu: true,
+          label: "通用配置",
+          key: "common",
+          hide_in_menu: false,
         },
       },
     ],
@@ -351,35 +238,8 @@ const saasRoutes = [
       },
     ],
   },
-  {
-    path: "403",
-    element: <Result403 />,
-    meta: {
-      label: "403",
-      key: "403",
-      hide_in_menu: true,
-    },
-  },
-  {
-    path: "500",
-    element: <Result500 />,
-    meta: {
-      label: "500",
-      key: "500",
-      hide_in_menu: true,
-    },
-  },
-  {
-    path: "*",
-    element: <Result404 />,
-    meta: {
-      label: "404",
-      key: "404",
-      hide_in_menu: true,
-    },
-  },
 ];
 
-export { saasRoutes };
+export { saasBaseRoutes };
 
-export default saasRoutes;
+export default saasBaseRoutes;
