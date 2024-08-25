@@ -196,7 +196,6 @@ const LayoutBase = () => {
     keyPaths.map((key, _) => {
       linkPath = `${linkPath}/${key}`.replace(/\/\/+/g, "/");
       const label = findObjByKey(someMenu, key, "key")?.label;
-      console.log({ linkPath, label, someMenu });
       let curentPath = linkPath;
       breads.push({
         title: <Link to={`${curentPath}`}>{label}</Link>,

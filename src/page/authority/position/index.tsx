@@ -6,9 +6,7 @@ import {
   Flex,
   Input,
   Divider,
-  Tag,
   Badge,
-  Dropdown,
   Drawer,
   Popconfirm,
   App,
@@ -16,6 +14,7 @@ import {
 import { PlusOutlined } from "@ant-design/icons";
 import SuperForm from "@/component/SuperForm";
 import dayjs from "dayjs";
+import { clientPost, clientPut, clientDel, clientGetList } from "@/request";
 
 const { Search } = Input;
 
@@ -24,8 +23,8 @@ const Position = () => {
   const [dataSource, setDataSource] = useState([
     {
       id: 1,
-      position_name: "财务总监",
-      position_code: "CS001",
+      name: "财务总监",
+      code: "CS001",
       description: "管理全体系财务",
     },
   ]);
@@ -36,6 +35,29 @@ const Position = () => {
   const [record, setRecord] = useState({});
   const [selectedRows, setSelectedRows] = useState([]);
   const { modal } = App.useApp();
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  const getData = () => {
+    setSearchLoading(true);
+    clientGetList("position", {
+      current: 1,
+      pageSize: 10,
+    })
+      .then((res) => {
+        if (res.status) {
+          setDataSource(res.data.list);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {
+        setSearchLoading(false);
+      });
+  };
 
   const onSearch = (value) => {
     console.log(value);
@@ -59,7 +81,19 @@ const Position = () => {
     formRef?.current?.form
       .validateFields()
       .then(async (values) => {
-        console.log({ values });
+        if (action) {
+          const res = await clientPost("position", values);
+          if (res.status) {
+            getData();
+            setOpen(false);
+          }
+        } else {
+          const res = await clientPut("position", { ...values, id: record.id });
+          if (res.status) {
+            getData();
+            setOpen(false);
+          }
+        }
       })
       .catch(() => {});
   };
@@ -72,14 +106,14 @@ const Position = () => {
   const formData = [
     {
       label: "岗位名称",
-      name: "position_name",
+      name: "name",
       is: "Input",
       itemSpan: 24,
       placeholder: "请输入岗位名称",
     },
     {
       label: "岗位编码",
-      name: "position_code",
+      name: "code",
       is: "Input",
       itemSpan: 24,
       placeholder: "请输入联系方式",
@@ -136,13 +170,13 @@ const Position = () => {
   const columns = [
     {
       title: "岗位名称",
-      dataIndex: "position_name",
-      key: "position_name",
+      dataIndex: "name",
+      key: "name",
     },
     {
       title: "岗位编码",
-      dataIndex: "position_code",
-      key: "position_code",
+      dataIndex: "code",
+      key: "code",
     },
     {
       title: "岗位描述",
@@ -211,7 +245,13 @@ const Position = () => {
     }),
   };
 
-  const onConfirm = () => {};
+  const onConfirm = async () => {
+    const res = await clientDel("position", { ids: record.id });
+    if (res.status) {
+      getData();
+      console.log({ res });
+    }
+  };
 
   const onCancel = () => {};
 

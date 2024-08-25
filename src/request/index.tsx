@@ -1,6 +1,8 @@
 import axios from "axios";
 import { notification } from "@/store/hooks";
 
+const apiPrefix = "/auto";
+
 // 生成请求实例
 const instance = axios.create({
   baseURL: import.meta.env.VITE_HTTP_URL,
@@ -101,4 +103,42 @@ const comGetFile = (url, data) => {
   return instance.get(url, data);
 };
 
-export { srvGet, srvPost, comGet, comPost, comDel, comPut, comGetFile };
+const clientGetOne = (collection, recordId, params) => {
+  return comGet(`${apiPrefix}/${collection}/${recordId}`, params);
+};
+
+const clientGetAll = (collection, params) => {
+  return comGet(`${apiPrefix}/${collection}`, params);
+};
+
+const clientGetList = (collection, params) => {
+  return comGet(`${apiPrefix}/${collection}/list/page`, params);
+};
+
+const clientPost = (collection, data) => {
+  return instance.post(`${apiPrefix}/${collection}`, data);
+};
+
+const clientDel = (collection, params) => {
+  return instance.delete(`${apiPrefix}/${collection}`, { params });
+};
+
+const clientPut = (collection, data) => {
+  return instance.put(`${apiPrefix}/${collection}`, data);
+};
+
+export {
+  srvGet,
+  srvPost,
+  comGet,
+  comPost,
+  comDel,
+  comPut,
+  comGetFile,
+  clientGetOne,
+  clientGetAll,
+  clientGetList,
+  clientPost,
+  clientDel,
+  clientPut,
+};
