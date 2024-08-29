@@ -116,7 +116,7 @@ const appBaseRoutes = [
       label: "页面管理",
       icon: <DiffOutlined />,
       key: "page",
-      hide_in_menu: false,
+      hide_in_menu: true,
     },
     children: [
       {
