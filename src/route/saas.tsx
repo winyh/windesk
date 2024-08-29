@@ -1,7 +1,7 @@
 import {
   AppstoreOutlined,
   DashboardOutlined,
-  GroupOutlined,
+  ShopOutlined,
   UserOutlined,
   SettingOutlined,
   LineChartOutlined,
@@ -50,7 +50,7 @@ const saasBaseRoutes = [
     meta: {
       label: "租户管理",
       key: "tenant",
-      icon: <GroupOutlined />,
+      icon: <ShopOutlined />,
       hide_in_menu: false,
     },
   },

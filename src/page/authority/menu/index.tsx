@@ -2,13 +2,11 @@ import { useState } from "react";
 import {
   Col,
   Row,
-  List,
   Input,
   Flex,
   Space,
   Button,
   Select,
-  Table,
   InputNumber,
   Divider,
   Card,
@@ -22,10 +20,8 @@ import {
 
 import {
   PlusOutlined,
-  MoreOutlined,
   UserOutlined,
-  CodeOutlined,
-  QuestionOutlined,
+  ControlOutlined,
   ExceptionOutlined,
 } from "@ant-design/icons";
 
@@ -36,6 +32,8 @@ const { Option } = Select;
 const Menu = () => {
   const [value, setValue] = useState();
   const [menuType, setMenuType] = useState("directory");
+  const [selectedKeys, setSelectedKeys] = useState([]);
+  const [expandedKeys, setExpandedKeys] = useState([]);
   const [externalLink, setExternalLink] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -119,12 +117,12 @@ const Menu = () => {
       children: [
         {
           title: "leaf 1-0",
-          key: "0-3-0",
+          key: "0-4-0",
           isLeaf: true,
         },
         {
           title: "leaf 1-1",
-          key: "0-3-1",
+          key: "0-4-1",
           isLeaf: true,
         },
       ],
@@ -135,12 +133,12 @@ const Menu = () => {
       children: [
         {
           title: "leaf 1-0",
-          key: "0-3-0",
+          key: "0-5-0",
           isLeaf: true,
         },
         {
           title: "leaf 1-1",
-          key: "0-3-1",
+          key: "0-5-1",
           isLeaf: true,
         },
       ],
@@ -151,12 +149,12 @@ const Menu = () => {
       children: [
         {
           title: "leaf 1-0",
-          key: "0-3-0",
+          key: "0-6-0",
           isLeaf: true,
         },
         {
           title: "leaf 1-1",
-          key: "0-3-1",
+          key: "0-6-1",
           isLeaf: true,
         },
       ],
@@ -167,12 +165,12 @@ const Menu = () => {
       children: [
         {
           title: "leaf 1-0",
-          key: "0-3-0",
+          key: "0-7-0",
           isLeaf: true,
         },
         {
           title: "leaf 1-1",
-          key: "0-3-1",
+          key: "0-7-1",
           isLeaf: true,
         },
       ],
@@ -183,12 +181,12 @@ const Menu = () => {
       children: [
         {
           title: "leaf 1-0",
-          key: "0-3-0",
+          key: "0-8-0",
           isLeaf: true,
         },
         {
           title: "leaf 1-1",
-          key: "0-3-1",
+          key: "0-8-1",
           isLeaf: true,
         },
       ],
@@ -199,12 +197,12 @@ const Menu = () => {
       children: [
         {
           title: "leaf 1-0",
-          key: "0-3-0",
+          key: "0-9-0",
           isLeaf: true,
         },
         {
           title: "leaf 1-1",
-          key: "0-3-1",
+          key: "0-9-1",
           isLeaf: true,
         },
       ],
@@ -350,15 +348,11 @@ const Menu = () => {
     },
   ];
 
-  const onShowSizeChange = (current, pageSize) => {
-    console.log(current, pageSize);
-  };
-
   const onSelect = (keys, info) => {
-    console.log("Trigger Select", keys, info);
+    setSelectedKeys(keys);
   };
   const onExpand = (keys, info) => {
-    console.log("Trigger Expand", keys, info);
+    setExpandedKeys(keys);
   };
 
   const onChange = (newValue) => {
@@ -367,72 +361,6 @@ const Menu = () => {
   const onPopupScroll = (e) => {
     console.log("onPopupScroll", e);
   };
-
-  const dataSource = [
-    {
-      key: "1",
-      name: "胡彦斌",
-      age: 32,
-      address: "西湖区湖底公园1号",
-    },
-    {
-      key: "2",
-      name: "胡彦祖",
-      age: 42,
-      address: "西湖区湖底公园1号",
-    },
-  ];
-
-  const columns = [
-    {
-      title: "文件名",
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: "文件ID",
-      dataIndex: "hash",
-      key: "hash",
-    },
-    {
-      title: "文件后缀",
-      dataIndex: "suffix",
-      key: "suffix",
-    },
-    {
-      title: "大小",
-      dataIndex: "size",
-      key: "size",
-    },
-    {
-      title: "类型",
-      dataIndex: "type",
-      key: "type",
-    },
-    {
-      title: "状态",
-      dataIndex: "status",
-      key: "status",
-    },
-    {
-      title: "创建时间",
-      dataIndex: "created_at",
-      key: "created_at",
-    },
-    {
-      title: "操作",
-      dataIndex: "action",
-      key: "action",
-      render: (text) => (
-        <Space>
-          <span>增加子项</span>
-          <Divider />
-          <span>分配角色</span>
-          <Divider />
-        </Space>
-      ),
-    },
-  ];
 
   const onChangeMenuType = (value) => {
     setMenuType(value);
@@ -449,16 +377,14 @@ const Menu = () => {
         <Card
           title={
             <Space>
-              <Button type="text" block icon={<PlusOutlined />}>
-                新增菜单
-              </Button>
+              <Button icon={<PlusOutlined />}>新增菜单</Button>
+              <Button icon={<ControlOutlined />}>展开折叠</Button>
               <Search placeholder="搜索菜单" />
             </Space>
           }
         >
           <DirectoryTree
-            multiple
-            defaultExpandAll
+            expandedKeys={expandedKeys}
             onSelect={onSelect}
             onExpand={onExpand}
             treeData={treeData}
@@ -547,6 +473,24 @@ const Menu = () => {
                 </Col>
               </Row>
 
+              {menuType !== "button" ? (
+                <Row>
+                  <Col span={4}>路由地址：</Col>
+                  <Col span={8}>
+                    <Input placeholder="请输入路由地址" />
+                  </Col>
+                </Row>
+              ) : null}
+
+              {menuType !== "button" ? (
+                <Row>
+                  <Col span={4}>路由名称：</Col>
+                  <Col span={8}>
+                    <Input placeholder="请输入路由名称" />
+                  </Col>
+                </Row>
+              ) : null}
+
               {/* 权限相关 */}
 
               {menuType !== "directory" ? (
@@ -569,63 +513,59 @@ const Menu = () => {
 
               {/* 权限相关 */}
 
-              <Row>
-                <Col span={4}>路由地址：</Col>
-                <Col span={8}>
-                  <Input placeholder="请输入路由地址" />
-                </Col>
-              </Row>
+              {menuType !== "button" ? (
+                <Row>
+                  <Col span={4}>默认路由：</Col>
+                  <Col span={8}>
+                    <Input placeholder="请输入默认路由" />
+                  </Col>
+                </Row>
+              ) : null}
 
-              <Row>
-                <Col span={4}>路由名称：</Col>
-                <Col span={8}>
-                  <Input placeholder="请输入路由名称" />
-                </Col>
-              </Row>
+              {menuType === "menu" ? (
+                <Row>
+                  <Col span={4}>路由参数：</Col>
+                  <Col span={8}>
+                    <Input placeholder="请输入路由参数" />
+                  </Col>
+                </Row>
+              ) : null}
 
-              <Row>
-                <Col span={4}>默认路由：</Col>
-                <Col span={8}>
-                  <Input placeholder="请输入默认路由" />
-                </Col>
-              </Row>
+              {menuType === "menu" ? (
+                <Row>
+                  <Col span={4}>打开方式：</Col>
+                  <Col span={8}>
+                    <Select
+                      placeholder="请输入路由参数"
+                      style={{ width: "100%" }}
+                    >
+                      <Option value="tab">页签</Option>
+                      <Option value="window">新窗口</Option>
+                    </Select>
+                  </Col>
+                </Row>
+              ) : null}
 
-              <Row>
-                <Col span={4}>路由参数：</Col>
-                <Col span={8}>
-                  <Input placeholder="请输入路由参数" />
-                </Col>
-              </Row>
+              {menuType !== "button" ? (
+                <Row>
+                  <Col span={4}>组件路径：</Col>
+                  <Col span={8}>
+                    <Input placeholder="请输入组件路径" />
+                  </Col>
+                </Row>
+              ) : null}
 
-              <Row>
-                <Col span={4}>打开方式：</Col>
-                <Col span={8}>
-                  <Select
-                    placeholder="请输入路由参数"
-                    style={{ width: "100%" }}
-                  >
-                    <Option value="tab">页签</Option>
-                    <Option value="window">新窗口</Option>
-                  </Select>
-                </Col>
-              </Row>
-
-              <Row>
-                <Col span={4}>组件路径：</Col>
-                <Col span={8}>
-                  <Input placeholder="请输入组件路径" />
-                </Col>
-              </Row>
-
-              <Row>
-                <Col span={4}>显示排序：</Col>
-                <Col span={8}>
-                  <InputNumber
-                    style={{ width: "100%" }}
-                    placeholder="请输入显示排序"
-                  />
-                </Col>
-              </Row>
+              {menuType !== "button" ? (
+                <Row>
+                  <Col span={4}>显示排序：</Col>
+                  <Col span={8}>
+                    <InputNumber
+                      style={{ width: "100%" }}
+                      placeholder="请输入显示排序"
+                    />
+                  </Col>
+                </Row>
+              ) : null}
             </Space>
 
             <Space size="middle" direction="vertical">

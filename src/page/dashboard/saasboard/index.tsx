@@ -79,9 +79,7 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
   return (
     <div>
       <Row gutter={24}>
-        <Col span={6}>
-          <Button onClick={onAppClick}>Saas Board</Button>
-        </Col>
+        <Col span={6}></Col>
         <Col span={12}>
           <Card
             title="应用访问方式"
