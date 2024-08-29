@@ -12,14 +12,13 @@ import {
   SafetyCertificateOutlined,
 } from "@ant-design/icons";
 
-import Layout from "@/component/Layout";
 import Dashboard from "@/page/dashboard";
 
 /* 应用管理 */
-import AppDetail from "@/page/application/detail";
-import AppKey from "@/page/application/key";
+
 import AppPage from "@/page/application/page";
 import AppNavigation from "@/page/application/navigation";
+import AppKey from "@/page/application/key";
 import AppPublish from "@/page/application/publish";
 
 import Database from "@/page/database";
@@ -34,8 +33,6 @@ import Result404 from "@/page/result/404";
 import Result500 from "@/page/result/500";
 
 /* 账户页 */
-import Login from "@/page/account/login";
-import Register from "@/page/account/register";
 import Profile from "@/page/user/profile";
 import CustomeTheme from "@/page/user/theme";
 import Message from "@/page/user/message";
@@ -68,7 +65,6 @@ const appBaseRoutes = [
   },
   {
     path: "self",
-    element: <AppPage />,
     meta: {
       label: "应用管理",
       icon: <AppstoreOutlined />,
@@ -77,11 +73,11 @@ const appBaseRoutes = [
     },
     children: [
       {
-        path: "publish",
-        element: <AppPublish />,
+        path: "page",
+        element: <AppPage />,
         meta: {
-          label: "应用发布",
-          key: "publish",
+          label: "页面管理",
+          key: "page",
           hide_in_menu: false,
         },
       },
@@ -103,11 +99,19 @@ const appBaseRoutes = [
           hide_in_menu: false,
         },
       },
+      {
+        path: "publish",
+        element: <AppPublish />,
+        meta: {
+          label: "应用发布",
+          key: "publish",
+          hide_in_menu: false,
+        },
+      },
     ],
   },
   {
-    path: "page",
-    element: <AppPage />,
+    path: "page/:pageId",
     meta: {
       label: "页面管理",
       icon: <DiffOutlined />,
@@ -116,16 +120,7 @@ const appBaseRoutes = [
     },
     children: [
       {
-        path: ":pageId",
-        element: <AppPage />,
-        meta: {
-          label: "页面详情",
-          key: "pageInfo",
-          hide_in_menu: false,
-        },
-      },
-      {
-        path: ":pageId/:tense",
+        path: ":tense",
         element: <AppPage />,
         meta: {
           label: "页面时态",

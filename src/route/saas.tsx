@@ -11,8 +11,8 @@ import {
 import Dashboard from "@/page/dashboard/saasboard";
 import Tenant from "@/page/tenant";
 
-/* 应用管理 */
-import Application from "@/page/application";
+/* 项目管理 */
+import Project from "@/page/application/project";
 
 /* 账户页 */
 import Profile from "@/page/user/profile";
@@ -56,9 +56,9 @@ const saasBaseRoutes = [
   },
   {
     path: "project",
-    element: <Application />,
+    element: <Project />,
     meta: {
-      label: "应用管理",
+      label: "项目管理",
       key: "project",
       icon: <AppstoreOutlined />,
       hide_in_menu: false,

@@ -79,55 +79,34 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
   return (
     <div>
       <Row gutter={24}>
-        <Col span={6}></Col>
-        <Col span={12}>
-          <Card
-            title="应用访问方式"
-            extra={
-              <Button type="text" icon={<ApiOutlined />}>
-                APIKey
-              </Button>
-            }
-          >
-            <Flex vertical gap={36}>
-              <Flex gap={24} justify="space-between">
-                <span>应用URL</span>
-                <Space>
-                  <Input value={appInfo.appUrl} style={{ width: 300 }} />
-                  <Button>
-                    <Text
-                      copyable={{
-                        text: appInfo.appUrl,
-                      }}
-                    />
-                  </Button>
-                </Space>
-              </Flex>
-              <Flex gap={24} justify="space-between">
-                <span>访问密钥</span>
-                <Space>
-                  <Input value={appInfo.appKey} style={{ width: 300 }} />
-                  <Button>
-                    <Text
-                      copyable={{
-                        text: appInfo.appKey,
-                      }}
-                    />
-                  </Button>
-                </Space>
-              </Flex>
-            </Flex>
-            <Divider />
-            <Tabs
-              activeKey={activeKey}
-              type="card"
-              size="small"
-              items={tabContent}
-              onChange={onChange}
-            />
+        <Col span={6}>
+          <Card title="项目总数">
+            <p>Card content</p>
+            <p>Card content</p>
+            <p>Card content</p>
           </Card>
         </Col>
-        <Col span={6}></Col>
+        <Col span={6}>
+          <Card title="今日新增">
+            <p>Card content</p>
+            <p>Card content</p>
+            <p>Card content</p>
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card title="运行中">
+            <p>Card content</p>
+            <p>Card content</p>
+            <p>Card content</p>
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card title="已停服">
+            <p>Card content</p>
+            <p>Card content</p>
+            <p>Card content</p>
+          </Card>
+        </Col>
       </Row>
     </div>
   );
