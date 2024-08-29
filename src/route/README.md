@@ -20,7 +20,7 @@
 
 /saas/tenant 租户管理
 
-/saas/app 应用管理-应用列表和入口
+/saas/project 应用管理-应用列表和入口
 
 /saas/analysis 数据分析：总览数据分析（内容暂时放控制台，多了再开放这个）
 

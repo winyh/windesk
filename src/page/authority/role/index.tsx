@@ -6,7 +6,6 @@ import {
   Flex,
   Input,
   Divider,
-  Tag,
   Badge,
   Tree,
   Drawer,
@@ -15,9 +14,7 @@ import {
 } from "antd";
 import {
   PlusOutlined,
-  EllipsisOutlined,
   DeleteOutlined,
-  KeyOutlined,
   UserAddOutlined,
 } from "@ant-design/icons";
 import SuperForm from "@/component/SuperForm";
@@ -87,7 +84,7 @@ const Role = () => {
 
   const onSearch = (value) => {
     console.log(value);
-    getData({ name: value });
+    getData({ role_name: value });
   };
 
   const onPaginationChange = (current, pageSize) => {
@@ -350,8 +347,17 @@ const Role = () => {
       name: "status",
       itemSpan: 24,
       placeholder: "请选择状态",
-      options: [],
       is: "Select",
+      options: [
+        {
+          label: "启用",
+          value: "1",
+        },
+        {
+          label: "禁用",
+          value: "0",
+        },
+      ],
     },
     {
       label: "分配权限", // 单独封装一个组件-加入全选/不选-展开/收起按钮
@@ -410,15 +416,20 @@ const Role = () => {
       title: "状态",
       dataIndex: "status",
       key: "status",
-      render: () => {
-        return <Badge status="processing" text="启用" />;
+      render: (text) => {
+        return (
+          <Badge
+            status={text === "1" ? "processing" : "default"}
+            text={text === "1" ? "启用" : "禁用"}
+          />
+        );
       },
     },
     {
       title: "操作",
       dataIndex: "action",
       key: "action",
-      render: (text) => (
+      render: (text, record) => (
         <>
           <Button
             type="text"
@@ -502,6 +513,7 @@ const Role = () => {
           rowKey={(record) => record.id}
           dataSource={dataSource}
           columns={columns}
+          loading={loading}
           pagination={{
             position: ["bottomCenter"],
             showSizeChanger: true,

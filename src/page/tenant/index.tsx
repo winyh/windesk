@@ -154,6 +154,7 @@ const Tenant = () => {
       name: "status",
       itemSpan: 24,
       placeholder: "请选择状态",
+      is: "Select",
       options: [
         {
           label: "启用",
@@ -164,7 +165,6 @@ const Tenant = () => {
           value: "0",
         },
       ],
-      is: "Select",
     },
   ];
 

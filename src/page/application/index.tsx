@@ -411,7 +411,12 @@ const Application = () => {
                 style={{
                   width: 360,
                 }}
-                extra={item?.status}
+                extra={
+                  <Badge
+                    status={item.status === "1" ? "processing" : "default"}
+                    text={item?.status === "1" ? "启用" : "禁用"}
+                  ></Badge>
+                }
               >
                 <Link to="/app/1/dashboard">
                   <Card.Meta

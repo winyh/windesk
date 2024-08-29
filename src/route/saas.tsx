@@ -4,6 +4,7 @@ import {
   GroupOutlined,
   UserOutlined,
   SettingOutlined,
+  LineChartOutlined,
   SafetyCertificateOutlined,
 } from "@ant-design/icons";
 
@@ -12,20 +13,14 @@ import Tenant from "@/page/tenant";
 
 /* 应用管理 */
 import Application from "@/page/application";
-import AppKey from "@/page/application/key";
-import AppPage from "@/page/application/page";
-import AppNavigation from "@/page/application/navigation";
-import AppPublish from "@/page/application/publish";
-
-/* 结果页 */
-import Result403 from "@/page/result/403";
-import Result404 from "@/page/result/404";
-import Result500 from "@/page/result/500";
 
 /* 账户页 */
 import Profile from "@/page/user/profile";
 import CustomeTheme from "@/page/user/theme";
 import Message from "@/page/user/message";
+
+/* 数据分析 */
+import Analysis from "@/page/analysis/saas";
 
 /* 权限管理 */
 import Admin from "@/page/authority/admin";
@@ -36,7 +31,7 @@ import Position from "@/page/authority/position";
 
 /* 系统设置 */
 import Log from "@/page/system/log";
-import Area from "@/page/system/area"; // 待开发-暂时屏蔽
+import Common from "@/page/system/common";
 
 const saasBaseRoutes = [
   {
@@ -66,6 +61,16 @@ const saasBaseRoutes = [
       label: "应用管理",
       key: "project",
       icon: <AppstoreOutlined />,
+      hide_in_menu: false,
+    },
+  },
+  {
+    path: "analysis",
+    element: <Analysis />,
+    meta: {
+      label: "分析监控",
+      key: "analysis",
+      icon: <LineChartOutlined />,
       hide_in_menu: false,
     },
   },
@@ -145,7 +150,7 @@ const saasBaseRoutes = [
       },
       {
         path: "common",
-        element: <Area />,
+        element: <Common />,
         meta: {
           label: "通用配置",
           key: "common",
