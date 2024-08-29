@@ -447,11 +447,6 @@ const LayoutBase = () => {
             onClose={onAgentClose}
             open={open}
             mask={false}
-            extra={
-              <Button type="primary" onClick={onAgentClose}>
-                关闭
-              </Button>
-            }
           >
             <p>Some contents...</p>
             <p>Some contents...</p>

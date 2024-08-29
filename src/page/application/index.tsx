@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   EditOutlined,
@@ -15,7 +15,7 @@ import {
   PushpinOutlined,
 } from "@ant-design/icons";
 import {
-  Avatar,
+  Empty,
   Card,
   Flex,
   Pagination,
@@ -31,8 +31,10 @@ import {
   App,
   Upload,
   Alert,
+  Popconfirm,
 } from "antd";
 import SuperForm from "@/component/SuperForm";
+import { clientPost, clientPut, clientDel, clientGetList } from "@/request";
 import appLogo from "@/assets/react.svg";
 
 const { Paragraph, Text } = Typography;
@@ -42,18 +44,61 @@ const { Search } = Input;
 const Application = () => {
   const formRef = useRef();
   const [appType, setAppType] = useState("create");
-  const [loading, setLoading] = useState(false);
   const [action, setAction] = useState(true);
   const [record, setRecord] = useState({});
   const { message, modal } = App.useApp();
+  const [appItems, setAppItems] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchLoading, setSearchLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [paginationMeta, setPaginationMeta] = useState({
+    pageSize: 10,
+    current: 1,
+    total: 10,
+  });
+
+  useEffect(() => {
+    getData({
+      current: 1,
+      pageSize: 10,
+    });
+  }, []);
+
+  const getData = (params = {}) => {
+    setLoading(true);
+    const { current, pageSize } = paginationMeta;
+    clientGetList("application", {
+      current,
+      pageSize,
+      ...params,
+    })
+      .then((res) => {
+        if (res.status) {
+          const { list, total, current, pageSize } = res.data;
+          setPaginationMeta({
+            pageSize: pageSize,
+            current: current,
+            total: total,
+          });
+          setAppItems(list);
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  const onSearch = (value) => {
+    getData({ name: value });
+  };
 
   const showDrawer = (bool, record) => {
     setAction(bool);
     setOpen(true);
-    console.log({ record });
     setRecord(record);
   };
 
@@ -69,7 +114,22 @@ const Application = () => {
     formRef?.current?.form
       .validateFields()
       .then(async (values) => {
-        console.log({ values });
+        if (action) {
+          const res = await clientPost("application", values);
+          if (res.status) {
+            getData();
+            setOpen(false);
+          }
+        } else {
+          const res = await clientPut("application", {
+            ...values,
+            id: record.id,
+          });
+          if (res.status) {
+            getData();
+            setOpen(false);
+          }
+        }
       })
       .catch(() => {});
   };
@@ -99,69 +159,10 @@ const Application = () => {
     wrapperCol: { span: 18 },
   };
 
-  const appItems = [
-    {
-      id: "1",
-      application_name: "应用A",
-      status: <Badge status="processing" text="运行中" />,
-      description:
-        "这是应用描述这是应用描述这是应用描述这是应用描述这是应用描述这是应用描述这是应用描述这是应用描述这是应用描述",
-      logo: appLogo,
-      isDefault: true,
-    },
-    {
-      id: "2",
-      application_name: "应用B",
-      status: <Badge status="default" text="已停用" />,
-      description: "这是应用描述这是应用描述",
-      logo: appLogo,
-    },
-    {
-      id: "3",
-      application_name: "应用C",
-      status: <Badge status="processing" text="运行中" />,
-      description:
-        "这是应用描述这是应用描述这是应用描述这是应用描述这是应用描述这是应用描述",
-      logo: appLogo,
-    },
-    {
-      id: "4",
-      application_name: "应用D",
-      status: <Badge status="processing" text="运行中" />,
-      description:
-        "这是应用描述这是应用描述这是应用描述这是应用描述这是应用描述这是应用描述",
-      logo: appLogo,
-    },
-    {
-      id: "5",
-      application_name: "应用E",
-      status: <Badge status="processing" text="运行中" />,
-      description:
-        "这是应用描述这是应用描述这是应用描述这是应用描述这是应用描述这是应用描述",
-      logo: appLogo,
-    },
-    {
-      id: "6",
-      application_name: "应用F",
-      status: <Badge status="processing" text="运行中" />,
-      description:
-        "这是应用描述这是应用描述这是应用描述这是应用描述这是应用描述这是应用描述",
-      logo: appLogo,
-    },
-    {
-      id: "7",
-      application_name: "应用G",
-      status: <Badge status="processing" text="运行中" />,
-      description:
-        "这是应用描述这是应用描述这是应用描述这是应用描述这是应用描述这是应用描述",
-      logo: appLogo,
-    },
-  ];
-
   const formData = [
     {
       label: "应用名称",
-      name: "application_name",
+      name: "name",
       is: "Input",
       itemSpan: 24,
       placeholder: "请输入应用名称",
@@ -175,7 +176,7 @@ const Application = () => {
     },
     {
       label: "应用标识",
-      name: "application_uuid",
+      name: "app_code",
       is: "Input",
       itemSpan: 24,
       placeholder: "请输入应用标识",
@@ -214,8 +215,17 @@ const Application = () => {
       name: "status",
       itemSpan: 24,
       placeholder: "请选择状态",
-      options: [],
       is: "Select",
+      options: [
+        {
+          label: "启用",
+          value: "1",
+        },
+        {
+          label: "禁用",
+          value: "0",
+        },
+      ],
     },
   ];
 
@@ -235,8 +245,13 @@ const Application = () => {
     console.log(item);
   };
 
-  const onAppDetete = (item) => {
+  const onAppDetete = async (item) => {
     console.log(item);
+    const res = await clientDel("application", { ids: item.id });
+    if (res.status) {
+      getData();
+      console.log({ res });
+    }
   };
 
   const actionMore = (item) => {
@@ -279,9 +294,18 @@ const Application = () => {
       },
       {
         key: "3",
-        label: "应用删除",
+        label: (
+          <Popconfirm
+            title="系统提醒"
+            description="您确认要删除应用吗?"
+            onConfirm={() => onAppDetete(item)}
+            okText="确认"
+            cancelText="取消"
+          >
+            应用删除
+          </Popconfirm>
+        ),
         icon: <DeleteOutlined />,
-        onClick: () => onAppDetete(item),
         danger: true,
       },
     ];
@@ -341,11 +365,6 @@ const Application = () => {
     console.log("Page: ", pageNumber);
   };
 
-  const onSearch = (keyword) => {
-    console.log(keyword);
-    setSearchLoading(false);
-  };
-
   const onSegmentedChange = (key) => {
     console.log({ key });
     setAppType(key);
@@ -355,7 +374,7 @@ const Application = () => {
     <Flex justify="space-between" vertical style={{ height: "100%" }}>
       <Flex vertical gap="middle">
         <Space size="middle">
-          <Button icon={<PlusOutlined />} onClick={showDrawer}>
+          <Button icon={<PlusOutlined />} onClick={() => showDrawer(true)}>
             新建应用
           </Button>
           <Button icon={<ImportOutlined />} onClick={showModal}>
@@ -377,7 +396,7 @@ const Application = () => {
           />
           <Search
             placeholder="搜索应用名称"
-            loading={searchLoading}
+            loading={loading}
             onSearch={onSearch}
           />
         </Space>
@@ -385,7 +404,7 @@ const Application = () => {
           {appItems.map((item) => {
             const child = (
               <Card
-                title={item.application_name}
+                title={item.name}
                 loading={loading}
                 actions={actions(item)}
                 key={item.id}
@@ -396,7 +415,7 @@ const Application = () => {
               >
                 <Link to="/app/1/dashboard">
                   <Card.Meta
-                    avatar={<img src={item.logo} />}
+                    avatar={<img src={item.logo || appLogo} />}
                     description={
                       <Paragraph
                         ellipsis={{
@@ -412,7 +431,7 @@ const Application = () => {
                 </Link>
               </Card>
             );
-            if (item.isDefault) {
+            if (item.isDefault === "1") {
               return (
                 <Badge.Ribbon text={<PushpinOutlined />} key={item.id}>
                   {child}
@@ -425,11 +444,17 @@ const Application = () => {
         </Flex>
       </Flex>
 
+      {appItems.length === 0 && (
+        <Flex justify="center">
+          <Empty />
+        </Flex>
+      )}
+
       <Flex justify="center">
         <Pagination
           showQuickJumper
-          defaultCurrent={2}
-          total={500}
+          current={paginationMeta.current}
+          total={paginationMeta.total}
           onChange={onChange}
         />
       </Flex>
@@ -453,7 +478,6 @@ const Application = () => {
           ref={formRef}
           data={formData}
           layout={layout}
-          limit={6}
           initialValues={record}
           rulesValid={false}
           btnAction={false}

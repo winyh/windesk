@@ -16,32 +16,67 @@ import {
 import { PlusOutlined, ControlOutlined } from "@ant-design/icons";
 import SuperForm from "@/component/SuperForm";
 import dayjs from "dayjs";
+import { clientPost, clientPut, clientDel, clientGetList } from "@/request";
 
 const { Search } = Input;
 
 const Organization = () => {
   const formRef = useRef();
-  const [dataSource, setDataSource] = useState([
-    {
-      id: 1,
-      organization_name: "全栈科技",
-      organization_code: "OZ001",
-      description: "低代码系统",
-    },
-  ]);
+  const [dataSource, setDataSource] = useState([]);
   const [open, setOpen] = useState(false);
   const [action, setAction] = useState(true);
-  const [searchLoading, setSearchLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [record, setRecord] = useState({});
+  const [paginationMeta, setPaginationMeta] = useState({
+    pageSize: 10,
+    current: 1,
+    total: 10,
+  });
   const [selectedRows, setSelectedRows] = useState([]);
-  const { modal } = App.useApp();
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  const getData = (params) => {
+    clientGetList("organization", {
+      current: 1,
+      pageSize: 10,
+      name: params?.name,
+    })
+      .then((res) => {
+        if (res.status) {
+          const { list, total, current, pageSize } = res.data;
+          setPaginationMeta({
+            pageSize: pageSize,
+            current: current,
+            total: total,
+          });
+          setDataSource(list);
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
 
   const onSearch = (value) => {
     console.log(value);
+    getData({ name: value });
+  };
+
+  const onPaginationChange = (current, pageSize) => {
+    setPaginationMeta((pre) => ({ ...pre, current, pageSize }));
+    getData({ current, pageSize });
   };
 
   const onShowSizeChange = (current, pageSize) => {
-    console.log(current, pageSize);
+    setPaginationMeta((pre) => ({ ...pre, current, pageSize }));
+    getData({ current, pageSize });
   };
 
   const showDrawer = (bool, record) => {
@@ -58,7 +93,22 @@ const Organization = () => {
     formRef?.current?.form
       .validateFields()
       .then(async (values) => {
-        console.log({ values });
+        if (action) {
+          const res = await clientPost("organization", values);
+          if (res.status) {
+            getData();
+            setOpen(false);
+          }
+        } else {
+          const res = await clientPut("organization", {
+            ...values,
+            id: record.id,
+          });
+          if (res.status) {
+            getData();
+            setOpen(false);
+          }
+        }
       })
       .catch(() => {});
   };
@@ -71,17 +121,17 @@ const Organization = () => {
   const formData = [
     {
       label: "组织名称",
-      name: "organization_name",
+      name: "name",
       is: "Input",
       itemSpan: 24,
       placeholder: "请输入组织名称",
     },
     {
       label: "组织编码",
-      name: "organization_code",
+      name: "code",
       is: "Input",
       itemSpan: 24,
-      placeholder: "请输入联系方式",
+      placeholder: "请输入组织编码",
     },
     {
       label: "组织描述",
@@ -93,16 +143,17 @@ const Organization = () => {
     {
       label: "上级组织",
       name: "pid",
-      is: "Input",
+      is: "InputNumber",
       itemSpan: 24,
+      style: { width: "100%" },
       placeholder: "请输入上级组织",
     },
     {
-      label: "负责人",
-      name: "leader",
+      label: "联系人",
+      name: "contacts",
       is: "Input",
       itemSpan: 24,
-      placeholder: "请输入负责人",
+      placeholder: "请输入联系人",
     },
     {
       label: "联系方式",
@@ -139,13 +190,13 @@ const Organization = () => {
   const columns = [
     {
       title: "组织名称",
-      dataIndex: "organization_name",
-      key: "organization_name",
+      dataIndex: "name",
+      key: "name",
     },
     {
       title: "组织编码",
-      dataIndex: "organization_code",
-      key: "organization_code",
+      dataIndex: "code",
+      key: "code",
     },
     {
       title: "组织描述",
@@ -218,7 +269,7 @@ const Organization = () => {
           <Popconfirm
             title="系统提醒"
             description="您确认要删除组织吗?"
-            onConfirm={onConfirm}
+            onConfirm={() => onConfirm(record)}
             onCancel={onCancel}
             okText="确认"
             cancelText="取消"
@@ -242,7 +293,13 @@ const Organization = () => {
     }),
   };
 
-  const onConfirm = () => {};
+  const onConfirm = async (record) => {
+    const res = await clientDel("organization", { ids: record.id });
+    if (res.status) {
+      getData();
+      console.log({ res });
+    }
+  };
 
   const onCancel = () => {};
 
@@ -268,7 +325,7 @@ const Organization = () => {
           ) : null}
           <Search
             placeholder="搜索组织"
-            loading={searchLoading}
+            loading={loading}
             onSearch={onSearch}
           />
         </Space>
@@ -276,16 +333,19 @@ const Organization = () => {
           rowSelection={{
             ...rowSelection,
           }}
+          loading={loading}
           rowKey={(record) => record.id}
           dataSource={dataSource}
           columns={columns}
           pagination={{
-            organization: ["bottomCenter"],
+            position: ["bottomCenter"],
             showSizeChanger: true,
             showQuickJumper: true,
-            onShowSizeChange: { onShowSizeChange },
-            defaultCurrent: 3,
-            total: 500,
+            onChange: onPaginationChange,
+            onShowSizeChange: onShowSizeChange,
+            pageSize: paginationMeta.pageSize, // 每页显示记录数
+            current: paginationMeta.current, // 当前页码
+            total: paginationMeta.total, // 总记录数
           }}
         />
       </Flex>

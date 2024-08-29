@@ -8,7 +8,6 @@ import {
   Divider,
   Tag,
   Badge,
-  Dropdown,
   Drawer,
   Popconfirm,
   App,
@@ -16,34 +15,79 @@ import {
 import { PlusOutlined } from "@ant-design/icons";
 import SuperForm from "@/component/SuperForm";
 import dayjs from "dayjs";
+import { clientPost, clientPut, clientDel, clientGetList } from "@/request";
 
 const { Search } = Input;
 
 const Tenant = () => {
   const formRef = useRef();
-  const [dataSource, setDataSource] = useState([
-    { id: 1, tenant_name: "唱响科技", leader: "常山" },
-  ]);
+  const [dataSource, setDataSource] = useState([]);
   const [open, setOpen] = useState(false);
   const [action, setAction] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [paginationMeta, setPaginationMeta] = useState({
+    pageSize: 10,
+    current: 1,
+    total: 10,
+  });
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchLoading, setSearchLoading] = useState(false);
   const [record, setRecord] = useState({});
   const [selectedRows, setSelectedRows] = useState([]);
   const { modal } = App.useApp();
 
+  useEffect(() => {
+    getData({
+      current: 1,
+      pageSize: 10,
+    });
+  }, []);
+
+  const getData = (params = {}) => {
+    setLoading(true);
+    const { current, pageSize } = paginationMeta;
+    clientGetList("tenant", {
+      current,
+      pageSize,
+      ...params,
+    })
+      .then((res) => {
+        if (res.status) {
+          const { list, total, current, pageSize } = res.data;
+          setPaginationMeta({
+            pageSize: pageSize,
+            current: current,
+            total: total,
+          });
+          setDataSource(list);
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
   const onSearch = (value) => {
     console.log(value);
+    getData({ name: value });
+  };
+
+  const onPaginationChange = (current, pageSize) => {
+    setPaginationMeta((pre) => ({ ...pre, current, pageSize }));
+    getData({ current, pageSize });
   };
 
   const onShowSizeChange = (current, pageSize) => {
-    console.log(current, pageSize);
+    setPaginationMeta((pre) => ({ ...pre, current, pageSize }));
+    getData({ current, pageSize });
   };
 
   const showDrawer = (bool, record) => {
     setAction(bool);
     setOpen(true);
-    console.log({ record });
     setRecord(record);
   };
   const onClose = () => {
@@ -54,7 +98,19 @@ const Tenant = () => {
     formRef?.current?.form
       .validateFields()
       .then(async (values) => {
-        console.log({ values });
+        if (action) {
+          const res = await clientPost("tenant", values);
+          if (res.status) {
+            getData();
+            setOpen(false);
+          }
+        } else {
+          const res = await clientPut("tenant", { ...values, id: record.id });
+          if (res.status) {
+            getData();
+            setOpen(false);
+          }
+        }
       })
       .catch(() => {});
   };
@@ -67,17 +123,24 @@ const Tenant = () => {
   const formData = [
     {
       label: "租户名称",
-      name: "tenant_name",
+      name: "name",
       is: "Input",
       itemSpan: 24,
       placeholder: "请输入租户名称",
     },
     {
-      label: "负责人",
-      name: "leader",
+      label: "租户描述",
+      name: "description",
       is: "Input",
       itemSpan: 24,
-      placeholder: "请输入负责人",
+      placeholder: "请输入租户描述",
+    },
+    {
+      label: "联系人",
+      name: "contacts",
+      is: "Input",
+      itemSpan: 24,
+      placeholder: "请输入联系人",
     },
     {
       label: "联系方式",
@@ -91,7 +154,16 @@ const Tenant = () => {
       name: "status",
       itemSpan: 24,
       placeholder: "请选择状态",
-      options: [],
+      options: [
+        {
+          label: "启用",
+          value: "1",
+        },
+        {
+          label: "禁用",
+          value: "0",
+        },
+      ],
       is: "Select",
     },
   ];
@@ -123,13 +195,18 @@ const Tenant = () => {
   const columns = [
     {
       title: "租户名称",
-      dataIndex: "tenant_name",
-      key: "tenant_name",
+      dataIndex: "name",
+      key: "name",
     },
     {
-      title: "负责人",
-      dataIndex: "leader",
-      key: "leader",
+      title: "租户描述",
+      dataIndex: "description",
+      key: "description",
+    },
+    {
+      title: "联系人",
+      dataIndex: "contacts",
+      key: "contacts",
     },
     {
       title: "联系方式",
@@ -138,15 +215,20 @@ const Tenant = () => {
     },
     {
       title: "应用数",
-      dataIndex: "type",
-      key: "type",
+      dataIndex: "app_num",
+      key: "app_num",
     },
     {
       title: "状态",
       dataIndex: "status",
       key: "status",
-      render: () => {
-        return <Badge status="processing" text="启用" />;
+      render: (text) => {
+        return (
+          <Badge
+            status={Number(text) > 0 ? "processing" : "default"}
+            text={Number(text) > 0 ? "启用" : "禁用"}
+          />
+        );
       },
     },
     {
@@ -159,8 +241,8 @@ const Tenant = () => {
     },
     {
       title: "到期时间",
-      dataIndex: "expire_at",
-      key: "expire_at",
+      dataIndex: "expired_at",
+      key: "expired_at",
       render: () => {
         return <span>{dayjs().format("YYYY-MM-DD HH:mm:ss")}</span>;
       },
@@ -186,7 +268,7 @@ const Tenant = () => {
           <Popconfirm
             title="系统提醒"
             description="您确认要删除租户吗?"
-            onConfirm={onConfirm}
+            onConfirm={() => onConfirm(record)}
             onCancel={onCancel}
             okText="确认"
             cancelText="取消"
@@ -210,7 +292,13 @@ const Tenant = () => {
     }),
   };
 
-  const onConfirm = () => {};
+  const onConfirm = async (record) => {
+    const res = await clientDel("tenant", { ids: record.id });
+    if (res.status) {
+      getData();
+      console.log({ res });
+    }
+  };
 
   const onCancel = () => {};
 
@@ -235,7 +323,7 @@ const Tenant = () => {
           ) : null}
           <Search
             placeholder="搜索租户"
-            loading={searchLoading}
+            loading={loading}
             onSearch={onSearch}
           />
         </Space>
@@ -243,6 +331,7 @@ const Tenant = () => {
           rowSelection={{
             ...rowSelection,
           }}
+          loading={loading}
           rowKey={(record) => record.id}
           dataSource={dataSource}
           columns={columns}
@@ -250,9 +339,11 @@ const Tenant = () => {
             position: ["bottomCenter"],
             showSizeChanger: true,
             showQuickJumper: true,
-            onShowSizeChange: { onShowSizeChange },
-            defaultCurrent: 3,
-            total: 500,
+            onChange: onPaginationChange,
+            onShowSizeChange: onShowSizeChange,
+            pageSize: paginationMeta.pageSize, // 每页显示记录数
+            current: paginationMeta.current, // 当前页码
+            total: paginationMeta.total, // 总记录数
           }}
         />
       </Flex>

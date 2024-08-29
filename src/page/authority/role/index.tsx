@@ -22,6 +22,7 @@ import {
 } from "@ant-design/icons";
 import SuperForm from "@/component/SuperForm";
 import dayjs from "dayjs";
+import { clientPost, clientPut, clientDel, clientGetList } from "@/request";
 
 const { Search } = Input;
 const { DirectoryTree } = Tree;
@@ -39,19 +40,65 @@ const Role = () => {
   const [open, setOpen] = useState(false);
   const [action, setAction] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchLoading, setSearchLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [paginationMeta, setPaginationMeta] = useState({
+    pageSize: 10,
+    current: 1,
+    total: 10,
+  });
   const [record, setRecord] = useState({});
   const [selectedRows, setSelectedRows] = useState([]);
   const { modal } = App.useApp();
 
+  useEffect(() => {
+    getData({
+      current: 1,
+      pageSize: 10,
+    });
+  }, []);
+
+  const getData = (params = {}) => {
+    setLoading(true);
+    const { current, pageSize } = paginationMeta;
+    clientGetList("role", {
+      current,
+      pageSize,
+      ...params,
+    })
+      .then((res) => {
+        if (res.status) {
+          const { list, total, current, pageSize } = res.data;
+          setPaginationMeta({
+            pageSize: pageSize,
+            current: current,
+            total: total,
+          });
+          setDataSource(list);
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
   const onSearch = (value) => {
     console.log(value);
+    getData({ name: value });
+  };
+
+  const onPaginationChange = (current, pageSize) => {
+    setPaginationMeta((pre) => ({ ...pre, current, pageSize }));
+    getData({ current, pageSize });
   };
 
   const onShowSizeChange = (current, pageSize) => {
-    console.log(current, pageSize);
+    setPaginationMeta((pre) => ({ ...pre, current, pageSize }));
+    getData({ current, pageSize });
   };
-
   const showDrawer = (bool, record) => {
     setAction(bool);
     setOpen(true);
@@ -66,7 +113,19 @@ const Role = () => {
     formRef?.current?.form
       .validateFields()
       .then(async (values) => {
-        console.log({ values });
+        if (action) {
+          const res = await clientPost("role", values);
+          if (res.status) {
+            getData();
+            setOpen(false);
+          }
+        } else {
+          const res = await clientPut("role", { ...values, id: record.id });
+          if (res.status) {
+            getData();
+            setOpen(false);
+          }
+        }
       })
       .catch(() => {});
   };
@@ -401,7 +460,13 @@ const Role = () => {
     }),
   };
 
-  const onConfirm = () => {};
+  const onConfirm = async (record) => {
+    const res = await clientDel("role", { ids: record.id });
+    if (res.status) {
+      getData();
+      console.log({ res });
+    }
+  };
 
   const onCancel = () => {};
 
@@ -426,7 +491,7 @@ const Role = () => {
           ) : null}
           <Search
             placeholder="搜索角色"
-            loading={searchLoading}
+            loading={loading}
             onSearch={onSearch}
           />
         </Space>
@@ -441,9 +506,11 @@ const Role = () => {
             position: ["bottomCenter"],
             showSizeChanger: true,
             showQuickJumper: true,
-            onShowSizeChange: { onShowSizeChange },
-            defaultCurrent: 3,
-            total: 500,
+            onChange: onPaginationChange,
+            onShowSizeChange: onShowSizeChange,
+            pageSize: paginationMeta.pageSize, // 每页显示记录数
+            current: paginationMeta.current, // 当前页码
+            total: paginationMeta.total, // 总记录数
           }}
         />
       </Flex>

@@ -7,7 +7,7 @@ import {
   SafetyCertificateOutlined,
 } from "@ant-design/icons";
 
-import Dashboard from "@/page/dashboard";
+import Dashboard from "@/page/dashboard/saasboard";
 import Tenant from "@/page/tenant";
 
 /* 应用管理 */

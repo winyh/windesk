@@ -25,31 +25,75 @@ import {
 } from "@ant-design/icons";
 import SuperForm from "@/component/SuperForm";
 import dayjs from "dayjs";
+import { clientPost, clientPut, clientDel, clientGetList } from "@/request";
 
 const { Search } = Input;
 
 const Admin = () => {
   const formRef = useRef();
   const formPwdRef = useRef();
-  const [dataSource, setDataSource] = useState([
-    { id: 1, username: "唱响科技", leader: "常山" },
-  ]);
+  const [dataSource, setDataSource] = useState([]);
   const [open, setOpen] = useState(false);
-  const [resetOpen, setResetOpen] = useState(false);
   const [pwdOpen, setPwdOpen] = useState(false);
   const [action, setAction] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchLoading, setSearchLoading] = useState(false);
+  const [paginationMeta, setPaginationMeta] = useState({
+    pageSize: 10,
+    current: 1,
+    total: 10,
+  });
   const [record, setRecord] = useState({});
   const [selectedRows, setSelectedRows] = useState([]);
   const { modal } = App.useApp();
 
+  useEffect(() => {
+    getData({
+      current: 1,
+      pageSize: 10,
+    });
+  }, []);
+  const getData = (params = {}) => {
+    setLoading(true);
+    const { current, pageSize } = paginationMeta;
+    clientGetList("admin", {
+      current,
+      pageSize,
+      ...params,
+    })
+      .then((res) => {
+        if (res.status) {
+          const { list, total, current, pageSize } = res.data;
+          setPaginationMeta({
+            pageSize: pageSize,
+            current: current,
+            total: total,
+          });
+          setDataSource(list);
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
   const onSearch = (value) => {
     console.log(value);
+    getData({ name: value });
+  };
+
+  const onPaginationChange = (current, pageSize) => {
+    setPaginationMeta((pre) => ({ ...pre, current, pageSize }));
+    getData({ current, pageSize });
   };
 
   const onShowSizeChange = (current, pageSize) => {
-    console.log(current, pageSize);
+    setPaginationMeta((pre) => ({ ...pre, current, pageSize }));
+    getData({ current, pageSize });
   };
 
   const showDrawer = (bool, record) => {
@@ -66,11 +110,22 @@ const Admin = () => {
     formRef?.current?.form
       .validateFields()
       .then(async (values) => {
-        console.log({ values });
+        if (action) {
+          const res = await clientPost("admin", values);
+          if (res.status) {
+            getData();
+            setOpen(false);
+          }
+        } else {
+          const res = await clientPut("admin", { ...values, id: record.id });
+          if (res.status) {
+            getData();
+            setOpen(false);
+          }
+        }
       })
       .catch(() => {});
   };
-
   const showPwdDrawer = (bool) => {
     setPwdOpen(true);
   };
@@ -181,23 +236,23 @@ const Admin = () => {
     {
       label: "组织部门",
       name: "organization",
-      is: "Input",
+      is: "Select",
       itemSpan: 24,
-      placeholder: "请输入组织部门",
+      placeholder: "请选择组织部门",
     },
     {
       label: "岗位",
       name: "position",
-      is: "Input",
+      is: "Select",
       itemSpan: 24,
-      placeholder: "请输入岗位",
+      placeholder: "请选择岗位",
     },
     {
       label: "角色",
       name: "role",
-      is: "Input",
+      is: "Select",
       itemSpan: 24,
-      placeholder: "请输入角色",
+      placeholder: "请选择角色",
     },
     {
       label: "状态",
@@ -360,7 +415,13 @@ const Admin = () => {
     }),
   };
 
-  const onConfirm = () => {};
+  const onConfirm = async (record) => {
+    const res = await clientDel("tenant", { ids: record.id });
+    if (res.status) {
+      getData();
+      console.log({ res });
+    }
+  };
 
   const onCancel = () => {};
 
@@ -385,7 +446,7 @@ const Admin = () => {
           ) : null}
           <Search
             placeholder="搜索用户"
-            loading={searchLoading}
+            loading={loading}
             onSearch={onSearch}
           />
         </Space>
@@ -400,9 +461,11 @@ const Admin = () => {
             position: ["bottomCenter"],
             showSizeChanger: true,
             showQuickJumper: true,
-            onShowSizeChange: { onShowSizeChange },
-            defaultCurrent: 3,
-            total: 500,
+            onChange: onPaginationChange,
+            onShowSizeChange: onShowSizeChange,
+            pageSize: paginationMeta.pageSize, // 每页显示记录数
+            current: paginationMeta.current, // 当前页码
+            total: paginationMeta.total, // 总记录数
           }}
         />
       </Flex>

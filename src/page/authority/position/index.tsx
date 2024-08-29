@@ -20,19 +20,17 @@ const { Search } = Input;
 
 const Position = () => {
   const formRef = useRef();
-  const [dataSource, setDataSource] = useState([
-    {
-      id: 1,
-      name: "财务总监",
-      code: "CS001",
-      description: "管理全体系财务",
-    },
-  ]);
+  const [dataSource, setDataSource] = useState([]);
   const [open, setOpen] = useState(false);
   const [action, setAction] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchLoading, setSearchLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [record, setRecord] = useState({});
+  const [paginationMeta, setPaginationMeta] = useState({
+    pageSize: 10,
+    current: 1,
+    total: 10,
+  });
   const [selectedRows, setSelectedRows] = useState([]);
   const { modal } = App.useApp();
 
@@ -40,31 +38,46 @@ const Position = () => {
     getData();
   }, []);
 
-  const getData = () => {
-    setSearchLoading(true);
+  const getData = (params) => {
+    setLoading(true);
     clientGetList("position", {
       current: 1,
       pageSize: 10,
+      name: params?.name,
     })
       .then((res) => {
         if (res.status) {
-          setDataSource(res.data.list);
+          const { list, total, current, pageSize } = res.data;
+          setPaginationMeta({
+            pageSize: pageSize,
+            current: current,
+            total: total,
+          });
+          setDataSource(list);
+          setLoading(false);
         }
       })
       .catch((err) => {
         console.log(err);
       })
       .finally(() => {
-        setSearchLoading(false);
+        setLoading(false);
       });
   };
 
   const onSearch = (value) => {
     console.log(value);
+    getData({ name: value });
+  };
+
+  const onPaginationChange = (current, pageSize) => {
+    setPaginationMeta((pre) => ({ ...pre, current, pageSize }));
+    getData({ current, pageSize });
   };
 
   const onShowSizeChange = (current, pageSize) => {
-    console.log(current, pageSize);
+    setPaginationMeta((pre) => ({ ...pre, current, pageSize }));
+    getData({ current, pageSize });
   };
 
   const showDrawer = (bool, record) => {
@@ -221,7 +234,7 @@ const Position = () => {
           <Popconfirm
             title="系统提醒"
             description="您确认要删除岗位吗?"
-            onConfirm={onConfirm}
+            onConfirm={() => onConfirm(record)}
             onCancel={onCancel}
             okText="确认"
             cancelText="取消"
@@ -276,7 +289,7 @@ const Position = () => {
           ) : null}
           <Search
             placeholder="搜索岗位"
-            loading={searchLoading}
+            loading={loading}
             onSearch={onSearch}
           />
         </Space>
@@ -284,6 +297,7 @@ const Position = () => {
           rowSelection={{
             ...rowSelection,
           }}
+          loading={loading}
           rowKey={(record) => record.id}
           dataSource={dataSource}
           columns={columns}
@@ -291,9 +305,11 @@ const Position = () => {
             position: ["bottomCenter"],
             showSizeChanger: true,
             showQuickJumper: true,
-            onShowSizeChange: { onShowSizeChange },
-            defaultCurrent: 3,
-            total: 500,
+            onChange: onPaginationChange,
+            onShowSizeChange: onShowSizeChange,
+            pageSize: paginationMeta.pageSize, // 每页显示记录数
+            current: paginationMeta.current, // 当前页码
+            total: paginationMeta.total, // 总记录数
           }}
         />
       </Flex>
