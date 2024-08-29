@@ -418,7 +418,7 @@ const Project = () => {
                   ></Badge>
                 }
               >
-                <Link to="/app/1/dashboard">
+                <Link to={`/app/${item.id}/dashboard`}>
                   <Card.Meta
                     avatar={<img src={item.logo || appLogo} />}
                     description={

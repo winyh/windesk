@@ -18,6 +18,11 @@ const { Search } = Input;
 
 const Dictionary = () => {
   const [selectedRows, setSelectedRows] = useState([]);
+  const [paginationMeta, setPaginationMeta] = useState({
+    pageSize: 10,
+    current: 1,
+    total: 10,
+  });
 
   const data = ["用户性别", "订单状态", "租户状态", "云存储", "数据库"];
 
@@ -47,8 +52,14 @@ const Dictionary = () => {
     },
   ];
 
+  const onPaginationChange = (current, pageSize) => {
+    setPaginationMeta((pre) => ({ ...pre, current, pageSize }));
+    getData({ current, pageSize });
+  };
+
   const onShowSizeChange = (current, pageSize) => {
-    console.log(current, pageSize);
+    setPaginationMeta((pre) => ({ ...pre, current, pageSize }));
+    getData({ current, pageSize });
   };
 
   const dataSource = [
@@ -189,14 +200,18 @@ const Dictionary = () => {
             rowKey={(record) => record.id}
             dataSource={dataSource}
             columns={columns}
-            pagination={{
-              position: ["bottomCenter"],
-              showSizeChanger: true,
-              showQuickJumper: true,
-              onShowSizeChange: { onShowSizeChange },
-              defaultCurrent: 3,
-              total: 500,
-            }}
+            pagination={
+              dataSource.length > 0 && {
+                position: ["bottomCenter"],
+                showSizeChanger: true,
+                showQuickJumper: true,
+                onChange: onPaginationChange,
+                onShowSizeChange: onShowSizeChange,
+                pageSize: paginationMeta.pageSize, // 每页显示记录数
+                current: paginationMeta.current, // 当前页码
+                total: paginationMeta.total, // 总记录数
+              }
+            }
           />
         </Flex>
       </Col>

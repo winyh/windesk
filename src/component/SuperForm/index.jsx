@@ -1,13 +1,13 @@
-import React, { useImperativeHandle, useState, useEffect } from "react"
-import Component from "../CustomTag"
-import { Row, Col, Form, Button, Space } from "antd"
+import React, { useImperativeHandle, useState, useEffect } from "react";
+import Component from "../CustomTag";
+import { Row, Col, Form, Button, Space } from "antd";
 import {
   DownOutlined,
   UpOutlined,
   SearchOutlined,
-  RedoOutlined
-} from "@ant-design/icons"
-import { computedWrapperCol } from "@/utils/index"
+  RedoOutlined,
+} from "@ant-design/icons";
+import { computedWrapperCol } from "@/utils/index";
 
 /*
  * @desc 超级表单
@@ -33,64 +33,64 @@ const SuperForm = (
     layout = "horizontal",
     labelCol = {
       xs: {
-        span: 24
+        span: 24,
       },
       sm: {
-        span: 24
+        span: 24,
       },
       md: {
-        span: 6
+        span: 6,
       },
       lg: {
-        span: 6
+        span: 6,
       },
       xl: {
-        span: 6
+        span: 6,
       },
       xxl: {
-        span: 6
-      }
+        span: 6,
+      },
     },
     wrapperCol = {
       xs: {
-        span: 24
+        span: 24,
       },
       sm: {
-        span: 24
+        span: 24,
       },
       md: {
-        span: 18
+        span: 18,
       },
       lg: {
-        span: 18
+        span: 18,
       },
       xl: {
-        span: 18
+        span: 18,
       },
       xxl: {
-        span: 18
-      }
+        span: 18,
+      },
     },
     gutter = { xs: 8, sm: 16, md: 24, lg: 32 },
     itemResponsive = {
       xs: {
-        span: 24
+        span: 24,
       },
       sm: {
-        span: 24
+        span: 24,
       },
       md: {
-        span: 12
+        span: 12,
       },
       lg: {
-        span: 12
+        span: 12,
       },
       xl: {
-        span: 6
+        span: 6,
       },
       xxl: {
-        span: 6
-      }
+        span: 6,
+      },
     },
     limit = 100,
     onFinish,
@@ -103,66 +103,66 @@ const SuperForm = (
   },
   ref
 ) => {
-  const [form] = Form.useForm()
+  const [form] = Form.useForm();
 
-  const [expand, setExpand] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [expand, setExpand] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useImperativeHandle(ref, () => ({
-    form
-  }))
+    form,
+  }));
 
-  useEffect(() => form.resetFields(), [initialValues])
+  useEffect(() => form.resetFields(), [initialValues]);
 
   /*
    * @desc 请求数据时 查询按钮的 Loading 状态控制
    */
   const getDataCallBack = (status) => {
-    setLoading(status)
-  }
+    setLoading(status);
+  };
 
   /*
    * @desc 表单校验成功处理
    * @params { values } object 表单值对象
    */
   const handleFinish = (values) => {
-    onFinish ? onFinish(values, getDataCallBack) : null
-  }
+    onFinish ? onFinish(values, getDataCallBack) : null;
+  };
 
   /*
    * @desc 表单校验失败处理
    * @params { values } object 表单值对象
    */
   const handleFinishFailed = (values) => {
-    onFinishFailed ? onFinishFailed(values) : null
-  }
+    onFinishFailed ? onFinishFailed(values) : null;
+  };
 
   /*
    * @desc 表单重置处理
    */
   const handleReset = () => {
-    form.resetFields()
+    form.resetFields();
     if (onReset) {
-      onReset()
+      onReset();
     }
-  }
+  };
 
   /*
    * @desc 表单展开折叠
    */
   const handleExpand = () => {
-    setExpand(!expand)
-  }
+    setExpand(!expand);
+  };
 
   /*
    * @desc 按钮项布局
    */
-  const itemWrapperCol = computedWrapperCol(labelCol)
+  const itemWrapperCol = computedWrapperCol(labelCol);
 
   /*
    * @desc 实际展示数据
    */
-  const showData = () => (expand ? data : data.slice(0, limit))
+  const showData = () => (expand ? data : data.slice(0, limit));
 
   return (
     <Form
@@ -189,7 +189,7 @@ const SuperForm = (
             itemSpan,
             extra,
             ...restProps
-          } = item
+          } = item;
 
           if (itemSpan) {
             return (
@@ -206,7 +206,7 @@ const SuperForm = (
                   <Component {...restProps}></Component>
                 </Form.Item>
               </Col>
-            )
+            );
           } else {
             return (
               <Col key={index} {...itemResponsive}>
@@ -220,7 +220,7 @@ const SuperForm = (
                   <Component {...restProps}></Component>
                 </Form.Item>
               </Col>
-            )
+            );
           }
         })}
 
@@ -257,7 +257,7 @@ const SuperForm = (
         ) : null}
       </Row>
     </Form>
-  )
-}
+  );
+};
 
-export default React.forwardRef(SuperForm)
+export default React.forwardRef(SuperForm);

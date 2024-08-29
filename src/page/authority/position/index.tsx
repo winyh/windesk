@@ -301,16 +301,18 @@ const Position = () => {
           rowKey={(record) => record.id}
           dataSource={dataSource}
           columns={columns}
-          pagination={{
-            position: ["bottomCenter"],
-            showSizeChanger: true,
-            showQuickJumper: true,
-            onChange: onPaginationChange,
-            onShowSizeChange: onShowSizeChange,
-            pageSize: paginationMeta.pageSize, // 每页显示记录数
-            current: paginationMeta.current, // 当前页码
-            total: paginationMeta.total, // 总记录数
-          }}
+          pagination={
+            dataSource.length > 0 && {
+              position: ["bottomCenter"],
+              showSizeChanger: true,
+              showQuickJumper: true,
+              onChange: onPaginationChange,
+              onShowSizeChange: onShowSizeChange,
+              pageSize: paginationMeta.pageSize, // 每页显示记录数
+              current: paginationMeta.current, // 当前页码
+              total: paginationMeta.total, // 总记录数
+            }
+          }
         />
       </Flex>
 

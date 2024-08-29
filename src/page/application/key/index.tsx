@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button, Table, Flex, Space } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 
 const ApiKey = () => {
   const [keyList, setKeyList] = useState([]);
@@ -74,13 +75,13 @@ const ApiKey = () => {
     <Flex vertical gap={12}>
       <Flex align="center">
         <Space>
-          <Button>创建KEY</Button>
+          <Button icon={<PlusOutlined />}>创建KEY</Button>
           <div>
             分为租户KEY可以通过接口管理整个后台-应用KEY 可以管理单个应用
           </div>
         </Space>
       </Flex>
-      <Table dataSource={dataSource} columns={columns} />
+      <Table dataSource={dataSource} columns={columns} pagination={false} />
     </Flex>
   );
 };

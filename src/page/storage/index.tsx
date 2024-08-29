@@ -42,14 +42,15 @@ const Storage = () => {
   const [open, setOpen] = useState(false);
   const [action, setAction] = useState(true);
   const [searchLoading, setSearchLoading] = useState(false);
+  const [paginationMeta, setPaginationMeta] = useState({
+    pageSize: 10,
+    current: 1,
+    total: 10,
+  });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [record, setRecord] = useState({});
   const [folders, setFolders] = useState(["文件夹A", "文件夹B"]);
   const { message, modal } = App.useApp();
-
-  const onShowSizeChange = (current, pageSize) => {
-    console.log(current, pageSize);
-  };
 
   const props = {
     name: "file",
@@ -329,6 +330,16 @@ const Storage = () => {
     }),
   };
 
+  const onPaginationChange = (current, pageSize) => {
+    setPaginationMeta((pre) => ({ ...pre, current, pageSize }));
+    getData({ current, pageSize });
+  };
+
+  const onShowSizeChange = (current, pageSize) => {
+    setPaginationMeta((pre) => ({ ...pre, current, pageSize }));
+    getData({ current, pageSize });
+  };
+
   const onSearch = () => {};
 
   const onConfirm = () => {};
@@ -426,14 +437,18 @@ const Storage = () => {
         rowKey={(record) => record.key}
         dataSource={dataSource}
         columns={columns}
-        pagination={{
-          position: ["bottomCenter"],
-          showSizeChanger: true,
-          showQuickJumper: true,
-          onShowSizeChange: { onShowSizeChange },
-          defaultCurrent: 3,
-          total: 500,
-        }}
+        pagination={
+          dataSource.length > 0 && {
+            position: ["bottomCenter"],
+            showSizeChanger: true,
+            showQuickJumper: true,
+            onChange: onPaginationChange,
+            onShowSizeChange: onShowSizeChange,
+            pageSize: paginationMeta.pageSize, // 每页显示记录数
+            current: paginationMeta.current, // 当前页码
+            total: paginationMeta.total, // 总记录数
+          }
+        }
       />
 
       <Drawer

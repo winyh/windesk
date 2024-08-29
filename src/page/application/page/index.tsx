@@ -1,5 +1,5 @@
-import { useState, useRef } from "react";
-import { Link } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
+import { Link, useParams } from "react-router-dom";
 import {
   Flex,
   Table,
@@ -14,29 +14,86 @@ import {
 } from "antd";
 import {
   PlusOutlined,
-  LoadingOutlined,
   CloudServerOutlined,
   BorderlessTableOutlined,
   FontColorsOutlined,
 } from "@ant-design/icons";
 import SuperForm from "@/component/SuperForm";
+import { clientPost, clientPut, clientDel, clientGetList } from "@/request";
 
 const { Search } = Input;
 
 const Page = () => {
+  const { appId } = useParams();
+
   const formRef = useRef();
   const [open, setOpen] = useState(false);
   const [action, setAction] = useState(true);
+
+  const [dataSource, setDataSource] = useState([]);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchLoading, setSearchLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [paginationMeta, setPaginationMeta] = useState({
+    pageSize: 10,
+    current: 1,
+    total: 10,
+  });
   const [record, setRecord] = useState({});
 
-  const onSearch = () => {};
+  useEffect(() => {
+    getData({
+      current: 1,
+      pageSize: 10,
+    });
+  }, []);
+
+  const getData = (params = {}) => {
+    setLoading(true);
+    const { current, pageSize } = paginationMeta;
+    clientGetList("page", {
+      current,
+      pageSize,
+      ...params,
+    })
+      .then((res) => {
+        if (res.status) {
+          const { list, total, current, pageSize } = res.data;
+          setPaginationMeta({
+            pageSize: pageSize,
+            current: current,
+            total: total,
+          });
+          setDataSource(list);
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  const onSearch = (value) => {
+    console.log(value);
+    getData({ name: value });
+  };
+
+  const onPaginationChange = (current, pageSize) => {
+    setPaginationMeta((pre) => ({ ...pre, current, pageSize }));
+    getData({ current, pageSize });
+  };
+
+  const onShowSizeChange = (current, pageSize) => {
+    setPaginationMeta((pre) => ({ ...pre, current, pageSize }));
+    getData({ current, pageSize });
+  };
 
   const showDrawer = (bool, record) => {
     setAction(bool);
     setOpen(true);
-    console.log({ record });
     setRecord(record);
   };
   const onClose = () => {
@@ -47,7 +104,23 @@ const Page = () => {
     formRef?.current?.form
       .validateFields()
       .then(async (values) => {
-        console.log({ values });
+        values = {
+          ...values,
+          application_id: Number(appId),
+        };
+        if (action) {
+          const res = await clientPost("page", values);
+          if (res.status) {
+            getData();
+            setOpen(false);
+          }
+        } else {
+          const res = await clientPut("page", { ...values, id: record.id });
+          if (res.status) {
+            getData();
+            setOpen(false);
+          }
+        }
       })
       .catch(() => {});
   };
@@ -64,32 +137,41 @@ const Page = () => {
   const formData = [
     {
       label: "页面名称",
-      name: "tenant_name",
+      name: "name",
       is: "Input",
       itemSpan: 24,
       placeholder: "请输入页面名称",
     },
     {
       label: "标识",
-      name: "uuid",
+      name: "page_code",
       is: "Input",
       itemSpan: 24,
       placeholder: "请输入标识",
     },
-  ];
-
-  const dataSource = [
     {
-      key: "1",
-      name: "第一个页面",
-      uuid: "dkla",
-      address: "西湖区湖底公园1号",
+      label: "页面描述",
+      name: "description",
+      is: "Input.TextArea",
+      itemSpan: 24,
+      placeholder: "请输入页面描述",
     },
     {
-      key: "2",
-      name: "第二个页面",
-      uuid: "lflf",
-      address: "西湖区湖底公园1号",
+      label: "状态",
+      name: "status",
+      itemSpan: 24,
+      placeholder: "请选择状态",
+      is: "Select",
+      options: [
+        {
+          label: "启用",
+          value: "1",
+        },
+        {
+          label: "禁用",
+          value: "0",
+        },
+      ],
     },
   ];
 
@@ -103,8 +185,13 @@ const Page = () => {
     },
     {
       title: "标识",
-      dataIndex: "uuid",
-      key: "uuid",
+      dataIndex: "page_code",
+      key: "page_code",
+    },
+    {
+      title: "页面描述",
+      dataIndex: "description",
+      key: "description",
     },
     {
       title: "创建时间",
@@ -118,19 +205,18 @@ const Page = () => {
     },
     {
       title: "最近修改人",
-      dataIndex: "updated_user",
-      key: "updated_user",
+      dataIndex: "updated_by_user",
+      key: "updated_by_user",
     },
     {
       title: "操作",
       dataIndex: "action",
       key: "action",
       render: (text, record) => {
-        console.log({ record });
         return (
           <Space>
             <Link
-              to={`${ENGINE_HOST}/app/2/page/${record.uuid}/design`}
+              to={`${ENGINE_HOST}/app/${appId}/page/${record.uid}/design`}
               target="_blank"
             >
               设计
@@ -167,13 +253,26 @@ const Page = () => {
         <Button icon={<PlusOutlined />} onClick={() => showDrawer(true)}>
           新建页面
         </Button>
-        <Search
-          placeholder="搜索页面"
-          loading={searchLoading}
-          onSearch={onSearch}
-        />
+        <Search placeholder="搜索页面" loading={loading} onSearch={onSearch} />
       </Space>
-      <Table dataSource={dataSource} columns={columns} />
+      <Table
+        dataSource={dataSource}
+        loading={loading}
+        rowKey={(record) => record.id}
+        columns={columns}
+        pagination={
+          dataSource.length > 0 && {
+            position: ["bottomCenter"],
+            showSizeChanger: true,
+            showQuickJumper: true,
+            onChange: onPaginationChange,
+            onShowSizeChange: onShowSizeChange,
+            pageSize: paginationMeta.pageSize, // 每页显示记录数
+            current: paginationMeta.current, // 当前页码
+            total: paginationMeta.total, // 总记录数
+          }
+        }
+      />
       <Drawer
         width={420}
         title={`${action ? "新增" : "编辑"}页面`}

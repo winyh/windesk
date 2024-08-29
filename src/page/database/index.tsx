@@ -48,6 +48,11 @@ const Database = () => {
   const [docType, setDocType] = useState("api");
   const [searchLoading, setSearchLoading] = useState(false);
   const [dataSearchLoading, setDataSearchLoading] = useState(false);
+  const [paginationMeta, setPaginationMeta] = useState({
+    pageSize: 10,
+    current: 1,
+    total: 10,
+  });
   const [record, setRecord] = useState({});
   const data = ["user", "article", "role", "admin", "category"];
 
@@ -115,8 +120,14 @@ const Database = () => {
     }),
   };
 
+  const onPaginationChange = (current, pageSize) => {
+    setPaginationMeta((pre) => ({ ...pre, current, pageSize }));
+    getData({ current, pageSize });
+  };
+
   const onShowSizeChange = (current, pageSize) => {
-    console.log(current, pageSize);
+    setPaginationMeta((pre) => ({ ...pre, current, pageSize }));
+    getData({ current, pageSize });
   };
 
   const layout = {
@@ -535,14 +546,18 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
               rowKey={(record) => record.key}
               dataSource={dataSource}
               columns={columns}
-              pagination={{
-                position: ["bottomCenter"],
-                showSizeChanger: true,
-                showQuickJumper: true,
-                onShowSizeChange: { onShowSizeChange },
-                defaultCurrent: 3,
-                total: 500,
-              }}
+              pagination={
+                dataSource.length > 0 && {
+                  position: ["bottomCenter"],
+                  showSizeChanger: true,
+                  showQuickJumper: true,
+                  onChange: onPaginationChange,
+                  onShowSizeChange: onShowSizeChange,
+                  pageSize: paginationMeta.pageSize, // 每页显示记录数
+                  current: paginationMeta.current, // 当前页码
+                  total: paginationMeta.total, // 总记录数
+                }
+              }
             />
           ) : (
             <WinCode

@@ -26,14 +26,7 @@ const { DirectoryTree } = Tree;
 
 const Role = () => {
   const formRef = useRef();
-  const [dataSource, setDataSource] = useState([
-    {
-      id: 1,
-      role_name: "管理员",
-      role_code: "R0001",
-      description: "可以管理系统",
-    },
-  ]);
+  const [dataSource, setDataSource] = useState([]);
   const [open, setOpen] = useState(false);
   const [action, setAction] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -514,16 +507,18 @@ const Role = () => {
           dataSource={dataSource}
           columns={columns}
           loading={loading}
-          pagination={{
-            position: ["bottomCenter"],
-            showSizeChanger: true,
-            showQuickJumper: true,
-            onChange: onPaginationChange,
-            onShowSizeChange: onShowSizeChange,
-            pageSize: paginationMeta.pageSize, // 每页显示记录数
-            current: paginationMeta.current, // 当前页码
-            total: paginationMeta.total, // 总记录数
-          }}
+          pagination={
+            dataSource.length > 0 && {
+              position: ["bottomCenter"],
+              showSizeChanger: true,
+              showQuickJumper: true,
+              onChange: onPaginationChange,
+              onShowSizeChange: onShowSizeChange,
+              pageSize: paginationMeta.pageSize, // 每页显示记录数
+              current: paginationMeta.current, // 当前页码
+              total: paginationMeta.total, // 总记录数
+            }
+          }
         />
       </Flex>
 
