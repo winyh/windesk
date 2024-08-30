@@ -241,7 +241,6 @@ const Common = () => {
       children: (
         <div style={{ width: 500 }}>
           1.数据库：平台提供的数据库基础设施 <br /> 2.云函数：存储配置 <br />
-          3.文件存储：存储路径配置 <br /> 4.智能助手：key 相关配置 <br />
           {form(formBasic)}
         </div>
       ),

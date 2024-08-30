@@ -358,9 +358,6 @@ const Menu = () => {
   const onChange = (newValue) => {
     setValue(newValue);
   };
-  const onPopupScroll = (e) => {
-    console.log("onPopupScroll", e);
-  };
 
   const onChangeMenuType = (value) => {
     setMenuType(value);
@@ -377,8 +374,8 @@ const Menu = () => {
         <Card
           title={
             <Space>
-              <Button icon={<PlusOutlined />}>新增菜单</Button>
-              <Button icon={<ControlOutlined />}>展开折叠</Button>
+              <Button icon={<PlusOutlined />}>新增</Button>
+              <Button icon={<ControlOutlined />}>展开</Button>
               <Search placeholder="搜索菜单" />
             </Space>
           }
@@ -454,7 +451,6 @@ const Menu = () => {
                     treeDefaultExpandAll
                     onChange={onChange}
                     treeData={treeData}
-                    onPopupScroll={onPopupScroll}
                   />
                 </Col>
               </Row>
@@ -487,6 +483,15 @@ const Menu = () => {
                   <Col span={4}>路由名称：</Col>
                   <Col span={8}>
                     <Input placeholder="请输入路由名称" />
+                  </Col>
+                </Row>
+              ) : null}
+
+              {menuType !== "button" ? (
+                <Row>
+                  <Col span={4}>组件路径：</Col>
+                  <Col span={8}>
+                    <Input placeholder="请输入组件路径" />
                   </Col>
                 </Row>
               ) : null}
@@ -539,18 +544,9 @@ const Menu = () => {
                       placeholder="请输入路由参数"
                       style={{ width: "100%" }}
                     >
-                      <Option value="tab">页签</Option>
-                      <Option value="window">新窗口</Option>
+                      <Option value="_self">页签</Option>
+                      <Option value="_blank">新窗口</Option>
                     </Select>
-                  </Col>
-                </Row>
-              ) : null}
-
-              {menuType !== "button" ? (
-                <Row>
-                  <Col span={4}>组件路径：</Col>
-                  <Col span={8}>
-                    <Input placeholder="请输入组件路径" />
                   </Col>
                 </Row>
               ) : null}

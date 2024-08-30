@@ -440,7 +440,7 @@ const Role = () => {
           <Popconfirm
             title="系统提醒"
             description="您确认要删除岗位吗?"
-            onConfirm={onConfirm}
+            onConfirm={() => onConfirm(record)}
             onCancel={onCancel}
             okText="确认"
             cancelText="取消"
