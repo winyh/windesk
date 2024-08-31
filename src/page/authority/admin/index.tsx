@@ -25,7 +25,13 @@ import {
 } from "@ant-design/icons";
 import SuperForm from "@/component/SuperForm";
 import dayjs from "dayjs";
-import { clientPost, clientPut, clientDel, clientGetList } from "@/request";
+import {
+  clientPost,
+  clientPut,
+  clientDel,
+  clientGetList,
+  clientGetAll,
+} from "@/request";
 
 const { Search } = Input;
 
@@ -44,6 +50,9 @@ const Admin = () => {
     total: 10,
   });
   const [record, setRecord] = useState({});
+  const [roles, setRoles] = useState([]);
+  const [positions, setPositions] = useState([]);
+  const [organizations, setOrganizations] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const { modal } = App.useApp();
 
@@ -52,7 +61,11 @@ const Admin = () => {
       current: 1,
       pageSize: 10,
     });
+    getOrganizations();
+    getPositions();
+    getRoles();
   }, []);
+
   const getData = (params = {}) => {
     setLoading(true);
     const { current, pageSize } = paginationMeta;
@@ -79,6 +92,48 @@ const Admin = () => {
       .finally(() => {
         setLoading(false);
       });
+  };
+
+  const getOrganizations = () => {
+    clientGetAll("organization", {})
+      .then((res) => {
+        if (res.status) {
+          const { data } = res;
+          setOrganizations(data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {});
+  };
+
+  const getRoles = () => {
+    clientGetAll("role", {})
+      .then((res) => {
+        if (res.status) {
+          const { data } = res;
+          setRoles(data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {});
+  };
+
+  const getPositions = () => {
+    clientGetAll("position", {})
+      .then((res) => {
+        if (res.status) {
+          const { data } = res;
+          setPositions(data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {});
   };
 
   const onSearch = (value) => {
@@ -235,32 +290,53 @@ const Admin = () => {
     },
     {
       label: "组织部门",
-      name: "organization",
+      name: "organization_id",
       is: "Select",
       itemSpan: 24,
       placeholder: "请选择组织部门",
+      options: organizations.map((item) => ({
+        label: item?.name,
+        value: item?.id,
+      })),
     },
     {
       label: "岗位",
-      name: "position",
+      name: "position_id",
       is: "Select",
       itemSpan: 24,
       placeholder: "请选择岗位",
+      options: positions.map((item) => ({
+        label: item?.name,
+        value: item?.id,
+      })),
     },
     {
       label: "角色",
-      name: "role",
+      name: "role_id",
       is: "Select",
       itemSpan: 24,
       placeholder: "请选择角色",
+      options: roles.map((item) => ({
+        label: item?.role_name,
+        value: item?.id,
+      })),
     },
     {
       label: "状态",
       name: "status",
       itemSpan: 24,
       placeholder: "请选择状态",
-      options: [],
       is: "Select",
+      options: [
+        {
+          label: "启用",
+          value: "1",
+        },
+        {
+          label: "禁用",
+          value: "0",
+        },
+      ],
     },
   ];
 
@@ -335,18 +411,18 @@ const Admin = () => {
     },
     {
       title: "组织部门",
-      dataIndex: "organization",
-      key: "organization",
+      dataIndex: "organization_id",
+      key: "organization_id",
     },
     {
       title: "岗位",
-      dataIndex: "position",
-      key: "position",
+      dataIndex: "position_id",
+      key: "position_id",
     },
     {
       title: "角色",
-      dataIndex: "role",
-      key: "role",
+      dataIndex: "role_id",
+      key: "role_id",
       render: () => {
         return <Tag color="green">管理员</Tag>;
       },
@@ -371,7 +447,7 @@ const Admin = () => {
       title: "操作",
       dataIndex: "action",
       key: "action",
-      render: (text) => (
+      render: (text, record) => (
         <>
           <Button
             type="text"

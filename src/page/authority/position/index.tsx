@@ -151,8 +151,17 @@ const Position = () => {
       name: "status",
       itemSpan: 24,
       placeholder: "请选择状态",
-      options: [],
       is: "Select",
+      options: [
+        {
+          label: "启用",
+          value: "1",
+        },
+        {
+          label: "禁用",
+          value: "0",
+        },
+      ],
     },
   ];
 

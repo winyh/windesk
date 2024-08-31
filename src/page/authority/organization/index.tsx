@@ -143,10 +143,11 @@ const Organization = () => {
     {
       label: "上级组织",
       name: "pid",
-      is: "InputNumber",
       itemSpan: 24,
       style: { width: "100%" },
-      placeholder: "请输入上级组织",
+      placeholder: "请选择上级组织",
+      is: "Select",
+      options: [],
     },
     {
       label: "联系人",
@@ -182,8 +183,17 @@ const Organization = () => {
       name: "status",
       itemSpan: 24,
       placeholder: "请选择状态",
-      options: [],
       is: "Select",
+      options: [
+        {
+          label: "启用",
+          value: "1",
+        },
+        {
+          label: "禁用",
+          value: "0",
+        },
+      ],
     },
   ];
 
@@ -210,8 +220,8 @@ const Organization = () => {
     },
     {
       title: "负责人",
-      dataIndex: "leader",
-      key: "leader",
+      dataIndex: "contacts",
+      key: "contacts",
     },
     {
       title: "联系方式",

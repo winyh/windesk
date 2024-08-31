@@ -112,7 +112,7 @@ const clientGetAll = (collection, params) => {
 };
 
 const clientGetList = (collection, params) => {
-  return comGet(`${apiPrefix}/${collection}/list/page`, params);
+  return comGet(`${apiPrefix}/${collection}/list/paginate`, params);
 };
 
 const clientPost = (collection, data) => {
