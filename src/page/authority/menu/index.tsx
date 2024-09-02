@@ -12,6 +12,7 @@ import {
   Card,
   Tree,
   Segmented,
+  Popconfirm,
   Switch,
   TreeSelect,
   Drawer,
@@ -57,8 +58,8 @@ const Menu = () => {
     getAllMenus();
   }, []);
 
-  const getAllMenus = async () => {
-    const { status, data } = await comGet("/admin/menus");
+  const getAllMenus = async (params) => {
+    const { status, data } = await comGet("/admin/menus", { ...params });
     if (status) {
       const menuTree = genMenuToTree(data);
       setTreeData(menuTree);
@@ -218,6 +219,10 @@ const Menu = () => {
     setExpandedKeys(keys);
   };
 
+  const onSearch = (keyword) => {
+    getAllMenus({ title: keyword });
+  };
+
   const onChange = (newValue) => {
     setValue(newValue);
   };
@@ -255,6 +260,17 @@ const Menu = () => {
       .catch(() => {});
   };
 
+  const onDeleteMenu = () => {
+    clientDel("menu", { ids: record.id })
+      .then((res) => {
+        if (res.status) {
+          form.resetFields();
+          getAllMenus();
+        }
+      })
+      .catch(() => {});
+  };
+
   return (
     <Row gutter={24}>
       <Col span={6}>
@@ -265,7 +281,7 @@ const Menu = () => {
                 新增
               </Button>
               <Button icon={<ControlOutlined />}>展开</Button>
-              <Search placeholder="搜索菜单" />
+              <Search placeholder="搜索菜单" onSearch={onSearch} />
             </Space>
           }
         >
@@ -289,11 +305,18 @@ const Menu = () => {
                     {menuType === "menu" ? "菜单" : ""}
                     {menuType === "button" ? "按钮" : ""}
                   </Button>
-                  <Button danger>
-                    删除{menuType === "directory" ? "目录" : ""}
-                    {menuType === "menu" ? "菜单" : ""}
-                    {menuType === "button" ? "按钮" : ""}
-                  </Button>
+                  <Popconfirm
+                    title="您确定要删除吗?"
+                    onConfirm={() => onDeleteMenu()}
+                    okText="确定"
+                    cancelText="取消"
+                  >
+                    <Button danger>
+                      删除{menuType === "directory" ? "目录" : ""}
+                      {menuType === "menu" ? "菜单" : ""}
+                      {menuType === "button" ? "按钮" : ""}
+                    </Button>
+                  </Popconfirm>
                 </Space>
                 <Space size="middle">
                   <Button icon={<ExceptionOutlined />} onClick={showDrawer}>
