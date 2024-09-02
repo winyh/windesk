@@ -248,11 +248,11 @@ const appBaseRoutes = [
     ],
   },
   {
-    path: "system",
+    path: "manage",
     meta: {
       label: "应用配置",
       icon: <SettingOutlined />,
-      key: "system",
+      key: "manage",
       hide_in_menu: false,
     },
     children: [

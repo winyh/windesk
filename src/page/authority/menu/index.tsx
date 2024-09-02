@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   Col,
   Row,
@@ -25,7 +25,15 @@ import {
   ControlOutlined,
   ExceptionOutlined,
 } from "@ant-design/icons";
-import { clientPost, clientPut, clientDel, clientGetList } from "@/request";
+import { SegmentedItem } from "@/component/CustomFormItem";
+import {
+  clientPost,
+  clientPut,
+  clientDel,
+  clientGetList,
+  comGet,
+} from "@/request";
+import { genMenuToTree } from "@/utils";
 
 import "./index.css";
 
@@ -38,10 +46,25 @@ const Menu = () => {
   const [form] = Form.useForm();
   const [menuType, setMenuType] = useState("directory");
   const [action, setAction] = useState(true);
+  const [record, setRecord] = useState({});
   const [selectedKeys, setSelectedKeys] = useState([]);
   const [expandedKeys, setExpandedKeys] = useState([]);
   const [externalLink, setExternalLink] = useState(false);
+  const [treeData, setTreeData] = useState([]);
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    getAllMenus();
+  }, []);
+
+  const getAllMenus = async () => {
+    const { status, data } = await comGet("/admin/menus");
+    if (status) {
+      const menuTree = genMenuToTree(data);
+      setTreeData(menuTree);
+      console.log({ menuTree });
+    }
+  };
 
   const showDrawer = () => {
     setOpen(true);
@@ -49,171 +72,6 @@ const Menu = () => {
   const onClose = () => {
     setOpen(false);
   };
-
-  const data = ["user", "article", "role", "admin", "category"];
-
-  const treeData = [
-    {
-      title: "控制台",
-      key: "0-0",
-      children: [
-        {
-          title: "leaf 0-0",
-          key: "0-0-0",
-          isLeaf: true,
-        },
-        {
-          title: "leaf 0-1",
-          key: "0-0-1",
-          isLeaf: true,
-        },
-      ],
-    },
-    {
-      title: "租户管理",
-      key: "0-1",
-      children: [
-        {
-          title: "leaf 1-0",
-          key: "0-1-0",
-          isLeaf: true,
-        },
-        {
-          title: "leaf 1-1",
-          key: "0-1-1",
-          isLeaf: true,
-        },
-      ],
-    },
-    {
-      title: "应用管理",
-      key: "0-2",
-      children: [
-        {
-          title: "leaf 1-0",
-          key: "0-2-0",
-          isLeaf: true,
-        },
-        {
-          title: "leaf 1-1",
-          key: "0-2-1",
-          isLeaf: true,
-        },
-      ],
-    },
-    {
-      title: "数据库",
-      key: "0-3",
-      children: [
-        {
-          title: "leaf 1-0",
-          key: "0-3-0",
-          isLeaf: true,
-        },
-        {
-          title: "leaf 1-1",
-          key: "0-3-1",
-          isLeaf: true,
-        },
-      ],
-    },
-    {
-      title: "云函数",
-      key: "0-4",
-      children: [
-        {
-          title: "leaf 1-0",
-          key: "0-4-0",
-          isLeaf: true,
-        },
-        {
-          title: "leaf 1-1",
-          key: "0-4-1",
-          isLeaf: true,
-        },
-      ],
-    },
-    {
-      title: "文件存储",
-      key: "0-5",
-      children: [
-        {
-          title: "leaf 1-0",
-          key: "0-5-0",
-          isLeaf: true,
-        },
-        {
-          title: "leaf 1-1",
-          key: "0-5-1",
-          isLeaf: true,
-        },
-      ],
-    },
-    {
-      title: "AI助手",
-      key: "0-6",
-      children: [
-        {
-          title: "leaf 1-0",
-          key: "0-6-0",
-          isLeaf: true,
-        },
-        {
-          title: "leaf 1-1",
-          key: "0-6-1",
-          isLeaf: true,
-        },
-      ],
-    },
-    {
-      title: "分析监控",
-      key: "0-7",
-      children: [
-        {
-          title: "leaf 1-0",
-          key: "0-7-0",
-          isLeaf: true,
-        },
-        {
-          title: "leaf 1-1",
-          key: "0-7-1",
-          isLeaf: true,
-        },
-      ],
-    },
-    {
-      title: "权限管理",
-      key: "0-8",
-      children: [
-        {
-          title: "leaf 1-0",
-          key: "0-8-0",
-          isLeaf: true,
-        },
-        {
-          title: "leaf 1-1",
-          key: "0-8-1",
-          isLeaf: true,
-        },
-      ],
-    },
-    {
-      title: "系统配置",
-      key: "0-9",
-      children: [
-        {
-          title: "leaf 1-0",
-          key: "0-9-0",
-          isLeaf: true,
-        },
-        {
-          title: "leaf 1-1",
-          key: "0-9-1",
-          isLeaf: true,
-        },
-      ],
-    },
-  ];
 
   const items = [
     {
@@ -240,18 +98,6 @@ const Menu = () => {
       disabled: true,
     },
   ];
-
-  const text = (
-    <p
-      style={{
-        paddingLeft: 24,
-      }}
-    >
-      A dog is a type of domesticated animal. Known for its loyalty and
-      faithfulness, it can be found as a welcome guest in many households across
-      the world.
-    </p>
-  );
 
   const collapseItems = [
     {
@@ -354,7 +200,18 @@ const Menu = () => {
     },
   ];
 
+  const onAdd = () => {
+    form.resetFields();
+    setAction(true);
+    setExpandedKeys([]);
+    setSelectedKeys([]);
+    setRecord({});
+  };
+
   const onSelect = (keys, info) => {
+    form.setFieldsValue({ ...info.node });
+    setRecord(info.node);
+    setAction(false);
     setSelectedKeys(keys);
   };
   const onExpand = (keys, info) => {
@@ -378,16 +235,19 @@ const Menu = () => {
     form
       .validateFields()
       .then(async (values) => {
+        console.log({ values });
         if (action) {
           const res = await clientPost("menu", values);
           if (res.status) {
             form.resetFields();
+            getAllMenus();
             setOpen(false);
           }
         } else {
           const res = await clientPut("menu", { ...values, id: record.id });
           if (res.status) {
             form.resetFields();
+            getAllMenus();
             setOpen(false);
           }
         }
@@ -401,13 +261,16 @@ const Menu = () => {
         <Card
           title={
             <Space>
-              <Button icon={<PlusOutlined />}>新增</Button>
+              <Button icon={<PlusOutlined />} onClick={onAdd}>
+                新增
+              </Button>
               <Button icon={<ControlOutlined />}>展开</Button>
               <Search placeholder="搜索菜单" />
             </Space>
           }
         >
           <DirectoryTree
+            selectedKeys={selectedKeys}
             expandedKeys={expandedKeys}
             onSelect={onSelect}
             onExpand={onExpand}
@@ -422,7 +285,9 @@ const Menu = () => {
               <Flex justify="space-between">
                 <Space size="middle">
                   <Button type="primary" onClick={onFinish}>
-                    保存菜单
+                    保存{menuType === "directory" ? "目录" : ""}
+                    {menuType === "menu" ? "菜单" : ""}
+                    {menuType === "button" ? "按钮" : ""}
                   </Button>
                   <Button danger>
                     删除{menuType === "directory" ? "目录" : ""}
@@ -443,45 +308,49 @@ const Menu = () => {
                 <Row>
                   <Col span={4}>菜单类型：</Col>
                   <Col span={8}>
-                    <Segmented
-                      options={[
-                        {
-                          label: "目录",
-                          value: "directory",
-                        },
-                        {
-                          label: "菜单",
-                          value: "menu",
-                        },
-                        {
-                          label: "按钮",
-                          value: "button",
-                        },
-                      ]}
-                      value={menuType}
-                      onChange={onChangeMenuType}
-                    />
+                    <Form.Item name="type">
+                      <SegmentedItem
+                        options={[
+                          {
+                            label: "目录",
+                            value: "directory",
+                          },
+                          {
+                            label: "菜单",
+                            value: "menu",
+                          },
+                          {
+                            label: "按钮",
+                            value: "button",
+                          },
+                        ]}
+                        onChange={onChangeMenuType}
+                      />
+                    </Form.Item>
                   </Col>
                 </Row>
                 <Row>
                   <Col span={4}>上级目录：</Col>
                   <Col span={8}>
-                    <TreeSelect
-                      showSearch
-                      value={value}
-                      style={{
-                        width: "100%",
-                      }}
-                      dropdownStyle={{
-                        maxHeight: 400,
-                        overflow: "auto",
-                      }}
-                      placeholder="请选择"
-                      allowClear
-                      treeDefaultExpandAll
-                      onChange={onChange}
-                      treeData={treeData}
-                    />
+                    <Form.Item name="pid">
+                      <TreeSelect
+                        showSearch
+                        style={{
+                          width: "100%",
+                        }}
+                        dropdownStyle={{
+                          maxHeight: 400,
+                          overflow: "auto",
+                        }}
+                        placeholder="请选择"
+                        allowClear
+                        treeData={treeData}
+                        fieldNames={{
+                          label: "title",
+                          value: "key",
+                        }}
+                      />
+                    </Form.Item>
                   </Col>
                 </Row>
 
@@ -621,81 +490,38 @@ const Menu = () => {
                   功能设置
                 </Divider>
 
-                {menuType === "button" ? (
-                  <Row>
-                    <Col span={4}>按钮状态：</Col>
-                    <Col span={8}>
-                      <Segmented
-                        options={[
-                          {
-                            label: "启用",
-                            value: "1",
-                          },
-                          {
-                            label: "停用",
-                            value: "0",
-                          },
-                        ]}
-                        onChange={(value) => {
-                          console.log(value); // string
-                        }}
-                      />
-                    </Col>
-                  </Row>
-                ) : null}
+                <Row>
+                  <Col span={4}>
+                    {menuType === "directory" ? "目录" : ""}
+                    {menuType === "menu" ? "菜单" : ""}
+                    {menuType === "button" ? "按钮" : ""}状态：
+                  </Col>
+                  <Col span={8}>
+                    <Form.Item name="status">
+                      <Switch checkedChildren="启" unCheckedChildren="停" />
+                    </Form.Item>
+                  </Col>
+                </Row>
 
                 {menuType !== "button" ? (
                   <>
                     <Row>
                       <Col span={4}>根路由：</Col>
                       <Col span={8}>
-                        <Switch
-                          checkedChildren="是"
-                          unCheckedChildren="否"
-                          defaultChecked
-                        />
-                      </Col>
-                    </Row>
-
-                    <Row>
-                      <Col span={4}>目录状态：</Col>
-                      <Col span={8}>
-                        <Segmented
-                          options={[
-                            {
-                              label: "启用",
-                              value: "1",
-                            },
-                            {
-                              label: "停用",
-                              value: "0",
-                            },
-                          ]}
-                          onChange={(value) => {
-                            console.log(value); // string
-                          }}
-                        />
+                        <Switch checkedChildren="是" unCheckedChildren="否" />
                       </Col>
                     </Row>
 
                     <Row>
                       <Col span={4}>显示状态：</Col>
                       <Col span={8}>
-                        <Segmented
-                          options={[
-                            {
-                              label: "显示",
-                              value: "1",
-                            },
-                            {
-                              label: "隐藏",
-                              value: "0",
-                            },
-                          ]}
-                          onChange={(value) => {
-                            console.log(value); // string
-                          }}
-                        />
+                        <Form.Item name="hide_in_menu">
+                          <Switch
+                            checkedChildren="显"
+                            unCheckedChildren="隐"
+                            defaultChecked
+                          />
+                        </Form.Item>
                       </Col>
                     </Row>
 
@@ -751,14 +577,14 @@ const Menu = () => {
                       </Col>
                     </Row>
 
-                    {externalLink ? (
+                    {/* {externalLink ? (
                       <Row>
                         <Col span={4}>外链地址：</Col>
                         <Col span={8}>
                           <Input placeholder="请输入外链地址" />
                         </Col>
                       </Row>
-                    ) : null}
+                    ) : null} */}
                   </>
                 ) : null}
               </Space>

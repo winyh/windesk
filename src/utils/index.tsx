@@ -97,6 +97,45 @@ const computedWrapperCol = (labelCol) => {
   return wrapperCol;
 };
 
+const genMenuToTree = (items) => {
+  const result = []; // 存放结果集
+  const itemMap = {}; // 存放路径
+
+  // 先转化为map存储
+  for (const item of items) {
+    item.children = [];
+    itemMap[item.id] = item;
+  }
+
+  for (const item of items) {
+    const pid = item.pid;
+
+    if (pid === 0) {
+      result.push(item);
+    } else {
+      if (!itemMap[pid]) {
+        // 如果父节点不存在，则忽略此节点
+        continue;
+      }
+      itemMap[pid].children.push(item);
+    }
+  }
+
+  // 对每个层级进行sort排序
+  const sortItems = (arr) => {
+    arr.sort((a, b) => a.sort - b.sort);
+    arr.forEach((item) => {
+      if (item.children && item.children.length > 0) {
+        sortItems(item.children);
+      }
+    });
+  };
+
+  sortItems(result);
+
+  return result;
+};
+
 export {
   isTauri,
   getCurrentYear,
@@ -105,4 +144,5 @@ export {
   routes2menu,
   getMenuSome,
   computedWrapperCol,
+  genMenuToTree,
 };
