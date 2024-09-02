@@ -1,67 +1,126 @@
-import React from "react";
-import { Button, Tabs } from "antd";
-import SuperForm from "@/component/SuperForm";
-import SuperTable from "@/component/SuperTable";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Tabs, Table, Tag, Button } from "antd";
 import "./index.less";
-
-const { BASE_URL } = import.meta.env;
-
+import { comGet } from "@/request";
+import dayjs from "dayjs";
 const Log = () => {
-  const navigate = useNavigate();
+  const [activeKey, setActiveKey] = useState("operate");
+  const [operateDataSource, setOperateDataSource] = useState([]);
+  const [accountDataSource, setAccountDataSource] = useState([]);
+  const [paginationMeta, setPaginationMeta] = useState({
+    pageSize: 10,
+    current: 1,
+    total: 10,
+  });
 
-  const goHome = () => {
-    navigate(`${BASE_URL}dashboard`);
+  useEffect(() => {
+    getLogData({
+      current: 1,
+      pageSize: 10,
+      log: activeKey,
+    });
+  }, []);
+
+  const getLogData = async (params) => {
+    const res = await comGet("/admin/log/list", { ...params });
+    if (res.status) {
+      const { list, total, current, pageSize } = res.data;
+
+      if (params.log === "operate") {
+        console.log({ activeKey });
+        let data = list.map((item) => {
+          const [
+            timestamp,
+            type,
+            level,
+            device,
+            ip,
+            method,
+            path,
+            query,
+            browser,
+            os,
+            cpu,
+            time,
+            status,
+          ] = item.split(/\s+/);
+          return {
+            timestamp,
+            type,
+            level,
+            device,
+            ip,
+            method,
+            path,
+            query,
+            browser,
+            os,
+            cpu,
+            time,
+            status,
+          };
+        });
+        setOperateDataSource(data);
+      } else {
+        let data = list.map((item) => {
+          const [
+            timestamp,
+            type,
+            level,
+            device,
+            ip,
+            method,
+            path,
+            query,
+            browser,
+            os,
+            cpu,
+            time,
+            status,
+          ] = item.split(/\s+/);
+          return {
+            timestamp,
+            type,
+            level,
+            device,
+            ip,
+            method,
+            path,
+            query,
+            browser,
+            os,
+            cpu,
+            time,
+            status,
+          };
+        });
+        setAccountDataSource(data);
+      }
+
+      setPaginationMeta({
+        pageSize: pageSize,
+        current: current,
+        total: total,
+      });
+    }
   };
-
-  const onFinish = (values) => {};
-
-  const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
-  };
-
-  const layout = {
-    labelCol: { span: 6 },
-    wrapperCol: { span: 18 },
-  };
-
-  const formOperateData = [
-    {
-      label: "登录地点",
-      name: "name",
-      is: "Input",
-      placeholder: "请输入角色名称",
-    },
-    {
-      label: "用户名称",
-      name: "code",
-      is: "Input",
-      placeholder: "请输入角色编码",
-    },
-    {
-      label: "浏览器",
-      name: "description",
-      is: "Input",
-      placeholder: "请输入角色描述",
-    },
-  ];
 
   const operateColumns = [
-    {
-      title: "操作人",
-      dataIndex: "username",
-      key: "username",
-    },
-    {
-      title: "操作内容",
-      dataIndex: "action",
-      key: "action", // 用户退出、查询树列表、分页查询列表等
-    },
-    {
-      title: "所属模块",
-      dataIndex: "module",
-      key: "module", // 登录、用户管理、系统日志等
-    },
+    // {
+    //   title: "操作人",
+    //   dataIndex: "username",
+    //   key: "username",
+    // },
+    // {
+    //   title: "操作内容",
+    //   dataIndex: "action",
+    //   key: "action", // 用户退出、查询树列表、分页查询列表等
+    // },
+    // {
+    //   title: "所属模块",
+    //   dataIndex: "module",
+    //   key: "module", // 登录、用户管理、系统日志等
+    // },
     {
       title: "操作 IP",
       dataIndex: "ip",
@@ -74,8 +133,9 @@ const Log = () => {
     },
     {
       title: "耗时",
-      dataIndex: "time_consume",
-      key: "time_consume", // 58ms、100ms、8ms
+      dataIndex: "time",
+      key: "time", // 58ms、100ms、8ms
+      render: (text) => <Tag color="green">{text} ms</Tag>,
     },
     {
       title: "浏览器",
@@ -91,35 +151,13 @@ const Log = () => {
       title: "状态",
       dataIndex: "status",
       key: "status", // 成功、失败
+      render: (text) => <Tag color="green">{text ? text : "未知"}</Tag>,
     },
     {
-      title: "操作",
-      dataIndex: "action",
-      key: "action",
-      fixed: "right",
-      width: 100,
-      render: (text, row) => <div>强制退出</div>,
-    },
-  ];
-
-  const formAccountData = [
-    {
-      label: "登录地点",
-      name: "name",
-      is: "Input",
-      placeholder: "请输入角色名称",
-    },
-    {
-      label: "用户名称",
-      name: "code",
-      is: "Input",
-      placeholder: "请输入角色编码",
-    },
-    {
-      label: "浏览器",
-      name: "description",
-      is: "Input",
-      placeholder: "请输入角色描述",
+      title: "操作时间",
+      dataIndex: "created_at",
+      key: "created_at",
+      render: (text) => dayjs(text).format("YYYY-MM-DD HH:mm:ss"),
     },
   ];
 
@@ -175,12 +213,31 @@ const Log = () => {
       key: "action",
       fixed: "right",
       width: 100,
-      render: (text, row) => <div>强制退出</div>,
+      render: (text, row) => (
+        <Button type="text" danger>
+          强制退出
+        </Button>
+      ),
     },
   ];
 
   const onChange = (key) => {
-    console.log(key);
+    setActiveKey(key);
+    getLogData({
+      current: 1,
+      pageSize: 10,
+      log: key,
+    });
+  };
+
+  const onPaginationChange = (current, pageSize) => {
+    setPaginationMeta((pre) => ({ ...pre, current, pageSize }));
+    getLogData({ current, pageSize, log: activeKey });
+  };
+
+  const onShowSizeChange = (current, pageSize) => {
+    setPaginationMeta((pre) => ({ ...pre, current, pageSize }));
+    getLogData({ current, pageSize, log: activeKey });
   };
 
   const tabItems = [
@@ -188,46 +245,57 @@ const Log = () => {
       label: "操作日志",
       key: "operate",
       children: (
-        <>
-          <SuperForm
-            data={formOperateData}
-            layout={layout}
-            limit={6}
-            rulesValid={false}
-            btnText="查询"
-            onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
-          ></SuperForm>
-          <SuperTable
-            queryUrl="/admin/records?current=1&pageSize=10"
-            columns={operateColumns}
-          />
-        </>
+        <Table
+          dataSource={operateDataSource}
+          columns={operateColumns}
+          rowKey={(record) => record.timestamp}
+          pagination={
+            operateDataSource.length > 0 && {
+              position: ["bottomCenter"],
+              showSizeChanger: true,
+              showQuickJumper: true,
+              onChange: onPaginationChange,
+              onShowSizeChange: onShowSizeChange,
+              pageSize: paginationMeta.pageSize, // 每页显示记录数
+              current: paginationMeta.current, // 当前页码
+              total: paginationMeta.total, // 总记录数
+            }
+          }
+        />
       ),
     },
     {
       label: "登录日志",
-      key: "log",
+      key: "login",
       children: (
-        <>
-          <SuperForm
-            data={formAccountData}
-            layout={layout}
-            limit={6}
-            rulesValid={false}
-            btnText="查询"
-            onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
-          ></SuperForm>
-          <SuperTable
-            queryUrl="/admin/records?current=1&pageSize=10"
-            columns={accountColumns}
-          />
-        </>
+        <Table
+          dataSource={accountDataSource}
+          columns={accountColumns}
+          rowKey={(record) => record.timestamp}
+          pagination={
+            accountDataSource.length > 0 && {
+              position: ["bottomCenter"],
+              showSizeChanger: true,
+              showQuickJumper: true,
+              onChange: onPaginationChange,
+              onShowSizeChange: onShowSizeChange,
+              pageSize: paginationMeta.pageSize, // 每页显示记录数
+              current: paginationMeta.current, // 当前页码
+              total: paginationMeta.total, // 总记录数
+            }
+          }
+        />
       ),
     },
   ];
 
-  return <Tabs onChange={onChange} type="card" items={tabItems} />;
+  return (
+    <Tabs
+      type="card"
+      activeKey={activeKey}
+      items={tabItems}
+      onChange={onChange}
+    />
+  );
 };
 export default Log;

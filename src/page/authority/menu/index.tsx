@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   Col,
   Row,
@@ -16,6 +16,7 @@ import {
   TreeSelect,
   Drawer,
   Collapse,
+  Form,
 } from "antd";
 
 import {
@@ -24,6 +25,9 @@ import {
   ControlOutlined,
   ExceptionOutlined,
 } from "@ant-design/icons";
+import { clientPost, clientPut, clientDel, clientGetList } from "@/request";
+
+import "./index.css";
 
 const { Search } = Input;
 const { DirectoryTree } = Tree;
@@ -31,7 +35,9 @@ const { Option } = Select;
 
 const Menu = () => {
   const [value, setValue] = useState();
+  const [form] = Form.useForm();
   const [menuType, setMenuType] = useState("directory");
+  const [action, setAction] = useState(true);
   const [selectedKeys, setSelectedKeys] = useState([]);
   const [expandedKeys, setExpandedKeys] = useState([]);
   const [externalLink, setExternalLink] = useState(false);
@@ -368,6 +374,27 @@ const Menu = () => {
     console.log(value);
   };
 
+  const onFinish = () => {
+    form
+      .validateFields()
+      .then(async (values) => {
+        if (action) {
+          const res = await clientPost("menu", values);
+          if (res.status) {
+            form.resetFields();
+            setOpen(false);
+          }
+        } else {
+          const res = await clientPut("menu", { ...values, id: record.id });
+          if (res.status) {
+            form.resetFields();
+            setOpen(false);
+          }
+        }
+      })
+      .catch(() => {});
+  };
+
   return (
     <Row gutter={24}>
       <Col span={6}>
@@ -389,224 +416,214 @@ const Menu = () => {
         </Card>
       </Col>
       <Col span={18}>
-        <Card
-          title={
-            <Flex justify="space-between">
-              <Space size="middle">
-                <Button type="primary">保存菜单</Button>
-                <Button danger>
-                  删除{menuType === "directory" ? "目录" : ""}
-                  {menuType === "menu" ? "菜单" : ""}
-                  {menuType === "button" ? "按钮" : ""}
-                </Button>
-              </Space>
-              <Space size="middle">
-                <Button icon={<ExceptionOutlined />} onClick={showDrawer}>
-                  字段注释
-                </Button>
-              </Space>
-            </Flex>
-          }
-        >
-          <Flex vertical gap="middle">
-            <Space size="middle" direction="vertical">
-              <Row>
-                <Col span={4}>菜单类型：</Col>
-                <Col span={8}>
-                  <Segmented
-                    options={[
-                      {
-                        label: "目录",
-                        value: "directory",
-                      },
-                      {
-                        label: "菜单",
-                        value: "menu",
-                      },
-                      {
-                        label: "按钮",
-                        value: "button",
-                      },
-                    ]}
-                    value={menuType}
-                    onChange={onChangeMenuType}
-                  />
-                </Col>
-              </Row>
-              <Row>
-                <Col span={4}>上级目录：</Col>
-                <Col span={8}>
-                  <TreeSelect
-                    showSearch
-                    value={value}
-                    style={{
-                      width: "100%",
-                    }}
-                    dropdownStyle={{
-                      maxHeight: 400,
-                      overflow: "auto",
-                    }}
-                    placeholder="请选择"
-                    allowClear
-                    treeDefaultExpandAll
-                    onChange={onChange}
-                    treeData={treeData}
-                  />
-                </Col>
-              </Row>
-
-              <Row>
-                <Col span={4}>目录名称：</Col>
-                <Col span={8}>
-                  <Input placeholder="请输入目录名称" />
-                </Col>
-              </Row>
-
-              <Row>
-                <Col span={4}>目录图标：</Col>
-                <Col span={8}>
-                  <Input placeholder="请选择目录图标" />
-                </Col>
-              </Row>
-
-              {menuType !== "button" ? (
+        <Form name="menu" form={form}>
+          <Card
+            title={
+              <Flex justify="space-between">
+                <Space size="middle">
+                  <Button type="primary" onClick={onFinish}>
+                    保存菜单
+                  </Button>
+                  <Button danger>
+                    删除{menuType === "directory" ? "目录" : ""}
+                    {menuType === "menu" ? "菜单" : ""}
+                    {menuType === "button" ? "按钮" : ""}
+                  </Button>
+                </Space>
+                <Space size="middle">
+                  <Button icon={<ExceptionOutlined />} onClick={showDrawer}>
+                    字段注释
+                  </Button>
+                </Space>
+              </Flex>
+            }
+          >
+            <Flex vertical gap="middle">
+              <Space size="middle" direction="vertical">
                 <Row>
-                  <Col span={4}>路由地址：</Col>
-                  <Col span={8}>
-                    <Input placeholder="请输入路由地址" />
-                  </Col>
-                </Row>
-              ) : null}
-
-              {menuType !== "button" ? (
-                <Row>
-                  <Col span={4}>路由名称：</Col>
-                  <Col span={8}>
-                    <Input placeholder="请输入路由名称" />
-                  </Col>
-                </Row>
-              ) : null}
-
-              {menuType !== "button" ? (
-                <Row>
-                  <Col span={4}>组件路径：</Col>
-                  <Col span={8}>
-                    <Input placeholder="请输入组件路径" />
-                  </Col>
-                </Row>
-              ) : null}
-
-              {/* 权限相关 */}
-
-              {menuType !== "directory" ? (
-                <Row>
-                  <Col span={4}>权限标识：</Col>
-                  <Col span={8}>
-                    <Input placeholder="请输入权限标识" />
-                  </Col>
-                </Row>
-              ) : null}
-
-              {menuType !== "directory" ? (
-                <Row>
-                  <Col span={4}>权限名称：</Col>
-                  <Col span={8}>
-                    <Input placeholder="请输入权限名称" />
-                  </Col>
-                </Row>
-              ) : null}
-
-              {/* 权限相关 */}
-
-              {menuType !== "button" ? (
-                <Row>
-                  <Col span={4}>默认路由：</Col>
-                  <Col span={8}>
-                    <Input placeholder="请输入默认路由" />
-                  </Col>
-                </Row>
-              ) : null}
-
-              {menuType === "menu" ? (
-                <Row>
-                  <Col span={4}>路由参数：</Col>
-                  <Col span={8}>
-                    <Input placeholder="请输入路由参数" />
-                  </Col>
-                </Row>
-              ) : null}
-
-              {menuType === "menu" ? (
-                <Row>
-                  <Col span={4}>打开方式：</Col>
-                  <Col span={8}>
-                    <Select
-                      placeholder="请输入路由参数"
-                      style={{ width: "100%" }}
-                    >
-                      <Option value="_self">页签</Option>
-                      <Option value="_blank">新窗口</Option>
-                    </Select>
-                  </Col>
-                </Row>
-              ) : null}
-
-              {menuType !== "button" ? (
-                <Row>
-                  <Col span={4}>显示排序：</Col>
-                  <Col span={8}>
-                    <InputNumber
-                      style={{ width: "100%" }}
-                      placeholder="请输入显示排序"
-                    />
-                  </Col>
-                </Row>
-              ) : null}
-            </Space>
-
-            <Space size="middle" direction="vertical">
-              <Divider orientation="left" dashed>
-                功能设置
-              </Divider>
-
-              {menuType === "button" ? (
-                <Row>
-                  <Col span={4}>按钮状态：</Col>
+                  <Col span={4}>菜单类型：</Col>
                   <Col span={8}>
                     <Segmented
                       options={[
                         {
-                          label: "启用",
-                          value: "1",
+                          label: "目录",
+                          value: "directory",
                         },
                         {
-                          label: "停用",
-                          value: "0",
+                          label: "菜单",
+                          value: "menu",
+                        },
+                        {
+                          label: "按钮",
+                          value: "button",
                         },
                       ]}
-                      onChange={(value) => {
-                        console.log(value); // string
-                      }}
+                      value={menuType}
+                      onChange={onChangeMenuType}
                     />
                   </Col>
                 </Row>
-              ) : null}
+                <Row>
+                  <Col span={4}>上级目录：</Col>
+                  <Col span={8}>
+                    <TreeSelect
+                      showSearch
+                      value={value}
+                      style={{
+                        width: "100%",
+                      }}
+                      dropdownStyle={{
+                        maxHeight: 400,
+                        overflow: "auto",
+                      }}
+                      placeholder="请选择"
+                      allowClear
+                      treeDefaultExpandAll
+                      onChange={onChange}
+                      treeData={treeData}
+                    />
+                  </Col>
+                </Row>
 
-              {menuType !== "button" ? (
-                <>
+                <Row>
+                  <Col span={4}>目录名称：</Col>
+                  <Col span={8}>
+                    <Form.Item name="title">
+                      <Input placeholder="请输入目录名称" />
+                    </Form.Item>
+                  </Col>
+                </Row>
+
+                <Row>
+                  <Col span={4}>目录图标：</Col>
+                  <Col span={8}>
+                    <Form.Item name="icon">
+                      <Input placeholder="请选择目录图标" />
+                    </Form.Item>
+                  </Col>
+                </Row>
+
+                {menuType !== "button" ? (
                   <Row>
-                    <Col span={4}>根路由：</Col>
+                    <Col span={4}>路由地址：</Col>
                     <Col span={8}>
-                      <Switch
-                        checkedChildren="是"
-                        unCheckedChildren="否"
-                        defaultChecked
-                      />
+                      <Form.Item name="path">
+                        <Input placeholder="请输入路由地址" />
+                      </Form.Item>
                     </Col>
                   </Row>
+                ) : null}
 
+                {menuType !== "button" ? (
                   <Row>
-                    <Col span={4}>目录状态：</Col>
+                    <Col span={4}>路由名称：</Col>
+                    <Col span={8}>
+                      <Form.Item name="path_name">
+                        <Input placeholder="请输入路由名称" />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                ) : null}
+
+                {menuType !== "button" ? (
+                  <Row>
+                    <Col span={4}>组件路径：</Col>
+                    <Col span={8}>
+                      <Form.Item name="component">
+                        <Input placeholder="请输入组件路径" />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                ) : null}
+
+                {/* 权限相关 */}
+
+                {menuType !== "directory" ? (
+                  <Row>
+                    <Col span={4}>权限标识：</Col>
+                    <Col span={8}>
+                      <Form.Item name="access">
+                        <Input placeholder="请输入权限标识" />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                ) : null}
+
+                {menuType !== "directory" ? (
+                  <Row>
+                    <Col span={4}>权限名称：</Col>
+                    <Col span={8}>
+                      <Form.Item name="access_name">
+                        <Input placeholder="请输入权限名称" />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                ) : null}
+
+                {/* 权限相关 */}
+
+                {menuType !== "button" ? (
+                  <Row>
+                    <Col span={4}>默认路由：</Col>
+                    <Col span={8}>
+                      <Form.Item name="default_path">
+                        <Input placeholder="请输入默认路由" />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                ) : null}
+
+                {menuType === "menu" ? (
+                  <Row>
+                    <Col span={4}>路由参数：</Col>
+                    <Col span={8}>
+                      <Form.Item name="params">
+                        <Input placeholder="请输入路由参数" />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                ) : null}
+
+                {menuType === "menu" ? (
+                  <Row>
+                    <Col span={4}>打开方式：</Col>
+                    <Col span={8}>
+                      <Form.Item name="target">
+                        <Select
+                          placeholder="请选择打开方式"
+                          style={{ width: "100%" }}
+                        >
+                          <Option value="_self">页签</Option>
+                          <Option value="_blank">新窗口</Option>
+                        </Select>
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                ) : null}
+
+                {menuType !== "button" ? (
+                  <Row>
+                    <Col span={4}>显示排序：</Col>
+                    <Col span={8}>
+                      <Form.Item name="sort">
+                        <InputNumber
+                          style={{ width: "100%" }}
+                          placeholder="请输入显示排序"
+                        />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                ) : null}
+              </Space>
+
+              <Space size="middle" direction="vertical">
+                <Divider orientation="left" dashed>
+                  功能设置
+                </Divider>
+
+                {menuType === "button" ? (
+                  <Row>
+                    <Col span={4}>按钮状态：</Col>
                     <Col span={8}>
                       <Segmented
                         options={[
@@ -625,87 +642,144 @@ const Menu = () => {
                       />
                     </Col>
                   </Row>
+                ) : null}
 
-                  <Row>
-                    <Col span={4}>显示状态：</Col>
-                    <Col span={8}>
-                      <Segmented
-                        options={[
-                          {
-                            label: "显示",
-                            value: "1",
-                          },
-                          {
-                            label: "隐藏",
-                            value: "0",
-                          },
-                        ]}
-                        onChange={(value) => {
-                          console.log(value); // string
-                        }}
-                      />
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col span={4}>是否缓存：</Col>
-                    <Col span={8}>
-                      <Switch
-                        checkedChildren="是"
-                        unCheckedChildren="否"
-                        defaultChecked
-                      />
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col span={4}>简化路由：</Col>
-                    <Col span={8}>
-                      <Switch
-                        checkedChildren="是"
-                        unCheckedChildren="否"
-                        defaultChecked
-                      />
-                    </Col>
-                  </Row>
-
-                  <Row>
-                    <Col span={4}>是否外链：</Col>
-                    <Col span={8}>
-                      <Switch
-                        checkedChildren="是"
-                        unCheckedChildren="否"
-                        defaultChecked={externalLink}
-                        onChange={onChangeLink}
-                      />
-                    </Col>
-                  </Row>
-                  {externalLink ? (
+                {menuType !== "button" ? (
+                  <>
                     <Row>
-                      <Col span={4}>外链地址：</Col>
+                      <Col span={4}>根路由：</Col>
                       <Col span={8}>
-                        <Input placeholder="请输入外链地址" />
+                        <Switch
+                          checkedChildren="是"
+                          unCheckedChildren="否"
+                          defaultChecked
+                        />
                       </Col>
                     </Row>
-                  ) : null}
-                </>
-              ) : null}
-            </Space>
-          </Flex>
-          <Drawer title="字段注释" onClose={onClose} open={open}>
-            <Collapse
-              items={collapseItems}
-              bordered={false}
-              defaultActiveKey={["1"]}
-            />
-            <Divider orientation="left" dashed>
-              功能设置
-            </Divider>
-            <Collapse
-              items={collapseFnItems}
-              bordered={false}
-              defaultActiveKey={["1"]}
-            />
-          </Drawer>
-        </Card>
+
+                    <Row>
+                      <Col span={4}>目录状态：</Col>
+                      <Col span={8}>
+                        <Segmented
+                          options={[
+                            {
+                              label: "启用",
+                              value: "1",
+                            },
+                            {
+                              label: "停用",
+                              value: "0",
+                            },
+                          ]}
+                          onChange={(value) => {
+                            console.log(value); // string
+                          }}
+                        />
+                      </Col>
+                    </Row>
+
+                    <Row>
+                      <Col span={4}>显示状态：</Col>
+                      <Col span={8}>
+                        <Segmented
+                          options={[
+                            {
+                              label: "显示",
+                              value: "1",
+                            },
+                            {
+                              label: "隐藏",
+                              value: "0",
+                            },
+                          ]}
+                          onChange={(value) => {
+                            console.log(value); // string
+                          }}
+                        />
+                      </Col>
+                    </Row>
+
+                    <Row>
+                      <Col span={4}>是否缓存：</Col>
+                      <Col span={8}>
+                        <Form.Item name="isCache">
+                          <Switch
+                            checkedChildren="是"
+                            unCheckedChildren="否"
+                            defaultChecked
+                          />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+
+                    <Row>
+                      <Col span={4}>简化路由：</Col>
+                      <Col span={8}>
+                        <Switch
+                          checkedChildren="是"
+                          unCheckedChildren="否"
+                          defaultChecked
+                        />
+                      </Col>
+                    </Row>
+
+                    <Row>
+                      <Col span={4}>是否内嵌：</Col>
+                      <Col span={8}>
+                        <Form.Item name="isIframe">
+                          <Switch
+                            checkedChildren="是"
+                            unCheckedChildren="否"
+                            defaultChecked={externalLink}
+                            onChange={onChangeLink}
+                          />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+
+                    <Row>
+                      <Col span={4}>是否外链：</Col>
+                      <Col span={8}>
+                        <Form.Item name="isLink">
+                          <Switch
+                            checkedChildren="是"
+                            unCheckedChildren="否"
+                            defaultChecked={externalLink}
+                            onChange={onChangeLink}
+                          />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+
+                    {externalLink ? (
+                      <Row>
+                        <Col span={4}>外链地址：</Col>
+                        <Col span={8}>
+                          <Input placeholder="请输入外链地址" />
+                        </Col>
+                      </Row>
+                    ) : null}
+                  </>
+                ) : null}
+              </Space>
+            </Flex>
+            <Drawer title="字段注释" onClose={onClose} open={open}>
+              <Collapse
+                items={collapseItems}
+                bordered={false}
+                defaultActiveKey={["1"]}
+              />
+              <Divider orientation="left" dashed>
+                功能设置
+              </Divider>
+              <Collapse
+                items={collapseFnItems}
+                bordered={false}
+                defaultActiveKey={["1"]}
+              />
+            </Drawer>
+          </Card>
+        </Form>
       </Col>
     </Row>
   );

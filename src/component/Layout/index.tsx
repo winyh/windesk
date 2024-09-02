@@ -448,9 +448,9 @@ const LayoutBase = () => {
             open={open}
             mask={false}
           >
-            <p>Some contents...</p>
-            <p>Some contents...</p>
-            <p>Some contents...</p>
+            <p>AI 助手对话框</p>
+            <p>智能化能力</p>
+            <p>生成式AI</p>
           </Drawer>
         </Content>
         <Footer

@@ -150,6 +150,14 @@ const Tenant = () => {
       placeholder: "请输入联系方式",
     },
     {
+      label: "到期时间",
+      name: "expired_at",
+      is: "DatePicker",
+      itemSpan: 24,
+      style: { width: "100%" },
+      placeholder: "请录入到期时间",
+    },
+    {
       label: "状态",
       name: "status",
       itemSpan: 24,

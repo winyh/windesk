@@ -238,12 +238,7 @@ const Common = () => {
     {
       label: `基本信息`,
       key: "basic",
-      children: (
-        <div style={{ width: 500 }}>
-          1.数据库：平台提供的数据库基础设施 <br /> 2.云函数：存储配置 <br />
-          {form(formBasic)}
-        </div>
-      ),
+      children: <div style={{ width: 500 }}>{form(formBasic)}</div>,
     },
     {
       label: `数据库`,
