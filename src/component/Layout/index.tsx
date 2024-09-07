@@ -1,5 +1,11 @@
 import { useEffect, useState, useRef } from "react";
-import { Outlet, Link, useNavigate, useLocation } from "react-router-dom";
+import {
+  Outlet,
+  Link,
+  useNavigate,
+  useLocation,
+  useParams,
+} from "react-router-dom";
 
 import {
   Layout,
@@ -63,6 +69,7 @@ const LayoutBase = () => {
 
   const location = useLocation();
   const navigate = useNavigate();
+  const params = useParams();
   const { message } = App.useApp();
 
   const [menuItems, setMenuItems] = useState([]);
@@ -355,36 +362,38 @@ const LayoutBase = () => {
           <Flex justify="space-between" align="center">
             <div className="left">
               <Space size="middle">
-                <Select
-                  showSearch
-                  style={{
-                    width: 180,
-                  }}
-                  defaultValue="应用A"
-                  placeholder="请选择应用"
-                  dropdownRender={(menu) => (
-                    <>
-                      {menu}
-                      <Divider
-                        style={{
-                          margin: "8px 0",
-                        }}
-                      />
-                      <Button
-                        type="text"
-                        block
-                        icon={<PlusOutlined />}
-                        onClick={addItem}
-                      >
-                        新增应用
-                      </Button>
-                    </>
-                  )}
-                  options={applications.map((item) => ({
-                    label: item,
-                    value: item,
-                  }))}
-                />
+                {params?.appId && (
+                  <Select
+                    showSearch
+                    style={{
+                      width: 180,
+                    }}
+                    defaultValue="应用A"
+                    placeholder="请选择应用"
+                    dropdownRender={(menu) => (
+                      <>
+                        {menu}
+                        <Divider
+                          style={{
+                            margin: "8px 0",
+                          }}
+                        />
+                        <Button
+                          type="text"
+                          block
+                          icon={<PlusOutlined />}
+                          onClick={addItem}
+                        >
+                          新增应用
+                        </Button>
+                      </>
+                    )}
+                    options={applications.map((item) => ({
+                      label: item,
+                      value: item,
+                    }))}
+                  />
+                )}
 
                 <Breadcrumb items={breadcrumbItems} />
               </Space>
