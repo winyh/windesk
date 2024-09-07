@@ -110,15 +110,15 @@ const LayoutBase = () => {
   };
 
   const goMessage = () => {
-    navigate(`${BASE_URL}user/message`);
+    navigate(`${BASE_URL}saas/user/message`);
   };
 
   const goProfile = () => {
-    navigate(`${BASE_URL}user/profile`);
+    navigate(`${BASE_URL}saas/user/profile`);
   };
 
   const themeConfig = () => {
-    navigate(`${BASE_URL}user/theme`);
+    navigate(`${BASE_URL}saas/user/theme`);
   };
 
   const accountItems = [
