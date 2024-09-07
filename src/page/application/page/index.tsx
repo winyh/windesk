@@ -253,7 +253,12 @@ const Page = () => {
         <Button icon={<PlusOutlined />} onClick={() => showDrawer(true)}>
           新建页面
         </Button>
-        <Search placeholder="搜索页面" loading={loading} onSearch={onSearch} />
+        <Search
+          placeholder="搜索页面"
+          loading={loading}
+          allowClear
+          onSearch={onSearch}
+        />
       </Space>
       <Table
         dataSource={dataSource}

@@ -496,6 +496,7 @@ const Role = () => {
           <Search
             placeholder="搜索角色"
             loading={loading}
+            allowClear
             onSearch={onSearch}
           />
         </Space>

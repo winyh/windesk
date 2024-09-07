@@ -27,7 +27,6 @@ const Log = () => {
       const { list, total, current, pageSize } = res.data;
 
       if (params.log === "operate") {
-        console.log({ activeKey });
         let data = list.map((item) => {
           const [
             timestamp,

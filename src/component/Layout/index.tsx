@@ -100,6 +100,7 @@ const LayoutBase = () => {
           duration: 0,
         });
         setTimeout(() => {
+          message.destroy();
           navigate("/login");
         }, 1000);
       }

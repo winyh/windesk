@@ -429,6 +429,7 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
             <Search
               placeholder="搜索数据表"
               loading={searchLoading}
+              allowClear
               onSearch={onSearch}
             />
           }

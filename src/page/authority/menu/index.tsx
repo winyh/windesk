@@ -281,7 +281,7 @@ const Menu = () => {
                 新增
               </Button>
               <Button icon={<ControlOutlined />}>展开</Button>
-              <Search placeholder="搜索菜单" onSearch={onSearch} />
+              <Search placeholder="搜索菜单" allowClear onSearch={onSearch} />
             </Space>
           }
         >

@@ -397,6 +397,7 @@ const Application = () => {
           <Search
             placeholder="搜索应用名称"
             loading={loading}
+            allowClear
             onSearch={onSearch}
           />
         </Space>

@@ -299,6 +299,7 @@ const Position = () => {
           <Search
             placeholder="搜索岗位"
             loading={loading}
+            allowClear
             onSearch={onSearch}
           />
         </Space>

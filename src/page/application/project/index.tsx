@@ -397,6 +397,7 @@ const Project = () => {
           <Search
             placeholder="搜索项目名称"
             loading={loading}
+            allowClear
             onSearch={onSearch}
           />
         </Space>

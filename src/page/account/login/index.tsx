@@ -15,7 +15,11 @@ const Login = () => {
     token: { colorPrimary, colorBgContainer },
   } = theme.useToken();
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    // localStorage.removeItem("token");
+  }, []);
+
+  const homePage = "/saas/dashboard";
 
   const onFinish = async (values) => {
     try {
@@ -29,7 +33,7 @@ const Login = () => {
         localStorage.setItem("token", data.token);
         setTimeout(() => {
           setLoading(false);
-          navigate("/dashboard");
+          navigate(homePage);
         }, 1000);
       } else {
         setLoading(false);
@@ -49,7 +53,9 @@ const Login = () => {
   return (
     <div className="login-bg" style={{ background: colorBgContainer }}>
       <div className="language">
-        <Button icon={<TranslationOutlined />}>中文 / English</Button>
+        <Button type="text" icon={<TranslationOutlined />}>
+          中文 / English
+        </Button>
       </div>
       <div className="login">
         <Card

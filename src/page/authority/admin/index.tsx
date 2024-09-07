@@ -523,6 +523,7 @@ const Admin = () => {
           <Search
             placeholder="搜索用户"
             loading={loading}
+            allowClear
             onSearch={onSearch}
           />
         </Space>

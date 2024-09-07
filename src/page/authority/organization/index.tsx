@@ -336,6 +336,7 @@ const Organization = () => {
           <Search
             placeholder="搜索组织"
             loading={loading}
+            allowClear
             onSearch={onSearch}
           />
         </Space>

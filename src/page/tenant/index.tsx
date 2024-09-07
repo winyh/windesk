@@ -71,7 +71,6 @@ const Tenant = () => {
   };
 
   const onSearch = (value) => {
-    console.log(value);
     getData({ name: value });
   };
 
@@ -332,6 +331,7 @@ const Tenant = () => {
           <Search
             placeholder="搜索租户"
             loading={loading}
+            allowClear
             onSearch={onSearch}
           />
         </Space>

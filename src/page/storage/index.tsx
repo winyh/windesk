@@ -425,8 +425,9 @@ const Storage = () => {
         ) : null}
         <Search
           placeholder="搜索文件"
-          onSearch={onSearch}
+          allowClear
           loading={searchLoading}
+          onSearch={onSearch}
         />
       </Space>
 
