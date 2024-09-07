@@ -203,8 +203,9 @@ const Log = () => {
     },
     {
       title: "登录时间",
-      dataIndex: "login_at",
-      key: "login_at",
+      dataIndex: "created_at",
+      key: "created_at",
+      render: (text) => dayjs(text).format("YYYY-MM-DD HH:mm:ss"),
     },
     {
       title: "操作",
