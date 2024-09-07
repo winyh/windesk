@@ -43,7 +43,7 @@ function App() {
         width={watermark.width}
         image={watermark.image}
       >
-        <AntApp>
+        <AntApp notification={{ maxCount: 1 }}>
           <AntdHooks />
           <RouterProvider router={router}></RouterProvider>
         </AntApp>

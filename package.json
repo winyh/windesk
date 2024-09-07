@@ -17,7 +17,7 @@
     "@tauri-apps/api": ">=2.0.0-rc.0",
     "@tauri-apps/plugin-shell": ">=2.0.0-rc.0",
     "ace-builds": "^1.35.4",
-    "antd": "^5.19.3",
+    "antd": "^5.20.5",
     "antd-style": "^3.6.2",
     "axios": "^1.7.2",
     "highlight.js": "^11.10.0",
