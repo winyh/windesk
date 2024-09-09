@@ -27,6 +27,7 @@ import {
   ExceptionOutlined,
 } from "@ant-design/icons";
 import { SegmentedItem } from "@/component/CustomFormItem";
+import { IconSelect } from "@/component/IconSelect";
 import {
   clientPost,
   clientPut,
@@ -271,6 +272,12 @@ const Menu = () => {
       .catch(() => {});
   };
 
+  const labelText = {
+    directory: "目录",
+    menu: "菜单",
+    button: "按钮",
+  };
+
   return (
     <Row gutter={24}>
       <Col span={6}>
@@ -370,7 +377,7 @@ const Menu = () => {
                         treeData={treeData}
                         fieldNames={{
                           label: "title",
-                          value: "key",
+                          value: "id",
                         }}
                       />
                     </Form.Item>
@@ -378,7 +385,11 @@ const Menu = () => {
                 </Row>
 
                 <Row>
-                  <Col span={4}>目录名称：</Col>
+                  <Col span={4}>
+                    {menuType === "directory" ? "目录" : ""}
+                    {menuType === "menu" ? "菜单" : ""}
+                    {menuType === "button" ? "按钮" : ""}名称：
+                  </Col>
                   <Col span={8}>
                     <Form.Item name="title">
                       <Input placeholder="请输入目录名称" />
@@ -387,10 +398,14 @@ const Menu = () => {
                 </Row>
 
                 <Row>
-                  <Col span={4}>目录图标：</Col>
+                  <Col span={4}>
+                    {menuType === "directory" ? "目录" : ""}
+                    {menuType === "menu" ? "菜单" : ""}
+                    {menuType === "button" ? "按钮" : ""}图标：
+                  </Col>
                   <Col span={8}>
                     <Form.Item name="icon">
-                      <Input placeholder="请选择目录图标" />
+                      <IconSelect></IconSelect>
                     </Form.Item>
                   </Col>
                 </Row>
