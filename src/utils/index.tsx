@@ -127,6 +127,8 @@ const genMenuToTree = (items) => {
     arr.forEach((item) => {
       if (item.children && item.children.length > 0) {
         sortItems(item.children);
+      } else {
+        item.isLeaf = true;
       }
     });
   };

@@ -1,4 +1,5 @@
 import Icon, { createFromIconfontCN } from "@ant-design/icons";
+import * as antdIcons from "@ant-design/icons";
 
 const IconFontOnline = createFromIconfontCN({
   scriptUrl: ["//at.alicdn.com/t/font_8d5l8fzk5b87iudi.js"],
@@ -6,7 +7,8 @@ const IconFontOnline = createFromIconfontCN({
 
 const IconFont = (props) => {
   const { type, component, icon, ...rest } = props;
-  const IconShow = icon;
+  const { createFromIconfontCN, ...restIcons } = antdIcons;
+  const IconShow = restIcons[icon];
   return (
     <>
       {component && <Icon component={component} {...rest} />}

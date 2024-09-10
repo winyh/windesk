@@ -1,11 +1,14 @@
 import { useState, useRef, useEffect } from "react";
-import { Input, Tabs } from "antd";
+import { Input, Tabs, Row, Col, Typography } from "antd";
+import * as antdIcons from "@ant-design/icons";
+import copy from "copy-to-clipboard";
+import "./index.css";
 
-import { modal } from "@/store/hooks";
-
-import { ImportOutlined } from "@ant-design/icons";
+import { modal, message } from "@/store/hooks";
 
 import { IconFont } from "../CustomIcon";
+
+const { Text } = Typography;
 
 const HeartSvg = () => (
   <svg width="1em" height="1em" fill="currentColor" viewBox="0 0 1024 1024">
@@ -15,23 +18,43 @@ const HeartSvg = () => (
 );
 
 const IconSelect = ({ onChange, options, value, id }) => {
-  const [icon, setIcon] = useState("");
+  const [icon, setIcon] = useState("ImportOutlined");
+  const { createFromIconfontCN, ...restIcons } = antdIcons;
+
+  const onCopy = (icon) => {
+    copy(`<${icon} />`);
+    setIcon(icon);
+    message.success(`已选中 <${icon} /> 成功`);
+  };
 
   const items: TabsProps["items"] = [
     {
       key: "antd",
       label: "内置图标",
-      children: "Content of Tab Pane 1",
+      children: (
+        <Row gutter={[16, 16]}>
+          {Object.keys(restIcons).map((icon) => {
+            let IconShow = restIcons[icon];
+            return (
+              <Col span={2} onClick={() => onCopy(icon)}>
+                <div className="icon-card">
+                  <IconShow style={{ fontSize: 24 }} />
+                </div>
+              </Col>
+            );
+          })}
+        </Row>
+      ),
     },
     {
       key: "third",
       label: "三方图标",
-      children: "Content of Tab Pane 2",
+      children: "三方图标",
     },
     {
       key: "custom",
       label: "自定义图标",
-      children: "Content of Tab Pane 3",
+      children: "自定义图标",
     },
   ];
 
@@ -59,10 +82,10 @@ const IconSelect = ({ onChange, options, value, id }) => {
         value={value}
         onChange={onIconChange}
         onClick={onClick}
-        addonBefore={<ImportOutlined />}
+        addonBefore={<IconFont icon={icon} />}
         placeholder="请选择图标"
       />
-      <IconFont type={HeartSvg} />
+      {/* <IconFont type={HeartSvg} /> */}
     </>
   );
 };
