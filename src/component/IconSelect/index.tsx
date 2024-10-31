@@ -6,9 +6,7 @@ import "./index.css";
 
 import { modal, message } from "@/store/hooks";
 
-import { IconFont } from "../CustomIcon";
-
-const { Text } = Typography;
+import { IconFont } from "../IconFont";
 
 const HeartSvg = () => (
   <svg width="1em" height="1em" fill="currentColor" viewBox="0 0 1024 1024">
@@ -17,9 +15,15 @@ const HeartSvg = () => (
   </svg>
 );
 
-const IconSelect = ({ onChange, options, value, id }) => {
+const IconSelect = ({ onChange, value, id }) => {
   const [icon, setIcon] = useState("ImportOutlined");
+  const [activeKey, setActiveKey] = useState("antd");
   const { createFromIconfontCN, ...restIcons } = antdIcons;
+
+  const onIconChange = (changeValue) => {
+    setIcon(changeValue);
+    onChange && onChange(changeValue);
+  };
 
   const onCopy = (icon) => {
     copy(`<${icon} />`);
@@ -27,23 +31,26 @@ const IconSelect = ({ onChange, options, value, id }) => {
     message.success(`已选中 <${icon} /> 成功`);
   };
 
-  const items: TabsProps["items"] = [
+  const items = [
     {
       key: "antd",
       label: "内置图标",
       children: (
-        <Row gutter={[16, 16]}>
-          {Object.keys(restIcons).map((icon) => {
-            let IconShow = restIcons[icon];
-            return (
-              <Col span={2} onClick={() => onCopy(icon)}>
-                <div className="icon-card">
-                  <IconShow style={{ fontSize: 24 }} />
-                </div>
-              </Col>
-            );
-          })}
-        </Row>
+        <div className="icon-content">
+          <Row gutter={[16, 16]}>
+            {Object.keys(restIcons).map((icon, index) => {
+              if (icon !== "default") {
+                return (
+                  <Col span={2} onClick={() => onCopy(icon)} key={icon + index}>
+                    <div className="icon-card">
+                      <IconFont icon={icon} style={{ fontSize: 24 }} />
+                    </div>
+                  </Col>
+                );
+              }
+            })}
+          </Row>
+        </div>
       ),
     },
     {
@@ -58,9 +65,9 @@ const IconSelect = ({ onChange, options, value, id }) => {
     },
   ];
 
-  const onIconChange = (value) => {
-    setIcon(value);
-    onChange && onChange(value);
+  const onTabChange = (value) => {
+    console.log({ value });
+    setActiveKey(value);
   };
 
   const onClick = () => {
@@ -69,24 +76,28 @@ const IconSelect = ({ onChange, options, value, id }) => {
       closable: true,
       width: "50%",
       icon: <></>,
-      content: <Tabs defaultActiveKey="1" items={items} onChange={onChange} />,
+      content: (
+        <Tabs
+          defaultActiveKey={activeKey}
+          activeKey={activeKey}
+          items={items}
+          onChange={onTabChange}
+        />
+      ),
       okText: "确定",
       cancelText: "取消",
     });
   };
 
   return (
-    <>
-      <Input
-        id={id}
-        value={value}
-        onChange={onIconChange}
-        onClick={onClick}
-        addonBefore={<IconFont icon={icon} />}
-        placeholder="请选择图标"
-      />
-      {/* <IconFont type={HeartSvg} /> */}
-    </>
+    <Input
+      id={id}
+      value={value}
+      onChange={onIconChange}
+      onClick={onClick}
+      addonBefore={<IconFont icon={icon || value} />}
+      placeholder="请选择图标"
+    />
   );
 };
 

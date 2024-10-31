@@ -405,7 +405,7 @@ const Menu = () => {
                   </Col>
                   <Col span={8}>
                     <Form.Item name="icon">
-                      <IconSelect></IconSelect>
+                      <IconSelect value="AlipayCircleOutlined"></IconSelect>
                     </Form.Item>
                   </Col>
                 </Row>

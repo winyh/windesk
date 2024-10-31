@@ -10,3 +10,8 @@
   cursor: pointer;
   background-color: #1677ff;
 }
+
+.icon-content {
+  height: 70vh;
+  overflow-y: scroll;
+}
