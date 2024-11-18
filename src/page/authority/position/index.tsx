@@ -214,8 +214,13 @@ const Position = () => {
       title: "状态",
       dataIndex: "status",
       key: "status",
-      render: () => {
-        return <Badge status="processing" text="启用" />;
+      render: (text) => {
+        return (
+          <Badge
+            status={text === "1" ? "processing" : "default"}
+            text={text === "1" ? "启用" : "禁用"}
+          />
+        );
       },
     },
     {
@@ -267,7 +272,8 @@ const Position = () => {
     }),
   };
 
-  const onConfirm = async () => {
+  const onConfirm = async (record) => {
+    console.log({ record });
     const res = await clientDel("position", { ids: record.id });
     if (res.status) {
       getData();

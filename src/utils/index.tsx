@@ -138,6 +138,24 @@ const genMenuToTree = (items) => {
   return result;
 };
 
+const genOptions = (data) => {
+  const map = {};
+  // Initialize map with transformed objects
+  data.forEach((item) => {
+    map[item.id] = { value: item.id, label: item.name, children: [] };
+  });
+
+  // Build the tree structure
+  return data.reduce((tree, item) => {
+    if (item.pid === 0) {
+      tree.push(map[item.id]);
+    } else if (map[item.pid]) {
+      map[item.pid].children.push(map[item.id]);
+    }
+    return tree;
+  }, []);
+};
+
 export {
   isTauri,
   getCurrentYear,
@@ -147,4 +165,5 @@ export {
   getMenuSome,
   computedWrapperCol,
   genMenuToTree,
+  genOptions,
 };

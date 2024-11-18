@@ -19,6 +19,7 @@ import {
   FontColorsOutlined,
 } from "@ant-design/icons";
 import SuperForm from "@/component/SuperForm";
+import dayjs from "dayjs";
 import { clientPost, clientPut, clientDel, clientGetList } from "@/request";
 
 const { Search } = Input;
@@ -197,11 +198,17 @@ const Page = () => {
       title: "创建时间",
       dataIndex: "created_at",
       key: "created_at",
+      render: (text) => (
+        <span>{dayjs(text).format("YYYY-MM-DD HH:mm:ss")}</span>
+      ),
     },
     {
       title: "修改时间",
       dataIndex: "updated_at",
       key: "updated_at",
+      render: (text) => (
+        <div>{text ? dayjs(text).format("YYYY-MM-DD  HH:mm:ss") : ""}</div>
+      ),
     },
     {
       title: "最近修改人",

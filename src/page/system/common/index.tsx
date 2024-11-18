@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Card, Flex, Tabs } from "antd";
 import SuperForm from "@/component/SuperForm";
-import { options } from "node_modules/axios/index.d.cts";
 
 const Common = () => {
   const formRef = useRef();

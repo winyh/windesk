@@ -16,7 +16,14 @@ import {
 import { PlusOutlined, ControlOutlined } from "@ant-design/icons";
 import SuperForm from "@/component/SuperForm";
 import dayjs from "dayjs";
-import { clientPost, clientPut, clientDel, clientGetList } from "@/request";
+import { genOptions } from "@/utils";
+import {
+  clientGetTree,
+  clientPost,
+  clientPut,
+  clientDel,
+  clientGetList,
+} from "@/request";
 
 const { Search } = Input;
 
@@ -33,6 +40,7 @@ const Organization = () => {
     total: 10,
   });
   const [selectedRows, setSelectedRows] = useState([]);
+  const [organizationOptions, setOrganizationOptions] = useState([]);
 
   useEffect(() => {
     getData();
@@ -64,6 +72,23 @@ const Organization = () => {
       });
   };
 
+  const getTreeData = (params) => {
+    clientGetTree("organization", params)
+      .then((res) => {
+        if (res.status) {
+          const data = res.data;
+          const tree = genOptions(data);
+          setOrganizationOptions(tree);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
   const onSearch = (value) => {
     console.log(value);
     getData({ name: value });
@@ -79,9 +104,23 @@ const Organization = () => {
     getData({ current, pageSize });
   };
 
-  const showDrawer = (bool, record) => {
+  const showDrawer = async (bool, record, isAddChild) => {
     setAction(bool);
     setOpen(true);
+    if (isAddChild) {
+      record.pid = record.id;
+      setOrganizationOptions([
+        {
+          label: record.name,
+          value: record.id,
+        },
+      ]);
+    } else {
+      await getTreeData({
+        parent_field: "pid",
+        level: 0,
+      });
+    }
     console.log({ record });
     setRecord(record);
   };
@@ -147,7 +186,7 @@ const Organization = () => {
       style: { width: "100%" },
       placeholder: "请选择上级组织",
       is: "Select",
-      options: [],
+      options: organizationOptions,
     },
     {
       label: "联系人",
@@ -271,7 +310,7 @@ const Organization = () => {
           <Button
             type="text"
             size="small"
-            onClick={() => showDrawer(false, record)}
+            onClick={() => showDrawer(false, record, true)}
           >
             新增子组织
           </Button>
