@@ -139,21 +139,15 @@ const genMenuToTree = (items) => {
 };
 
 const genOptions = (data) => {
-  const map = {};
-  // Initialize map with transformed objects
-  data.forEach((item) => {
-    map[item.id] = { value: item.id, label: item.name, children: [] };
+  return data.map((item) => {
+    // 创建一个新对象，重命名属性
+    const newItem = {
+      value: item.id, // 将 id 改为 value
+      label: item.name, // 将 name 改为 label
+      children: item.children.length > 0 ? genOptions(item.children) : [], // 递归处理子节点
+    };
+    return newItem;
   });
-
-  // Build the tree structure
-  return data.reduce((tree, item) => {
-    if (item.pid === 0) {
-      tree.push(map[item.id]);
-    } else if (map[item.pid]) {
-      map[item.pid].children.push(map[item.id]);
-    }
-    return tree;
-  }, []);
 };
 
 export {

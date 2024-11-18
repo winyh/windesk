@@ -78,6 +78,7 @@ const Organization = () => {
         if (res.status) {
           const data = res.data;
           const tree = genOptions(data);
+          console.log({ tree });
           setOrganizationOptions(tree);
         }
       })
@@ -108,13 +109,14 @@ const Organization = () => {
     setAction(bool);
     setOpen(true);
     if (isAddChild) {
-      record.pid = record.id;
+      let cacheRecord = { pid: record.id, status: "1" };
       setOrganizationOptions([
         {
           label: record.name,
           value: record.id,
         },
       ]);
+      record = cacheRecord;
     } else {
       await getTreeData({
         parent_field: "pid",
@@ -185,8 +187,8 @@ const Organization = () => {
       itemSpan: 24,
       style: { width: "100%" },
       placeholder: "请选择上级组织",
-      is: "Select",
-      options: organizationOptions,
+      is: "TreeSelect",
+      treeData: organizationOptions,
     },
     {
       label: "联系人",
@@ -310,7 +312,7 @@ const Organization = () => {
           <Button
             type="text"
             size="small"
-            onClick={() => showDrawer(false, record, true)}
+            onClick={() => showDrawer(true, record, true)}
           >
             新增子组织
           </Button>
