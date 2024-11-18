@@ -23,6 +23,7 @@ import {
   clientPut,
   clientDel,
   clientGetList,
+  clientGetListTree,
 } from "@/request";
 
 const { Search } = Input;
@@ -47,7 +48,7 @@ const Organization = () => {
   }, []);
 
   const getData = (params) => {
-    clientGetList("organization", {
+    clientGetListTree("organization", {
       current: 1,
       pageSize: 10,
       name: params?.name,

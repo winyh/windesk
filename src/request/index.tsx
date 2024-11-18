@@ -117,6 +117,10 @@ const clientGetList = (collection, params) => {
   return comGet(`${apiPrefix}/${collection}/list/paginate`, params);
 };
 
+const clientGetListTree = (collection, params) => {
+  return comGet(`${apiPrefix}/${collection}/list/tree/paginate`, params);
+};
+
 const clientPost = (collection, data) => {
   return instance.post(`${apiPrefix}/${collection}`, data);
 };
@@ -141,6 +145,7 @@ export {
   clientGetAll,
   clientGetTree,
   clientGetList,
+  clientGetListTree,
   clientPost,
   clientDel,
   clientPut,
