@@ -39,7 +39,8 @@ const IconSelect = ({ onChange, value, id }) => {
         <div className="icon-content">
           <Row gutter={[16, 16]}>
             {Object.keys(restIcons).map((icon, index) => {
-              if (icon !== "default") {
+              // fix getTwoToneColor 暂时去掉双色图标
+              if (icon !== "default" && icon !== "getTwoToneColor") {
                 return (
                   <Col span={2} onClick={() => onCopy(icon)} key={icon + index}>
                     <div className="icon-card">

@@ -10,30 +10,45 @@ import {
   Tree,
   Drawer,
   Popconfirm,
-  App,
   Tag,
+  Select,
+  Card,
 } from "antd";
 import {
   PlusOutlined,
-  DeleteOutlined,
-  UserAddOutlined,
+  ControlOutlined,
+  CheckSquareOutlined,
 } from "@ant-design/icons";
 import SuperForm from "@/component/SuperForm";
+import { modal } from "@/store/hooks";
 import dayjs from "dayjs";
-import { clientPost, clientPut, clientDel, clientGetList } from "@/request";
+import { genMenuToTree } from "@/utils/index";
+import {
+  comGet,
+  clientPost,
+  clientPut,
+  clientDel,
+  clientGetList,
+} from "@/request";
 
 const { Search } = Input;
 const { DirectoryTree } = Tree;
+const { Option } = Select;
 
 const Role = () => {
   const formRef = useRef();
   const [dataSource, setDataSource] = useState([]);
   const [dataSourceAdmin, setDataSourceAdmin] = useState([]);
   const [open, setOpen] = useState(false);
+  const [openAccess, setOpenAccess] = useState(false);
   const [action, setAction] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingAdmin, setLoadingAdmin] = useState(false);
+  const [isExpend, setIsExpend] = useState(false);
+  const [checkedKeys, setCheckedKeys] = useState([]);
+  const [selectedKeys, setSelectedKeys] = useState([]);
+  const [expandedKeys, setExpandedKeys] = useState([]);
   const [paginationMeta, setPaginationMeta] = useState({
     pageSize: 10,
     current: 1,
@@ -47,7 +62,8 @@ const Role = () => {
   const [record, setRecord] = useState({});
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedRowsAdmin, setSelectedRowsAdmin] = useState([]);
-  const { modal } = App.useApp();
+  const [menuData, setMenuData] = useState([]);
+  const [treeData, setTreeData] = useState([]);
 
   useEffect(() => {
     getData({
@@ -58,7 +74,10 @@ const Role = () => {
       current: 1,
       pageSize: 10,
     });
+    getAllMenus();
   }, []);
+
+  useEffect(() => {}, [expandedKeys]);
 
   const getData = (params = {}) => {
     setLoading(true);
@@ -116,6 +135,47 @@ const Role = () => {
       });
   };
 
+  const getAllMenus = async (params) => {
+    const { status, data } = await comGet("/admin/menus", { ...params });
+    if (status) {
+      setMenuData(data);
+      const menuTree = genMenuToTree(data);
+      setTreeData(menuTree);
+    }
+  };
+
+  const onSelect = (keys, info) => {
+    let current = info.node;
+    console.log(current);
+    setSelectedKeys(keys);
+  };
+  const onExpand = (keys, info) => {
+    console.log({ keys });
+    setExpandedKeys(keys);
+  };
+
+  const onCheck = (checkedKeys, event) => {
+    console.log(checkedKeys, event);
+    setCheckedKeys(checkedKeys);
+  };
+
+  const onExpendTree = () => {
+    const keys = menuData.map((item) => item.id);
+    console.log({ keys }, isExpend);
+    setExpandedKeys(isExpend ? [] : keys);
+    setIsExpend(!isExpend);
+  };
+
+  const onCheckBatch = () => {
+    const keys = menuData.map((item) => item.id);
+    console.log({ keys });
+    setCheckedKeys(checkedKeys.length === 0 ? keys : []);
+  };
+
+  const onSearchMenu = (keyword) => {
+    getAllMenus({ title: keyword });
+  };
+
   const onSearch = (value) => {
     console.log(value);
     getData({ role_name: value });
@@ -161,198 +221,10 @@ const Role = () => {
       .catch(() => {});
   };
 
-  const menuItems = [
-    {
-      label: "分配用户",
-      key: "1",
-      icon: <UserAddOutlined />,
-      onClick: () => {
-        showModal();
-      },
-    },
-    {
-      label: "删除角色",
-      key: "delete",
-      icon: <DeleteOutlined />,
-      danger: true,
-      disabled: true,
-    },
-  ];
-
   const layout = {
     labelCol: { span: 6 },
     wrapperCol: { span: 18 },
   };
-
-  const onSelect = (keys, info) => {
-    console.log("Trigger Select", keys, info);
-  };
-  const onExpand = (keys, info) => {
-    console.log("Trigger Expand", keys, info);
-  };
-
-  const treeData = [
-    {
-      title: "控制台",
-      key: "0-0",
-      children: [
-        {
-          title: "leaf 0-0",
-          key: "0-0-0",
-          isLeaf: true,
-        },
-        {
-          title: "leaf 0-1",
-          key: "0-0-1",
-          isLeaf: true,
-        },
-      ],
-    },
-    {
-      title: "租户管理",
-      key: "0-1",
-      children: [
-        {
-          title: "leaf 1-0",
-          key: "0-1-0",
-          isLeaf: true,
-        },
-        {
-          title: "leaf 1-1",
-          key: "0-1-1",
-          isLeaf: true,
-        },
-      ],
-    },
-    {
-      title: "应用管理",
-      key: "0-2",
-      children: [
-        {
-          title: "leaf 1-0",
-          key: "0-2-0",
-          isLeaf: true,
-        },
-        {
-          title: "leaf 1-1",
-          key: "0-2-1",
-          isLeaf: true,
-        },
-      ],
-    },
-    {
-      title: "数据库",
-      key: "0-3",
-      children: [
-        {
-          title: "leaf 1-0",
-          key: "0-3-0",
-          isLeaf: true,
-        },
-        {
-          title: "leaf 1-1",
-          key: "0-3-1",
-          isLeaf: true,
-        },
-      ],
-    },
-    {
-      title: "云函数",
-      key: "0-4",
-      children: [
-        {
-          title: "leaf 1-0",
-          key: "0-3-0",
-          isLeaf: true,
-        },
-        {
-          title: "leaf 1-1",
-          key: "0-3-1",
-          isLeaf: true,
-        },
-      ],
-    },
-    {
-      title: "文件存储",
-      key: "0-5",
-      children: [
-        {
-          title: "leaf 1-0",
-          key: "0-3-0",
-          isLeaf: true,
-        },
-        {
-          title: "leaf 1-1",
-          key: "0-3-1",
-          isLeaf: true,
-        },
-      ],
-    },
-    {
-      title: "AI助手",
-      key: "0-6",
-      children: [
-        {
-          title: "leaf 1-0",
-          key: "0-3-0",
-          isLeaf: true,
-        },
-        {
-          title: "leaf 1-1",
-          key: "0-3-1",
-          isLeaf: true,
-        },
-      ],
-    },
-    {
-      title: "分析监控",
-      key: "0-7",
-      children: [
-        {
-          title: "leaf 1-0",
-          key: "0-3-0",
-          isLeaf: true,
-        },
-        {
-          title: "leaf 1-1",
-          key: "0-3-1",
-          isLeaf: true,
-        },
-      ],
-    },
-    {
-      title: "权限管理",
-      key: "0-8",
-      children: [
-        {
-          title: "leaf 1-0",
-          key: "0-3-0",
-          isLeaf: true,
-        },
-        {
-          title: "leaf 1-1",
-          key: "0-3-1",
-          isLeaf: true,
-        },
-      ],
-    },
-    {
-      title: "系统配置",
-      key: "0-9",
-      children: [
-        {
-          title: "leaf 1-0",
-          key: "0-3-0",
-          isLeaf: true,
-        },
-        {
-          title: "leaf 1-1",
-          key: "0-3-1",
-          isLeaf: true,
-        },
-      ],
-    },
-  ];
 
   const formData = [
     {
@@ -517,6 +389,18 @@ const Role = () => {
     });
   };
 
+  const showAccessDrawer = () => {
+    setOpenAccess(true);
+  };
+
+  const onFinishAccess = () => {
+    setOpenAccess(false);
+  };
+
+  const onCloseAccess = () => {
+    setOpenAccess(false);
+  };
+
   const columns = [
     {
       title: "角色名称",
@@ -565,7 +449,7 @@ const Role = () => {
           </Button>
           <Divider type="vertical" />
 
-          <Button type="text" size="small" onClick={showModal}>
+          <Button type="text" size="small" onClick={showAccessDrawer}>
             分配权限
           </Button>
           <Divider type="vertical" />
@@ -679,6 +563,54 @@ const Role = () => {
           rulesValid={false}
           btnAction={false}
         ></SuperForm>
+      </Drawer>
+
+      <Drawer
+        title="分配权限"
+        closable
+        width="30%"
+        open={openAccess}
+        footer={
+          <Flex justify="flex-end">
+            <Space>
+              <Button onClick={onCloseAccess}>取消</Button>
+              <Button type="primary" onClick={onFinishAccess}>
+                确认
+              </Button>
+            </Space>
+          </Flex>
+        }
+        onClose={onCloseAccess}
+      >
+        <Flex vertical gap="middle">
+          <Space size="middle">
+            <Button icon={<CheckSquareOutlined />} onClick={onCheckBatch}>
+              {isExpend ? "全选" : "全不选"}
+            </Button>
+            <Button icon={<ControlOutlined />} onClick={onExpendTree}>
+              {isExpend ? "收起" : "展开"}
+            </Button>
+            <Search
+              placeholder="搜索菜单"
+              loading={loading}
+              allowClear
+              onSearch={onSearchMenu}
+            />
+          </Space>
+
+          <Card>
+            <Tree
+              checkable
+              expandedKeys={expandedKeys}
+              selectedKeys={selectedKeys}
+              checkedKeys={checkedKeys}
+              onSelect={onSelect}
+              onExpand={onExpand}
+              onCheck={onCheck}
+              treeData={treeData}
+            />
+          </Card>
+        </Flex>
       </Drawer>
     </>
   );

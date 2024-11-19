@@ -6,7 +6,7 @@ const IconFontOnline = createFromIconfontCN({
 });
 
 const IconFont = (props) => {
-  const { type, component, icon, style, ...rest } = props;
+  const { type, component, icon, style } = props;
   const { createFromIconfontCN, ...restIcons } = antdIcons;
   const IconShow = restIcons[icon];
   return (

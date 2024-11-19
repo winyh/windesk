@@ -11,7 +11,6 @@ import {
   Divider,
   Card,
   Tree,
-  Segmented,
   Popconfirm,
   Switch,
   TreeSelect,
@@ -35,7 +34,8 @@ import {
   clientGetList,
   comGet,
 } from "@/request";
-import { genMenuToTree } from "@/utils";
+import { genMenuToTree, transBool2Str } from "@/utils";
+import { message } from "@/store/hooks";
 
 import "./index.css";
 
@@ -205,21 +205,31 @@ const Menu = () => {
   ];
 
   const onAdd = () => {
-    form.resetFields();
     setAction(true);
     setExpandedKeys([]);
     setSelectedKeys([]);
     setRecord({});
+    setMenuType("directory");
+    form.resetFields();
   };
 
   const onSelect = (keys, info) => {
-    form.setFieldsValue({ ...info.node });
+    let current = info.node;
+    current = {
+      ...current,
+      status: current.status === "1" ? true : false,
+      hide_in_menu: current.hide_in_menu === "1" ? true : false,
+      is_link: current.is_link === "1" ? true : false,
+      is_cache: current.is_cache === "1" ? true : false,
+      is_iframe: current.is_iframe === "1" ? true : false,
+    };
+    setMenuType(current.type);
     setRecord(info.node);
     setAction(false);
     setSelectedKeys(keys);
+    form.setFieldsValue(current);
   };
   const onExpand = (keys, info) => {
-    console.log({ keys });
     setExpandedKeys(keys);
   };
 
@@ -237,20 +247,28 @@ const Menu = () => {
 
   const onChangeLink = (value) => {
     setExternalLink(value);
-    console.log(value);
   };
 
   const onFinish = () => {
     form
       .validateFields()
       .then(async (values) => {
-        console.log({ values });
+        values = {
+          ...values,
+          status: transBool2Str(values?.status),
+          hide_in_menu: transBool2Str(values?.hide_in_menu),
+          is_link: transBool2Str(values?.is_link),
+          is_cache: transBool2Str(values?.is_cache),
+          is_iframe: transBool2Str(values?.is_iframe),
+        };
+
         if (action) {
           const res = await clientPost("menu", values);
           if (res.status) {
             form.resetFields();
             getAllMenus();
             setOpen(false);
+            message.success("新增成功");
           }
         } else {
           const res = await clientPut("menu", { ...values, id: record.id });
@@ -258,6 +276,7 @@ const Menu = () => {
             form.resetFields();
             getAllMenus();
             setOpen(false);
+            message.success("修改成功");
           }
         }
       })
@@ -293,6 +312,9 @@ const Menu = () => {
         <Card
           title={
             <Space>
+              <Button icon={<PlusOutlined />} onClick={onAdd}>
+                新增
+              </Button>
               <Button icon={<ControlOutlined />} onClick={onExpendTree}>
                 {isExpend ? "收起" : "展开"}
               </Button>
@@ -315,9 +337,6 @@ const Menu = () => {
             title={
               <Flex justify="space-between">
                 <Space size="middle">
-                  <Button icon={<PlusOutlined />} onClick={onAdd}>
-                    新增
-                  </Button>
                   <Button type="primary" onClick={onFinish}>
                     保存{menuType === "directory" ? "目录" : ""}
                     {menuType === "menu" ? "菜单" : ""}
@@ -560,12 +579,16 @@ const Menu = () => {
 
                 {menuType !== "button" ? (
                   <>
-                    <Row>
+                    {/* <Row>
                       <Col span={4}>根路由：</Col>
                       <Col span={8}>
-                        <Switch checkedChildren="是" unCheckedChildren="否" />
+                        
+                        <Form.Item name="is_root">
+                        <Switch checkedChildren="是" unCheckedChildren="否" defaultChecked />
+                          
+                        </Form.Item>
                       </Col>
-                    </Row>
+                    </Row> */}
 
                     <Row>
                       <Col span={4}>显示状态：</Col>
@@ -583,7 +606,7 @@ const Menu = () => {
                     <Row>
                       <Col span={4}>是否缓存：</Col>
                       <Col span={8}>
-                        <Form.Item name="isCache">
+                        <Form.Item name="is_cache">
                           <Switch
                             checkedChildren="是"
                             unCheckedChildren="否"
@@ -593,21 +616,23 @@ const Menu = () => {
                       </Col>
                     </Row>
 
-                    <Row>
+                    {/* <Row>
                       <Col span={4}>简化路由：</Col>
                       <Col span={8}>
-                        <Switch
-                          checkedChildren="是"
-                          unCheckedChildren="否"
-                          defaultChecked
-                        />
+                        <Form.Item name="is_short">
+                          <Switch
+                            checkedChildren="是"
+                            unCheckedChildren="否"
+                            defaultChecked
+                          />
+                        </Form.Item>
                       </Col>
-                    </Row>
+                    </Row> */}
 
                     <Row>
                       <Col span={4}>是否内嵌：</Col>
                       <Col span={8}>
-                        <Form.Item name="isIframe">
+                        <Form.Item name="is_iframe">
                           <Switch
                             checkedChildren="是"
                             unCheckedChildren="否"
@@ -621,7 +646,7 @@ const Menu = () => {
                     <Row>
                       <Col span={4}>是否外链：</Col>
                       <Col span={8}>
-                        <Form.Item name="isLink">
+                        <Form.Item name="is_link">
                           <Switch
                             checkedChildren="是"
                             unCheckedChildren="否"

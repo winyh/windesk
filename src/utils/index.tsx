@@ -151,6 +151,10 @@ const genOptions = (data) => {
   });
 };
 
+const transBool2Str = (field) => {
+  return field ? "1" : "0";
+};
+
 export {
   isTauri,
   getCurrentYear,
@@ -161,4 +165,5 @@ export {
   computedWrapperCol,
   genMenuToTree,
   genOptions,
+  transBool2Str,
 };
