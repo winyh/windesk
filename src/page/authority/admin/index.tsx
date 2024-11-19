@@ -14,8 +14,9 @@ import {
   App,
   Alert,
   Typography,
+  Descriptions,
 } from "antd";
-const { Paragraph, Text } = Typography;
+const { Text } = Typography;
 import {
   PlusOutlined,
   EllipsisOutlined,
@@ -25,13 +26,18 @@ import {
 } from "@ant-design/icons";
 import SuperForm from "@/component/SuperForm";
 import dayjs from "dayjs";
+import { genOptions } from "@/utils";
 import {
+  comPost,
+  comDel,
   clientPost,
   clientPut,
   clientDel,
   clientGetList,
   clientGetAll,
+  clientGetTree,
 } from "@/request";
+import { message } from "@/store/hooks";
 
 const { Search } = Input;
 
@@ -52,7 +58,7 @@ const Admin = () => {
   const [record, setRecord] = useState({});
   const [roles, setRoles] = useState([]);
   const [positions, setPositions] = useState([]);
-  const [organizations, setOrganizations] = useState([]);
+  const [organizationOptions, setOrganizationOptions] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const { modal } = App.useApp();
 
@@ -95,11 +101,15 @@ const Admin = () => {
   };
 
   const getOrganizations = () => {
-    clientGetAll("organization", {})
+    clientGetTree("organization", {
+      parent_field: "pid",
+      level: 0,
+    })
       .then((res) => {
         if (res.status) {
-          const { data } = res;
-          setOrganizations(data);
+          const data = res.data;
+          const tree = genOptions(data);
+          setOrganizationOptions(tree);
         }
       })
       .catch((err) => {
@@ -138,7 +148,7 @@ const Admin = () => {
 
   const onSearch = (value) => {
     console.log(value);
-    getData({ name: value });
+    getData({ username: value });
   };
 
   const onPaginationChange = (current, pageSize) => {
@@ -154,7 +164,6 @@ const Admin = () => {
   const showDrawer = (bool, record) => {
     setAction(bool);
     setOpen(true);
-    console.log({ record });
     setRecord(record);
   };
   const onClose = () => {
@@ -181,8 +190,9 @@ const Admin = () => {
       })
       .catch(() => {});
   };
-  const showPwdDrawer = (bool) => {
-    setPwdOpen(true);
+  const showPwdDrawer = (bool, record) => {
+    setPwdOpen(bool);
+    setRecord(record);
   };
 
   const onPwdClose = () => {
@@ -193,43 +203,67 @@ const Admin = () => {
     formPwdRef?.current?.form
       .validateFields()
       .then(async (values) => {
+        if (values.new_password !== values.confirm_password) {
+          message.warning("原密码和新密码不一致！");
+          return;
+        }
         console.log({ values });
+        comPost("/admin/password/change", {
+          user_id: record.id,
+          ...values,
+        })
+          .then((res) => {
+            if (res.status) {
+              setPwdOpen(false);
+              message.success("密码修改成功！");
+            } else {
+              message.warning(res.msg);
+            }
+          })
+          .catch((err) => {
+            message.error(err);
+          });
       })
       .catch(() => {});
   };
 
-  const onConfirmReset = () => {
-    modal.success({
-      title: "重置密码成功",
-      icon: <span></span>,
-      content: (
-        <Flex gap={24} vertical justify="center" style={{ height: 120 }}>
-          <Text type="warning">新密码只显示一次，请牢记新密码</Text>
-          <Alert
-            message="Success Tips"
-            type="success"
-            showIcon
-            action={<Text copyable={{ text: "26888888" }} />}
-          />
-        </Flex>
-      ),
-      okText: "确认",
+  const onConfirmReset = (record) => {
+    console.log(record);
+    comPost("/admin/password/reset", { user_id: record.id }).then((res) => {
+      if (res.status) {
+        modal.success({
+          title: "重置密码成功",
+          icon: <span></span>,
+          content: (
+            <Flex gap={24} vertical justify="center" style={{ height: 120 }}>
+              <Text type="warning">新密码只显示一次，请牢记新密码</Text>
+              <Alert
+                message={res?.data?.password}
+                type="success"
+                showIcon
+                action={<Text copyable={{ text: res?.data?.password }} />}
+              />
+            </Flex>
+          ),
+          okText: "确认",
+        });
+      }
     });
   };
 
-  const menuItems = [
+  const menuItems = (record) => [
     {
       label: "修改密码",
       key: "1",
       icon: <KeyOutlined />,
-      onClick: showPwdDrawer,
+      onClick: () => showPwdDrawer(true, record),
     },
     {
       label: (
         <Popconfirm
           title="系统提醒"
           description="您确认要重置密码?"
-          onConfirm={onConfirmReset}
+          onConfirm={() => onConfirmReset(record)}
         >
           重置密码
         </Popconfirm>
@@ -239,14 +273,22 @@ const Admin = () => {
         <Popconfirm
           title="系统提醒"
           description="您确认要重置密码?"
-          onConfirm={onConfirmReset}
+          onConfirm={() => onConfirmReset(record)}
         >
           <ReloadOutlined />
         </Popconfirm>
       ),
     },
     {
-      label: "删除账户",
+      label: (
+        <Popconfirm
+          title="系统提醒"
+          description="您确认要删除账户吗?"
+          onConfirm={() => onConfirmDelete(record)}
+        >
+          删除账户
+        </Popconfirm>
+      ),
       key: "delete",
       icon: <DeleteOutlined />,
       danger: true,
@@ -291,13 +333,10 @@ const Admin = () => {
     {
       label: "组织部门",
       name: "organization_id",
-      is: "Select",
+      is: "TreeSelect",
       itemSpan: 24,
       placeholder: "请选择组织部门",
-      options: organizations.map((item) => ({
-        label: item?.name,
-        value: item?.id,
-      })),
+      treeData: organizationOptions,
     },
     {
       label: "岗位",
@@ -364,7 +403,49 @@ const Admin = () => {
     },
   ];
 
-  const showModal = () => {
+  const showModal = (record) => {
+    const items = [
+      {
+        key: "1",
+        label: "账户名称",
+        children: record.username,
+      },
+      {
+        key: "2",
+        label: "账户昵称",
+        children: record.nick_name,
+      },
+      {
+        key: "3",
+        label: "手机号",
+        children: record.mobile,
+      },
+      {
+        key: "4",
+        label: "邮箱",
+        children: record.email,
+      },
+      {
+        key: "5",
+        label: "组织",
+        children: record.organization_id,
+      },
+      {
+        key: "6",
+        label: "部门",
+        children: record.position_id,
+      },
+      {
+        key: "7",
+        label: "角色",
+        children: record.role_id,
+      },
+      {
+        key: "8",
+        label: "状态",
+        children: record.status,
+      },
+    ];
     modal.confirm({
       title: "用户详情",
       closable: true,
@@ -372,13 +453,7 @@ const Admin = () => {
       icon: <span></span>,
       open: isModalOpen,
       width: "50%",
-      content: (
-        <div>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-        </div>
-      ),
+      content: <Descriptions items={items} />,
       onOk() {
         setIsModalOpen(false);
       },
@@ -457,14 +532,14 @@ const Admin = () => {
             编辑
           </Button>
           <Divider type="vertical" />
-          <Button type="text" size="small" onClick={showModal}>
+          <Button type="text" size="small" onClick={() => showModal(record)}>
             详情
           </Button>
           <Divider type="vertical" />
 
           <Dropdown
             menu={{
-              items: menuItems,
+              items: menuItems(record),
             }}
           >
             <Button
@@ -491,12 +566,21 @@ const Admin = () => {
     }),
   };
 
-  const onConfirm = async (record) => {
-    const res = await clientDel("tenant", { ids: record.id });
+  const deleteAdmin = async (ids) => {
+    const res = await comDel("/admin/delete", { ids });
     if (res.status) {
       getData();
       console.log({ res });
     }
+  };
+
+  const onConfirmDelete = async (record) => {
+    deleteAdmin(record.id);
+  };
+
+  const onConfirmBatch = () => {
+    const ids = selectedRows.map((item) => item.id).join(",");
+    deleteAdmin(ids);
   };
 
   const onCancel = () => {};
@@ -512,7 +596,7 @@ const Admin = () => {
             <Popconfirm
               title="系统提醒"
               description="您确认要删除用户吗?"
-              onConfirm={onConfirm}
+              onConfirm={onConfirmBatch}
               onCancel={onCancel}
               okText="确认"
               cancelText="取消"

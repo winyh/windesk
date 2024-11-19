@@ -44,14 +44,16 @@ const { DirectoryTree } = Tree;
 const { Option } = Select;
 
 const Menu = () => {
-  const [value, setValue] = useState();
   const [form] = Form.useForm();
+  const [value, setValue] = useState();
   const [menuType, setMenuType] = useState("directory");
+  const [isExpend, setIsExpend] = useState(false);
   const [action, setAction] = useState(true);
   const [record, setRecord] = useState({});
   const [selectedKeys, setSelectedKeys] = useState([]);
   const [expandedKeys, setExpandedKeys] = useState([]);
   const [externalLink, setExternalLink] = useState(false);
+  const [menuData, setMenuData] = useState([]);
   const [treeData, setTreeData] = useState([]);
   const [open, setOpen] = useState(false);
 
@@ -62,9 +64,9 @@ const Menu = () => {
   const getAllMenus = async (params) => {
     const { status, data } = await comGet("/admin/menus", { ...params });
     if (status) {
+      setMenuData(data);
       const menuTree = genMenuToTree(data);
       setTreeData(menuTree);
-      console.log({ menuTree });
     }
   };
 
@@ -217,6 +219,7 @@ const Menu = () => {
     setSelectedKeys(keys);
   };
   const onExpand = (keys, info) => {
+    console.log({ keys });
     setExpandedKeys(keys);
   };
 
@@ -272,6 +275,12 @@ const Menu = () => {
       .catch(() => {});
   };
 
+  const onExpendTree = () => {
+    const keys = menuData.map((item) => item.id);
+    setExpandedKeys(isExpend ? [] : keys);
+    setIsExpend(!isExpend);
+  };
+
   const labelText = {
     directory: "目录",
     menu: "菜单",
@@ -284,10 +293,9 @@ const Menu = () => {
         <Card
           title={
             <Space>
-              <Button icon={<PlusOutlined />} onClick={onAdd}>
-                新增
+              <Button icon={<ControlOutlined />} onClick={onExpendTree}>
+                {isExpend ? "收起" : "展开"}
               </Button>
-              <Button icon={<ControlOutlined />}>展开</Button>
               <Search placeholder="搜索菜单" allowClear onSearch={onSearch} />
             </Space>
           }
@@ -307,6 +315,9 @@ const Menu = () => {
             title={
               <Flex justify="space-between">
                 <Space size="middle">
+                  <Button icon={<PlusOutlined />} onClick={onAdd}>
+                    新增
+                  </Button>
                   <Button type="primary" onClick={onFinish}>
                     保存{menuType === "directory" ? "目录" : ""}
                     {menuType === "menu" ? "菜单" : ""}
@@ -392,7 +403,13 @@ const Menu = () => {
                   </Col>
                   <Col span={8}>
                     <Form.Item name="title">
-                      <Input placeholder="请输入目录名称" />
+                      <Input
+                        placeholder={`请输入${
+                          menuType === "directory" ? "目录" : ""
+                        }${menuType === "menu" ? "菜单" : ""}${
+                          menuType === "button" ? "按钮" : ""
+                        }名称`}
+                      />
                     </Form.Item>
                   </Col>
                 </Row>

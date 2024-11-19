@@ -101,9 +101,10 @@ const genMenuToTree = (items) => {
   const result = []; // 存放结果集
   const itemMap = {}; // 存放路径
 
-  // 先转化为map存储
+  // 先转化为map存储，并增加key键
   for (const item of items) {
     item.children = [];
+    item.key = item.id; // 增加key键，值为id的值
     itemMap[item.id] = item;
   }
 

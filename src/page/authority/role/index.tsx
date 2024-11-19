@@ -11,6 +11,7 @@ import {
   Drawer,
   Popconfirm,
   App,
+  Tag,
 } from "antd";
 import {
   PlusOutlined,
@@ -27,21 +28,33 @@ const { DirectoryTree } = Tree;
 const Role = () => {
   const formRef = useRef();
   const [dataSource, setDataSource] = useState([]);
+  const [dataSourceAdmin, setDataSourceAdmin] = useState([]);
   const [open, setOpen] = useState(false);
   const [action, setAction] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loadingAdmin, setLoadingAdmin] = useState(false);
   const [paginationMeta, setPaginationMeta] = useState({
+    pageSize: 10,
+    current: 1,
+    total: 10,
+  });
+  const [paginationMetaAdmin, setPaginationMetaAdmin] = useState({
     pageSize: 10,
     current: 1,
     total: 10,
   });
   const [record, setRecord] = useState({});
   const [selectedRows, setSelectedRows] = useState([]);
+  const [selectedRowsAdmin, setSelectedRowsAdmin] = useState([]);
   const { modal } = App.useApp();
 
   useEffect(() => {
     getData({
+      current: 1,
+      pageSize: 10,
+    });
+    getDataAdmin({
       current: 1,
       pageSize: 10,
     });
@@ -72,6 +85,34 @@ const Role = () => {
       })
       .finally(() => {
         setLoading(false);
+      });
+  };
+
+  const getDataAdmin = (params = {}) => {
+    setLoadingAdmin(true);
+    const { current, pageSize } = setPaginationMetaAdmin;
+    clientGetList("admin", {
+      current,
+      pageSize,
+      ...params,
+    })
+      .then((res) => {
+        if (res.status) {
+          const { list, total, current, pageSize } = res.data;
+          setPaginationMetaAdmin({
+            pageSize: pageSize,
+            current: current,
+            total: total,
+          });
+          setDataSourceAdmin(list);
+          setLoadingAdmin(false);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {
+        setLoadingAdmin(false);
       });
   };
 
@@ -352,18 +393,79 @@ const Role = () => {
         },
       ],
     },
+  ];
+
+  const adminColumns = [
     {
-      label: "分配权限", // 单独封装一个组件-加入全选/不选-展开/收起按钮
-      name: "auth",
-      itemSpan: 24,
-      is: "Tree.DirectoryTree",
-      multiple: true,
-      defaultExpandAll: true,
-      treeData: treeData,
-      onSelect: onSelect,
-      onExpand: onExpand,
+      title: "账户名称",
+      dataIndex: "username",
+      key: "username",
+    },
+    {
+      title: "用户昵称",
+      dataIndex: "nick_name",
+      key: "nick_name",
+    },
+    {
+      title: "联系方式",
+      dataIndex: "mobile",
+      key: "mobile",
+    },
+    {
+      title: "邮箱",
+      dataIndex: "email",
+      key: "email",
+    },
+    {
+      title: "组织部门",
+      dataIndex: "organization_id",
+      key: "organization_id",
+    },
+    {
+      title: "岗位",
+      dataIndex: "position_id",
+      key: "position_id",
+    },
+    {
+      title: "角色",
+      dataIndex: "role_id",
+      key: "role_id",
+      render: () => {
+        return <Tag color="green">管理员</Tag>;
+      },
+    },
+    {
+      title: "状态",
+      dataIndex: "status",
+      key: "status",
+      render: () => {
+        return <Badge status="processing" text="启用" />;
+      },
+    },
+    {
+      title: "注册时间",
+      dataIndex: "created_at",
+      key: "created_at",
+      render: () => {
+        return <span>{dayjs().format("YYYY-MM-DD HH:mm:ss")}</span>;
+      },
     },
   ];
+
+  const rowSelectionAdmin = {
+    onChange: (selectedRowKeys, selectedRows) => {
+      setSelectedRowsAdmin(selectedRows);
+    },
+    getCheckboxProps: (record) => ({
+      disabled: record.name === "Disabled User",
+      name: record.name,
+    }),
+  };
+
+  const onSearchAdmin = (value) => {
+    console.log(value);
+    getData({ username: value });
+  };
 
   const showModal = () => {
     modal.confirm({
@@ -374,11 +476,37 @@ const Role = () => {
       open: isModalOpen,
       width: "50%",
       content: (
-        <div>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-        </div>
+        <Flex vertical gap="middle">
+          <Space size="middle">
+            <Search
+              placeholder="搜索用户"
+              loading={loading}
+              allowClear
+              onSearch={onSearchAdmin}
+            />
+          </Space>
+          <Table
+            rowSelection={{
+              ...rowSelectionAdmin,
+            }}
+            rowKey={(record) => record.id}
+            dataSource={dataSourceAdmin}
+            columns={adminColumns}
+            loading={loadingAdmin}
+            pagination={
+              dataSourceAdmin.length > 0 && {
+                position: ["bottomCenter"],
+                showSizeChanger: true,
+                showQuickJumper: true,
+                onChange: onPaginationChange,
+                onShowSizeChange: onShowSizeChange,
+                pageSize: paginationMetaAdmin.pageSize, // 每页显示记录数
+                current: paginationMetaAdmin.current, // 当前页码
+                total: paginationMetaAdmin.total, // 总记录数
+              }
+            }
+          />
+        </Flex>
       ),
       onOk() {
         setIsModalOpen(false);
@@ -434,6 +562,11 @@ const Role = () => {
           <Divider type="vertical" />
           <Button type="text" size="small" onClick={showModal}>
             分配用户
+          </Button>
+          <Divider type="vertical" />
+
+          <Button type="text" size="small" onClick={showModal}>
+            分配权限
           </Button>
           <Divider type="vertical" />
 
