@@ -21,7 +21,7 @@ import {
   BorderOutlined,
 } from "@ant-design/icons";
 import SuperForm from "@/component/SuperForm";
-import { modal } from "@/store/hooks";
+import { message, modal } from "@/store/hooks";
 import dayjs from "dayjs";
 import { genMenuToTree } from "@/utils/index";
 import {
@@ -30,14 +30,17 @@ import {
   clientPut,
   clientDel,
   clientGetList,
+  comPost,
+  comPut,
+  clientGetAll,
 } from "@/request";
 
 const { Search } = Input;
 
 const initialStates = {
   action: false,
-  isCheck: false,
-  isExpend: false,
+  isCheck: false, // 是否全选
+  isExpend: false, // 是否展开
   loading: false,
   loadingAdmin: false,
   loadingMenu: false,
@@ -46,6 +49,8 @@ const initialStates = {
   modalOpen: false,
   selectedRows: [],
   selectedRowsAdmin: [],
+  selectedRoleAdmin: [],
+  selectedRolePermission: [],
   menuData: [],
   treeData: [],
   dataSource: {
@@ -68,7 +73,7 @@ const statesReducer = (states, action) => {
       return { ...states, action: action.bool };
     }
     case "check": {
-      return { ...states, isCheck: !states.isCheck };
+      return { ...states, isCheck: action.bool };
     }
     case "expend": {
       return { ...states, isExpend: !states.isExpend };
@@ -77,7 +82,7 @@ const statesReducer = (states, action) => {
       return { ...states, loading: !states.loading };
     }
     case "loadAdmin": {
-      return { ...states, loadingAdmin: !states.loadingAdmin };
+      return { ...states, loadingAdmin: action.bool };
     }
     case "loadMenu": {
       return { ...states, loadingMenu: !states.loadingMenu };
@@ -88,11 +93,23 @@ const statesReducer = (states, action) => {
     case "openAccess": {
       return { ...states, openAccess: !states.openAccess };
     }
+    case "modalOpen": {
+      return { ...states, modalOpen: !states.modalOpen };
+    }
     case "selectedRows": {
       return { ...states, selectedRows: action.selectedRows };
     }
     case "selectedRowsAdmin": {
       return { ...states, selectedRowsAdmin: action.selectedRowsAdmin };
+    }
+    case "selectedRoleAdmin": {
+      return { ...states, selectedRoleAdmin: action.selectedRoleAdmin };
+    }
+    case "selectedRolePermission": {
+      return {
+        ...states,
+        selectedRolePermission: action.selectedRolePermission,
+      };
     }
     case "menuData": {
       return { ...states, menuData: action.menuData };
@@ -145,7 +162,6 @@ const Role = () => {
       current: 1,
       pageSize: 10,
     });
-    getAllMenus();
   }, []);
 
   const getData = (params = {}) => {
@@ -186,6 +202,7 @@ const Role = () => {
   const getDataAdmin = (params = {}) => {
     dispatch({
       type: "loadAdmin",
+      bool: true,
     });
     const { current, pageSize } = states.dataSourceAdmin;
     clientGetList("admin", {
@@ -207,6 +224,7 @@ const Role = () => {
 
           dispatch({
             type: "loadAdmin",
+            bool: false,
           });
         }
       })
@@ -216,6 +234,7 @@ const Role = () => {
       .finally(() => {
         dispatch({
           type: "loadAdmin",
+          bool: false,
         });
       });
   };
@@ -231,6 +250,36 @@ const Role = () => {
       dispatch({
         type: "treeData",
         treeData: menuTree,
+      });
+    }
+  };
+
+  // 获取所有后台用户和角色关联数据
+  const getAllRoleAdmin = async (params) => {
+    const { status, data } = await clientGetAll("admin_role", { ...params });
+    if (status) {
+      dispatch({
+        type: "selectedRoleAdmin",
+        selectedRoleAdmin: data.map((item) => item.admin_id),
+      });
+    }
+  };
+
+  // 获取所有角色和权限关联数据
+  const getAllRolePermission = async (params) => {
+    const { menuData } = states;
+    const { status, data } = await clientGetAll("role_permission", {
+      ...params,
+    });
+    if (status) {
+      setCheckedKeys(data.map((item) => item.permission_id));
+      dispatch({
+        type: "selectedRolePermission",
+        selectedRolePermission: data,
+      });
+      dispatch({
+        type: "check",
+        bool: menuData.length > data.length ? false : true,
       });
     }
   };
@@ -256,10 +305,12 @@ const Role = () => {
   };
 
   const onCheckBatch = () => {
-    const keys = states.menuData.map((item) => item.id);
-    setCheckedKeys(states.isCheck ? [] : keys);
+    const { isCheck, menuData } = states;
+    const keys = menuData.map((item) => item.id);
+    setCheckedKeys(isCheck ? [] : keys);
     dispatch({
       type: "check",
+      bool: !isCheck,
     });
   };
 
@@ -316,6 +367,25 @@ const Role = () => {
         }
       })
       .catch(() => {});
+  };
+
+  const onRelateRoelAdmin = async (type, current) => {
+    const { data, status, msg } = await comPut(
+      "/admin/role/admin_role/relate",
+      {
+        type,
+        admin_id: current.id,
+        role_id: record.id,
+      }
+    );
+
+    if (status) {
+      getDataAdmin();
+      getAllRoleAdmin();
+      message.success(msg);
+    } else {
+      message.error(msg);
+    }
   };
 
   const layout = {
@@ -381,11 +451,6 @@ const Role = () => {
       key: "mobile",
     },
     {
-      title: "邮箱",
-      dataIndex: "email",
-      key: "email",
-    },
-    {
       title: "组织部门",
       dataIndex: "organization_id",
       key: "organization_id",
@@ -404,20 +469,30 @@ const Role = () => {
       },
     },
     {
-      title: "状态",
-      dataIndex: "status",
-      key: "status",
-      render: () => {
-        return <Badge status="processing" text="启用" />;
-      },
-    },
-    {
-      title: "注册时间",
-      dataIndex: "created_at",
-      key: "created_at",
-      render: () => {
-        return <span>{dayjs().format("YYYY-MM-DD HH:mm:ss")}</span>;
-      },
+      title: "操作",
+      dataIndex: "action",
+      key: "action",
+      with: 120,
+      render: (text, record) => (
+        <>
+          <Button
+            type="text"
+            size="small"
+            onClick={() => onRelateRoelAdmin("relate", record)}
+          >
+            关联
+          </Button>
+          <Divider type="vertical" />
+          <Button
+            type="text"
+            size="small"
+            danger
+            onClick={() => onRelateRoelAdmin("lift", record)}
+          >
+            解除
+          </Button>
+        </>
+      ),
     },
   ];
 
@@ -440,6 +515,10 @@ const Role = () => {
         type: "selectedRowsAdmin",
         selectedRowsAdmin: selectedRows,
       });
+      dispatch({
+        type: "selectedRoleAdmin",
+        selectedRoleAdmin: selectedRows,
+      });
     },
     getCheckboxProps: (record) => ({
       disabled: record.name === "Disabled User",
@@ -449,81 +528,80 @@ const Role = () => {
 
   const onSearchAdmin = (value) => {
     console.log(value);
-    getData({ username: value });
+    getDataAdmin({ username: value });
   };
 
-  const showModal = () => {
-    modal.confirm({
-      title: "用户列表",
-      closable: true,
-      maskClosable: true,
-      icon: <span></span>,
-      open: states.modalOpen,
-      width: "50%",
-      content: (
-        <Flex vertical gap="middle">
-          <Space size="middle">
-            <Search
-              placeholder="搜索用户"
-              loading={states.loadingAdmin}
-              allowClear
-              onSearch={onSearchAdmin}
-            />
-          </Space>
-          <Table
-            rowSelection={{
-              ...rowSelectionAdmin,
-            }}
-            rowKey={(record) => record.id}
-            dataSource={states.dataSourceAdmin.list}
-            columns={adminColumns}
-            loading={states.loadingAdmin}
-            pagination={
-              states.dataSourceAdmin.list.length > 0 && {
-                position: ["bottomCenter"],
-                showSizeChanger: true,
-                showQuickJumper: true,
-                onChange: onPaginationChange,
-                onShowSizeChange: onShowSizeChange,
-                pageSize: states.dataSourceAdmin.pageSize, // 每页显示记录数
-                current: states.dataSourceAdmin.current, // 当前页码
-                total: states.dataSourceAdmin.total, // 总记录数
-              }
-            }
-          />
-        </Flex>
-      ),
-      onOk() {
-        dispatch({
-          type: "action",
-          bool: false,
-        });
-      },
-      onCancel() {
-        dispatch({
-          type: "action",
-          bool: false,
-        });
-      },
+  const showModal = async (record) => {
+    await getAllRoleAdmin({ role_id: record.id });
+    setRecord(record);
+    dispatch({
+      type: "modalOpen",
     });
   };
 
-  const showAccessDrawer = () => {
+  const showAccessDrawer = async (record) => {
+    await getAllMenus();
+    await getAllRolePermission();
+    setRecord(record);
     dispatch({
       type: "openAccess",
     });
   };
 
-  const onFinishAccess = () => {
-    dispatch({
-      type: "openAccess",
+  const onFinishAccess = async () => {
+    // 1.将选中的权限id 存入到 role_permission
+    const { data, status, msg } = await comPut("/admin/role/role_permission", {
+      permission_ids: checkedKeys,
+      role_id: record.id,
     });
+
+    if (status) {
+      dispatch({
+        type: "openAccess",
+      });
+      message.success(msg);
+    } else {
+      message.error(msg);
+    }
   };
 
   const onCloseAccess = () => {
     dispatch({
       type: "openAccess",
     });
+  };
+
+  const onConfirm = async (record) => {
+    const res = await clientDel("role", { ids: record.id });
+    if (res.status) {
+      getData();
+    }
+  };
+
+  const onCancel = () => {};
+
+  const onAdminClose = () => {
+    dispatch({
+      type: "modalOpen",
+    });
+  };
+
+  const onAdminFinish = async () => {
+    // 1.将选中的用户id 存入到 admin_role
+    const { selectedRoleAdmin } = states;
+    const { data, status, msg } = await comPut("/admin/role/admin_role", {
+      admin_ids: selectedRoleAdmin,
+      role_id: record.id,
+    });
+
+    if (status) {
+      dispatch({
+        type: "modalOpen",
+      });
+      message.success(msg);
+    } else {
+      message.error(msg);
+    }
   };
 
   const columns = [
@@ -556,6 +634,12 @@ const Role = () => {
       },
     },
     {
+      title: "创建时间",
+      dataIndex: "created_at",
+      key: "created_at",
+      render: (text) => dayjs(text).format("YYYY-MM-DD HH:mm:ss"),
+    },
+    {
       title: "操作",
       dataIndex: "action",
       key: "action",
@@ -569,12 +653,16 @@ const Role = () => {
             编辑
           </Button>
           <Divider type="vertical" />
-          <Button type="text" size="small" onClick={showModal}>
+          <Button type="text" size="small" onClick={() => showModal(record)}>
             分配用户
           </Button>
           <Divider type="vertical" />
 
-          <Button type="text" size="small" onClick={showAccessDrawer}>
+          <Button
+            type="text"
+            size="small"
+            onClick={() => showAccessDrawer(record)}
+          >
             分配权限
           </Button>
           <Divider type="vertical" />
@@ -596,25 +684,20 @@ const Role = () => {
     },
   ];
 
-  const onConfirm = async (record) => {
-    const res = await clientDel("role", { ids: record.id });
-    if (res.status) {
-      getData();
-    }
-  };
-
-  const onCancel = () => {};
-
   const {
     action,
     dataSource,
+    dataSourceAdmin,
     selectedRows,
+    selectedRoleAdmin,
     open,
     openAccess,
+    modalOpen,
     isCheck,
     isExpend,
     loading,
     loadingMenu,
+    loadingAdmin,
     treeData,
   } = states;
 
@@ -693,6 +776,56 @@ const Role = () => {
       </Drawer>
 
       <Drawer
+        title="用户列表"
+        onClose={onAdminClose}
+        open={modalOpen}
+        width="50%"
+        footer={
+          <Flex justify="flex-end">
+            <Space>
+              <Button onClick={onAdminClose}>取消</Button>
+              <Button type="primary" onClick={onAdminFinish}>
+                确认
+              </Button>
+            </Space>
+          </Flex>
+        }
+      >
+        <Flex vertical gap="middle">
+          <Space size="middle">
+            <Search
+              placeholder="搜索用户"
+              loading={loadingAdmin}
+              allowClear
+              onSearch={onSearchAdmin}
+            />
+          </Space>
+          <Table
+            rowSelection={{
+              ...rowSelectionAdmin,
+              defaultSelectedRowKeys: selectedRoleAdmin,
+            }}
+            rowKey={(record) => record.id}
+            dataSource={dataSourceAdmin.list}
+            columns={adminColumns}
+            loading={loadingAdmin}
+            pagination={
+              dataSourceAdmin.list.length > 0 && {
+                position: ["bottomCenter"],
+                showSizeChanger: true,
+                showQuickJumper: true,
+                onChange: onPaginationChange,
+                onShowSizeChange: onShowSizeChange,
+                pageSize: dataSourceAdmin.pageSize, // 每页显示记录数
+                current: dataSourceAdmin.current, // 当前页码
+                total: dataSourceAdmin.total, // 总记录数
+              }
+            }
+          />
+        </Flex>
+      </Drawer>
+
+      <Drawer
         title="分配权限"
         closable
         width="30%"
@@ -734,6 +867,7 @@ const Role = () => {
               expandedKeys={expandedKeys}
               selectedKeys={selectedKeys}
               checkedKeys={checkedKeys}
+              defaultCheckedKeys={checkedKeys}
               onSelect={onSelect}
               onExpand={onExpand}
               onCheck={onCheck}
