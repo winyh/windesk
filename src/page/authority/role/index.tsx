@@ -1,4 +1,5 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useReducer } from "react";
+
 import {
   Table,
   Button,
@@ -11,13 +12,13 @@ import {
   Drawer,
   Popconfirm,
   Tag,
-  Select,
   Card,
 } from "antd";
 import {
   PlusOutlined,
   ControlOutlined,
   CheckSquareOutlined,
+  BorderOutlined,
 } from "@ant-design/icons";
 import SuperForm from "@/component/SuperForm";
 import { modal } from "@/store/hooks";
@@ -32,38 +33,108 @@ import {
 } from "@/request";
 
 const { Search } = Input;
-const { DirectoryTree } = Tree;
-const { Option } = Select;
+
+const initialStates = {
+  action: false,
+  isCheck: false,
+  isExpend: false,
+  loading: false,
+  loadingAdmin: false,
+  loadingMenu: false,
+  open: false,
+  openAccess: false,
+  modalOpen: false,
+  selectedRows: [],
+  selectedRowsAdmin: [],
+  menuData: [],
+  treeData: [],
+  dataSource: {
+    list: [],
+    pageSize: 10,
+    current: 1,
+    total: 10,
+  },
+  dataSourceAdmin: {
+    list: [],
+    pageSize: 10,
+    current: 1,
+    total: 10,
+  },
+};
+
+const statesReducer = (states, action) => {
+  switch (action.type) {
+    case "action": {
+      return { ...states, action: action.bool };
+    }
+    case "check": {
+      return { ...states, isCheck: !states.isCheck };
+    }
+    case "expend": {
+      return { ...states, isExpend: !states.isExpend };
+    }
+    case "load": {
+      return { ...states, loading: !states.loading };
+    }
+    case "loadAdmin": {
+      return { ...states, loadingAdmin: !states.loadingAdmin };
+    }
+    case "loadMenu": {
+      return { ...states, loadingMenu: !states.loadingMenu };
+    }
+    case "open": {
+      return { ...states, open: !states.open };
+    }
+    case "openAccess": {
+      return { ...states, openAccess: !states.openAccess };
+    }
+    case "selectedRows": {
+      return { ...states, selectedRows: action.selectedRows };
+    }
+    case "selectedRowsAdmin": {
+      return { ...states, selectedRowsAdmin: action.selectedRowsAdmin };
+    }
+    case "menuData": {
+      return { ...states, menuData: action.menuData };
+    }
+    case "treeData": {
+      return { ...states, treeData: action.treeData };
+    }
+    case "dataSource": {
+      return {
+        ...states,
+        dataSource: {
+          list: action.list,
+          pageSize: action.pageSize,
+          current: action.current,
+          total: action.total,
+        },
+      };
+    }
+    case "dataSourceAdmin": {
+      return {
+        ...states,
+        dataSourceAdmin: {
+          list: action.list,
+          pageSize: action.pageSize,
+          current: action.current,
+          total: action.total,
+        },
+      };
+    }
+    default: {
+      throw Error("未知 action: " + action.type);
+    }
+  }
+};
 
 const Role = () => {
   const formRef = useRef();
-  const [dataSource, setDataSource] = useState([]);
-  const [dataSourceAdmin, setDataSourceAdmin] = useState([]);
-  const [open, setOpen] = useState(false);
-  const [openAccess, setOpenAccess] = useState(false);
-  const [action, setAction] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [loadingAdmin, setLoadingAdmin] = useState(false);
-  const [isExpend, setIsExpend] = useState(false);
+  const [states, dispatch] = useReducer(statesReducer, initialStates);
   const [checkedKeys, setCheckedKeys] = useState([]);
   const [selectedKeys, setSelectedKeys] = useState([]);
   const [expandedKeys, setExpandedKeys] = useState([]);
-  const [paginationMeta, setPaginationMeta] = useState({
-    pageSize: 10,
-    current: 1,
-    total: 10,
-  });
-  const [paginationMetaAdmin, setPaginationMetaAdmin] = useState({
-    pageSize: 10,
-    current: 1,
-    total: 10,
-  });
   const [record, setRecord] = useState({});
-  const [selectedRows, setSelectedRows] = useState([]);
-  const [selectedRowsAdmin, setSelectedRowsAdmin] = useState([]);
-  const [menuData, setMenuData] = useState([]);
-  const [treeData, setTreeData] = useState([]);
 
   useEffect(() => {
     getData({
@@ -77,11 +148,11 @@ const Role = () => {
     getAllMenus();
   }, []);
 
-  useEffect(() => {}, [expandedKeys]);
-
   const getData = (params = {}) => {
-    setLoading(true);
-    const { current, pageSize } = paginationMeta;
+    dispatch({
+      type: "load",
+    });
+    const { current, pageSize } = states.dataSource;
     clientGetList("role", {
       current,
       pageSize,
@@ -90,26 +161,33 @@ const Role = () => {
       .then((res) => {
         if (res.status) {
           const { list, total, current, pageSize } = res.data;
-          setPaginationMeta({
+          dispatch({
+            type: "dataSource",
+            list: list,
             pageSize: pageSize,
             current: current,
             total: total,
           });
-          setDataSource(list);
-          setLoading(false);
+          dispatch({
+            type: "load",
+          });
         }
       })
       .catch((err) => {
         console.log(err);
       })
       .finally(() => {
-        setLoading(false);
+        dispatch({
+          type: "load",
+        });
       });
   };
 
   const getDataAdmin = (params = {}) => {
-    setLoadingAdmin(true);
-    const { current, pageSize } = setPaginationMetaAdmin;
+    dispatch({
+      type: "loadAdmin",
+    });
+    const { current, pageSize } = states.dataSourceAdmin;
     clientGetList("admin", {
       current,
       pageSize,
@@ -118,58 +196,71 @@ const Role = () => {
       .then((res) => {
         if (res.status) {
           const { list, total, current, pageSize } = res.data;
-          setPaginationMetaAdmin({
+
+          dispatch({
+            type: "dataSourceAdmin",
+            list: list,
             pageSize: pageSize,
             current: current,
             total: total,
           });
-          setDataSourceAdmin(list);
-          setLoadingAdmin(false);
+
+          dispatch({
+            type: "loadAdmin",
+          });
         }
       })
       .catch((err) => {
         console.log(err);
       })
       .finally(() => {
-        setLoadingAdmin(false);
+        dispatch({
+          type: "loadAdmin",
+        });
       });
   };
 
   const getAllMenus = async (params) => {
     const { status, data } = await comGet("/admin/menus", { ...params });
     if (status) {
-      setMenuData(data);
+      dispatch({
+        type: "menuData",
+        menuData: data,
+      });
       const menuTree = genMenuToTree(data);
-      setTreeData(menuTree);
+      dispatch({
+        type: "treeData",
+        treeData: menuTree,
+      });
     }
   };
 
   const onSelect = (keys, info) => {
     let current = info.node;
-    console.log(current);
     setSelectedKeys(keys);
   };
   const onExpand = (keys, info) => {
-    console.log({ keys });
     setExpandedKeys(keys);
   };
 
   const onCheck = (checkedKeys, event) => {
-    console.log(checkedKeys, event);
     setCheckedKeys(checkedKeys);
   };
 
   const onExpendTree = () => {
-    const keys = menuData.map((item) => item.id);
-    console.log({ keys }, isExpend);
-    setExpandedKeys(isExpend ? [] : keys);
-    setIsExpend(!isExpend);
+    const keys = states.menuData.map((item) => item.id);
+    setExpandedKeys(states.isExpend ? [] : keys);
+    dispatch({
+      type: "expend",
+    });
   };
 
   const onCheckBatch = () => {
-    const keys = menuData.map((item) => item.id);
-    console.log({ keys });
-    setCheckedKeys(checkedKeys.length === 0 ? keys : []);
+    const keys = states.menuData.map((item) => item.id);
+    setCheckedKeys(states.isCheck ? [] : keys);
+    dispatch({
+      type: "check",
+    });
   };
 
   const onSearchMenu = (keyword) => {
@@ -177,7 +268,6 @@ const Role = () => {
   };
 
   const onSearch = (value) => {
-    console.log(value);
     getData({ role_name: value });
   };
 
@@ -191,13 +281,16 @@ const Role = () => {
     getData({ current, pageSize });
   };
   const showDrawer = (bool, record) => {
-    setAction(bool);
-    setOpen(true);
-    console.log({ record });
+    dispatch({ type: "action", bool: bool });
+    dispatch({
+      type: "open",
+    });
     setRecord(record);
   };
   const onClose = () => {
-    setOpen(false);
+    dispatch({
+      type: "open",
+    });
   };
 
   const onFinish = () => {
@@ -208,13 +301,17 @@ const Role = () => {
           const res = await clientPost("role", values);
           if (res.status) {
             getData();
-            setOpen(false);
+            dispatch({
+              type: "open",
+            });
           }
         } else {
           const res = await clientPut("role", { ...values, id: record.id });
           if (res.status) {
             getData();
-            setOpen(false);
+            dispatch({
+              type: "open",
+            });
           }
         }
       })
@@ -324,9 +421,25 @@ const Role = () => {
     },
   ];
 
+  const rowSelection = {
+    onChange: (selectedRowKeys, selectedRows) => {
+      dispatch({
+        type: "selectedRows",
+        selectedRows: selectedRows,
+      });
+    },
+    getCheckboxProps: (record) => ({
+      disabled: record.name === "Disabled User",
+      name: record.name,
+    }),
+  };
+
   const rowSelectionAdmin = {
     onChange: (selectedRowKeys, selectedRows) => {
-      setSelectedRowsAdmin(selectedRows);
+      dispatch({
+        type: "selectedRowsAdmin",
+        selectedRowsAdmin: selectedRows,
+      });
     },
     getCheckboxProps: (record) => ({
       disabled: record.name === "Disabled User",
@@ -345,14 +458,14 @@ const Role = () => {
       closable: true,
       maskClosable: true,
       icon: <span></span>,
-      open: isModalOpen,
+      open: states.modalOpen,
       width: "50%",
       content: (
         <Flex vertical gap="middle">
           <Space size="middle">
             <Search
               placeholder="搜索用户"
-              loading={loading}
+              loading={states.loadingAdmin}
               allowClear
               onSearch={onSearchAdmin}
             />
@@ -362,43 +475,55 @@ const Role = () => {
               ...rowSelectionAdmin,
             }}
             rowKey={(record) => record.id}
-            dataSource={dataSourceAdmin}
+            dataSource={states.dataSourceAdmin.list}
             columns={adminColumns}
-            loading={loadingAdmin}
+            loading={states.loadingAdmin}
             pagination={
-              dataSourceAdmin.length > 0 && {
+              states.dataSourceAdmin.list.length > 0 && {
                 position: ["bottomCenter"],
                 showSizeChanger: true,
                 showQuickJumper: true,
                 onChange: onPaginationChange,
                 onShowSizeChange: onShowSizeChange,
-                pageSize: paginationMetaAdmin.pageSize, // 每页显示记录数
-                current: paginationMetaAdmin.current, // 当前页码
-                total: paginationMetaAdmin.total, // 总记录数
+                pageSize: states.dataSourceAdmin.pageSize, // 每页显示记录数
+                current: states.dataSourceAdmin.current, // 当前页码
+                total: states.dataSourceAdmin.total, // 总记录数
               }
             }
           />
         </Flex>
       ),
       onOk() {
-        setIsModalOpen(false);
+        dispatch({
+          type: "action",
+          bool: false,
+        });
       },
       onCancel() {
-        setIsModalOpen(false);
+        dispatch({
+          type: "action",
+          bool: false,
+        });
       },
     });
   };
 
   const showAccessDrawer = () => {
-    setOpenAccess(true);
+    dispatch({
+      type: "openAccess",
+    });
   };
 
   const onFinishAccess = () => {
-    setOpenAccess(false);
+    dispatch({
+      type: "openAccess",
+    });
   };
 
   const onCloseAccess = () => {
-    setOpenAccess(false);
+    dispatch({
+      type: "openAccess",
+    });
   };
 
   const columns = [
@@ -471,25 +596,27 @@ const Role = () => {
     },
   ];
 
-  const rowSelection = {
-    onChange: (selectedRowKeys, selectedRows) => {
-      setSelectedRows(selectedRows);
-    },
-    getCheckboxProps: (record) => ({
-      disabled: record.name === "Disabled User",
-      name: record.name,
-    }),
-  };
-
   const onConfirm = async (record) => {
     const res = await clientDel("role", { ids: record.id });
     if (res.status) {
       getData();
-      console.log({ res });
     }
   };
 
   const onCancel = () => {};
+
+  const {
+    action,
+    dataSource,
+    selectedRows,
+    open,
+    openAccess,
+    isCheck,
+    isExpend,
+    loading,
+    loadingMenu,
+    treeData,
+  } = states;
 
   return (
     <>
@@ -522,7 +649,7 @@ const Role = () => {
             ...rowSelection,
           }}
           rowKey={(record) => record.id}
-          dataSource={dataSource}
+          dataSource={dataSource.list}
           columns={columns}
           loading={loading}
           pagination={
@@ -532,9 +659,9 @@ const Role = () => {
               showQuickJumper: true,
               onChange: onPaginationChange,
               onShowSizeChange: onShowSizeChange,
-              pageSize: paginationMeta.pageSize, // 每页显示记录数
-              current: paginationMeta.current, // 当前页码
-              total: paginationMeta.total, // 总记录数
+              pageSize: dataSource.pageSize, // 每页显示记录数
+              current: dataSource.current, // 当前页码
+              total: dataSource.total, // 总记录数
             }
           }
         />
@@ -584,15 +711,18 @@ const Role = () => {
       >
         <Flex vertical gap="middle">
           <Space size="middle">
-            <Button icon={<CheckSquareOutlined />} onClick={onCheckBatch}>
-              {isExpend ? "全选" : "全不选"}
+            <Button
+              icon={isCheck ? <BorderOutlined /> : <CheckSquareOutlined />}
+              onClick={onCheckBatch}
+            >
+              {isCheck ? "全不选" : "全选"}
             </Button>
             <Button icon={<ControlOutlined />} onClick={onExpendTree}>
               {isExpend ? "收起" : "展开"}
             </Button>
             <Search
               placeholder="搜索菜单"
-              loading={loading}
+              loading={loadingMenu}
               allowClear
               onSearch={onSearchMenu}
             />
