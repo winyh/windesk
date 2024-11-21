@@ -94,6 +94,7 @@ const LayoutBase = () => {
       const { data, status } = await logoutService();
       if (status) {
         localStorage.removeItem("token");
+        const { pathname, search } = window.location;
         message.open({
           type: "loading",
           content: "即将退出登录!",
@@ -101,7 +102,7 @@ const LayoutBase = () => {
         });
         setTimeout(() => {
           message.destroy();
-          navigate("/login");
+          navigate(`/login?redirect=${pathname}${search}`);
         }, 1000);
       }
     } catch (error) {
