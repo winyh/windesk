@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, Button, Form, Input, theme, Image, App } from "antd";
 import { getAdminService, loginService } from "@/service/index";
 import { TranslationOutlined } from "@ant-design/icons";
@@ -8,8 +8,10 @@ import "./style.css";
 
 const Login = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { notification } = App.useApp();
   const [loading, setLoading] = useState(false);
+  const redirect = searchParams.get("redirect");
 
   const {
     token: { colorPrimary, colorBgContainer },
@@ -19,7 +21,7 @@ const Login = () => {
     // localStorage.removeItem("token");
   }, []);
 
-  const homePage = "/saas/dashboard";
+  const pageRoute = redirect ? redirect : "/saas/dashboard";
 
   const onFinish = async (values) => {
     try {
@@ -28,12 +30,14 @@ const Login = () => {
       if (status) {
         notification.success({
           message: "系统提醒",
-          description: "登录成功! 即将跳转到系统首页",
+          description: `登录成功! 即将跳转到${
+            redirect ? "退出前页面" : "系统首页"
+          }`,
         });
         localStorage.setItem("token", data.token);
         setTimeout(() => {
           setLoading(false);
-          navigate(homePage);
+          navigate(pageRoute);
         }, 1000);
       } else {
         setLoading(false);

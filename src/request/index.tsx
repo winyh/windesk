@@ -1,6 +1,5 @@
 import axios from "axios";
-import { redirect } from "react-router-dom";
-import { notification } from "@/store/hooks";
+import { notification, navigate } from "@/store/hooks";
 
 const { BASE_URL, VITE_HTTP_URL } = import.meta.env;
 
@@ -42,6 +41,7 @@ instance.interceptors.response.use(
       console.log("请求超时处理:", error.message);
     }
 
+    const { pathname, search } = window.location;
     const { response } = error;
     if (response?.status === 401) {
       notification.warning({
@@ -50,18 +50,18 @@ instance.interceptors.response.use(
       });
 
       localStorage.clear();
-      let loginPath = `${window.location.origin}${BASE_URL}login`;
+      let loginPath = `${BASE_URL}login`;
+
       setTimeout(() => {
-        window.location.href = loginPath;
-      }, 1000);
+        navigate(`${loginPath}?redirect=${pathname}${search}`);
+      }, 500);
     } else if (response?.status === 403) {
-      console.log(error);
       notification.warning({
         message: "系统提醒",
         description: `${error.message}. 无权限访问!`,
       });
-      // window.location.href = `${window.location.origin}${BASE_URL}saas/403`;
-      return redirect(`${BASE_URL}saas/403`);
+
+      navigate(`${BASE_URL}saas/403`);
     } else {
       notification.warning({
         message: "系统提醒",

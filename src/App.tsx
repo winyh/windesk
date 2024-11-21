@@ -35,14 +35,11 @@ function App() {
     setWatermark(customConfig.watermark);
   }, [customConfig]);
 
+  const { content, height, width, image } = watermark;
+
   return (
     <ConfigProvider locale={zhCN} theme={theme}>
-      <Watermark
-        content={watermark.content}
-        height={watermark.height}
-        width={watermark.width}
-        image={watermark.image}
-      >
+      <Watermark content={content} height={height} width={width} image={image}>
         <AntApp notification={{ maxCount: 1 }}>
           <AntdHooks />
           <RouterProvider router={router}></RouterProvider>

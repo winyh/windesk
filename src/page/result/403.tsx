@@ -1,13 +1,12 @@
-import React from "react"
-import { Button, Result } from "antd"
-import { useNavigate } from "react-router-dom"
-import "./index.less"
+import { Button, Result } from "antd";
+import { useNavigate } from "react-router-dom";
+import "./index.less";
 const Result403 = () => {
-  const navigate = useNavigate()
-  const { BASE_URL } = import.meta.env
+  const navigate = useNavigate();
+  const { BASE_URL } = import.meta.env;
   const goHome = () => {
-    navigate(`${BASE_URL}dashboard`)
-  }
+    navigate(`${BASE_URL}dashboard`);
+  };
   return (
     <Result
       status="403"
@@ -19,6 +18,6 @@ const Result403 = () => {
         </Button>
       }
     />
-  )
-}
-export default Result403
+  );
+};
+export default Result403;

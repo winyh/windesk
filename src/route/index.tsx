@@ -108,6 +108,6 @@ const router = createBrowserRouter(routes, {
   basename,
 });
 
-export { routes, saasRoutes, appRoutes };
+export { routes, saasRoutes, appRoutes, router };
 
 export default router;
