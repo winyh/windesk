@@ -34,7 +34,7 @@ import {
   clientGetList,
   comGet,
 } from "@/request";
-import { genMenuToTree, transBool2Str } from "@/utils";
+import { genMenuToTree, transBool2Str, transBool2num } from "@/utils";
 import { message } from "@/store/hooks";
 
 import "./index.css";
@@ -215,16 +215,17 @@ const Menu = () => {
 
   const onSelect = (keys, info) => {
     let current = info.node;
+    let { status, hide_in_menu, is_link, is_cache, is_iframe, type } = current;
     current = {
       ...current,
-      status: current.status === "1" ? true : false,
-      hide_in_menu: current.hide_in_menu === "1" ? true : false,
-      is_link: current.is_link === "1" ? true : false,
-      is_cache: current.is_cache === "1" ? true : false,
-      is_iframe: current.is_iframe === "1" ? true : false,
+      status: status === "1" ? true : false,
+      hide_in_menu: hide_in_menu ? true : false,
+      is_link: is_link ? true : false,
+      is_cache: is_cache ? true : false,
+      is_iframe: is_iframe ? true : false,
     };
-    setMenuType(current.type);
-    setRecord(info.node);
+    setMenuType(type);
+    setRecord(current);
     setAction(false);
     setSelectedKeys(keys);
     form.setFieldsValue(current);
@@ -256,10 +257,10 @@ const Menu = () => {
         values = {
           ...values,
           status: transBool2Str(values?.status),
-          hide_in_menu: transBool2Str(values?.hide_in_menu),
-          is_link: transBool2Str(values?.is_link),
-          is_cache: transBool2Str(values?.is_cache),
-          is_iframe: transBool2Str(values?.is_iframe),
+          hide_in_menu: transBool2num(values?.hide_in_menu),
+          is_link: transBool2num(values?.is_link),
+          is_cache: transBool2num(values?.is_cache),
+          is_iframe: transBool2num(values?.is_iframe),
         };
 
         if (action) {
@@ -441,7 +442,7 @@ const Menu = () => {
                   </Col>
                   <Col span={8}>
                     <Form.Item name="icon">
-                      <IconSelect value="AlipayCircleOutlined"></IconSelect>
+                      <IconSelect></IconSelect>
                     </Form.Item>
                   </Col>
                 </Row>

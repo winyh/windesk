@@ -16,7 +16,7 @@ const HeartSvg = () => (
 );
 
 const IconSelect = ({ onChange, value, id }) => {
-  const [icon, setIcon] = useState("ImportOutlined");
+  const [icon, setIcon] = useState("");
   const [activeKey, setActiveKey] = useState("antd");
   const { createFromIconfontCN, ...restIcons } = antdIcons;
 
@@ -28,6 +28,7 @@ const IconSelect = ({ onChange, value, id }) => {
   const onCopy = (icon) => {
     copy(`<${icon} />`);
     setIcon(icon);
+    onChange && onChange(icon);
     message.success(`已选中 <${icon} /> 成功`);
   };
 
@@ -93,10 +94,16 @@ const IconSelect = ({ onChange, value, id }) => {
   return (
     <Input
       id={id}
-      value={value}
+      value={value || icon}
       onChange={onIconChange}
       onClick={onClick}
-      addonBefore={<IconFont icon={icon || value} />}
+      addonBefore={
+        icon ? (
+          <IconFont icon={icon || value} />
+        ) : (
+          <IconFont icon="QuestionCircleOutlined" />
+        )
+      }
       placeholder="请选择图标"
     />
   );

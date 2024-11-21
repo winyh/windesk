@@ -69,8 +69,8 @@ import {
   Tree,
   TreeSelect,
   Typography,
-  Upload
-} from "antd"
+  Upload,
+} from "antd";
 
 const arr = {
   Affix,
@@ -134,26 +134,26 @@ const arr = {
   Typography,
   Upload,
   message,
-  notification
+  notification,
   // ImgPond
-}
+};
 
 const Component = ({ is, children, ...restProps }) => {
-  let NodeTag = null
+  let NodeTag = null;
 
   if (is && is.indexOf(".") !== -1) {
-    const tags = is.split(".")
-    NodeTag = arr[tags[0]][tags[1]]
+    const tags = is.split(".");
+    NodeTag = arr[tags[0]][tags[1]];
   } else {
-    NodeTag = arr[is]
+    NodeTag = arr[is];
     if (!NodeTag) {
-      console.error("is 组件类型未设定，请检查！") // 不中断程序
+      console.error("is 组件类型未设定，请检查！"); // 不中断程序
     }
   }
 
-  if (!NodeTag) return false
+  if (!NodeTag) return false;
 
-  return <NodeTag {...restProps}>{children}</NodeTag>
-}
+  return <NodeTag {...restProps}>{children}</NodeTag>;
+};
 
-export default Component
+export default Component;

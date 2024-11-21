@@ -155,6 +155,10 @@ const transBool2Str = (field) => {
   return field ? "1" : "0";
 };
 
+const transBool2num = (field) => {
+  return field ? 1 : 0;
+};
+
 export {
   isTauri,
   getCurrentYear,
@@ -166,4 +170,5 @@ export {
   genMenuToTree,
   genOptions,
   transBool2Str,
+  transBool2num,
 };
