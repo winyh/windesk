@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Input, Tabs, Row, Col, Typography } from "antd";
+import { Input, Tabs, Row, Col, Spin } from "antd";
 import * as antdIcons from "@ant-design/icons";
 import copy from "copy-to-clipboard";
 import "./index.css";
@@ -68,27 +68,38 @@ const IconSelect = ({ onChange, value, id }) => {
   ];
 
   const onTabChange = (value) => {
-    console.log({ value });
     setActiveKey(value);
   };
 
   const onClick = () => {
-    modal.confirm({
+    const content = (
+      <Tabs
+        defaultActiveKey={activeKey}
+        activeKey={activeKey}
+        items={items}
+        onChange={onTabChange}
+      />
+    );
+
+    const instance = modal.confirm({
       title: "请选择图标",
       closable: true,
       width: "50%",
       icon: <></>,
       content: (
-        <Tabs
-          defaultActiveKey={activeKey}
-          activeKey={activeKey}
-          items={items}
-          onChange={onTabChange}
-        />
+        <Spin tip="数据记载中..." spinning={true}>
+          <div className="icon-content-blank"></div>
+        </Spin>
       ),
       okText: "确定",
       cancelText: "取消",
     });
+
+    setTimeout(() => {
+      instance.update({
+        content,
+      });
+    }, 500);
   };
 
   return (

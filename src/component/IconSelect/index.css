@@ -15,3 +15,7 @@
   height: 70vh;
   overflow-y: scroll;
 }
+.icon-content-blank {
+  height: 50vh;
+  width: 100%;
+}
