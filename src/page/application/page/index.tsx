@@ -21,6 +21,7 @@ import {
 import SuperForm from "@/component/SuperForm";
 import dayjs from "dayjs";
 import { clientPost, clientPut, clientDel, clientGetList } from "@/request";
+import { message } from "@/store/hooks";
 
 const { Search } = Input;
 
@@ -110,16 +111,21 @@ const Page = () => {
           application_id: Number(appId),
         };
         if (action) {
-          const res = await clientPost("page", values);
-          if (res.status) {
+          const { status, msg } = await clientPost("page", values);
+          if (status) {
             getData();
             setOpen(false);
+            message.success(msg);
           }
         } else {
-          const res = await clientPut("page", { ...values, id: record.id });
-          if (res.status) {
+          const { status, msg } = await clientPut("page", {
+            ...values,
+            id: record.id,
+          });
+          if (status) {
             getData();
             setOpen(false);
+            message.success(msg);
           }
         }
       })

@@ -105,6 +105,7 @@ const IconSelect = ({ onChange, value, id }) => {
   return (
     <Input
       id={id}
+      readOnly
       value={value || icon}
       onChange={onIconChange}
       onClick={onClick}

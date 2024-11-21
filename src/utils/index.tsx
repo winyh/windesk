@@ -97,7 +97,7 @@ const computedWrapperCol = (labelCol) => {
   return wrapperCol;
 };
 
-const genMenuToTree = (items) => {
+const genMenuToTree = (items = []) => {
   const result = []; // 存放结果集
   const itemMap = {}; // 存放路径
 

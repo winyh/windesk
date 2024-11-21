@@ -79,7 +79,7 @@ const statesReducer = (states, action) => {
       return { ...states, isExpend: !states.isExpend };
     }
     case "load": {
-      return { ...states, loading: !states.loading };
+      return { ...states, loading: action.bool };
     }
     case "loadAdmin": {
       return { ...states, loadingAdmin: action.bool };
@@ -88,7 +88,7 @@ const statesReducer = (states, action) => {
       return { ...states, loadingMenu: !states.loadingMenu };
     }
     case "open": {
-      return { ...states, open: !states.open };
+      return { ...states, open: action.bool };
     }
     case "openAccess": {
       return { ...states, openAccess: !states.openAccess };
@@ -167,6 +167,7 @@ const Role = () => {
   const getData = (params = {}) => {
     dispatch({
       type: "load",
+      bool: true,
     });
     const { current, pageSize } = states.dataSource;
     clientGetList("role", {
@@ -186,6 +187,7 @@ const Role = () => {
           });
           dispatch({
             type: "load",
+            bool: false,
           });
         }
       })
@@ -195,6 +197,7 @@ const Role = () => {
       .finally(() => {
         dispatch({
           type: "load",
+          bool: false,
         });
       });
   };
@@ -335,12 +338,14 @@ const Role = () => {
     dispatch({ type: "action", bool: bool });
     dispatch({
       type: "open",
+      bool: true,
     });
     setRecord(record);
   };
   const onClose = () => {
     dispatch({
       type: "open",
+      bool: false,
     });
   };
 
@@ -354,6 +359,7 @@ const Role = () => {
             getData();
             dispatch({
               type: "open",
+              bool: false,
             });
           }
         } else {
@@ -362,6 +368,7 @@ const Role = () => {
             getData();
             dispatch({
               type: "open",
+              bool: false,
             });
           }
         }

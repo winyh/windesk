@@ -1,11 +1,14 @@
 import axios from "axios";
+import { redirect } from "react-router-dom";
 import { notification } from "@/store/hooks";
+
+const { BASE_URL, VITE_HTTP_URL } = import.meta.env;
 
 const apiPrefix = "/auto";
 
 // 生成请求实例
 const instance = axios.create({
-  baseURL: import.meta.env.VITE_HTTP_URL,
+  baseURL: VITE_HTTP_URL,
   timeout: 5000,
 });
 
@@ -47,12 +50,18 @@ instance.interceptors.response.use(
       });
 
       localStorage.clear();
-      let loginPath = `${window.location.origin}${
-        import.meta.env.BASE_URL
-      }login`;
+      let loginPath = `${window.location.origin}${BASE_URL}login`;
       setTimeout(() => {
         window.location.href = loginPath;
       }, 1000);
+    } else if (response?.status === 403) {
+      console.log(error);
+      notification.warning({
+        message: "系统提醒",
+        description: `${error.message}. 无权限访问!`,
+      });
+      // window.location.href = `${window.location.origin}${BASE_URL}saas/403`;
+      return redirect(`${BASE_URL}saas/403`);
     } else {
       notification.warning({
         message: "系统提醒",

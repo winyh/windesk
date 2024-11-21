@@ -324,6 +324,8 @@ const Menu = () => {
           }
         >
           <DirectoryTree
+            showLine
+            showIcon={false}
             selectedKeys={selectedKeys}
             expandedKeys={expandedKeys}
             onSelect={onSelect}

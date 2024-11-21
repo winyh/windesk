@@ -27,11 +27,6 @@ import Storage from "@/page/storage";
 import Agent from "@/page/agent";
 import Analysis from "@/page/analysis";
 
-/* 结果页 */
-import Result403 from "@/page/result/403";
-import Result404 from "@/page/result/404";
-import Result500 from "@/page/result/500";
-
 /* 账户页 */
 import Profile from "@/page/user/profile";
 import CustomeTheme from "@/page/user/theme";
@@ -349,33 +344,6 @@ const appBaseRoutes = [
         },
       },
     ],
-  },
-  {
-    path: "403",
-    element: <Result403 />,
-    meta: {
-      label: "403",
-      key: "403",
-      hide_in_menu: true,
-    },
-  },
-  {
-    path: "500",
-    element: <Result500 />,
-    meta: {
-      label: "500",
-      key: "500",
-      hide_in_menu: true,
-    },
-  },
-  {
-    path: "*",
-    element: <Result404 />,
-    meta: {
-      label: "404",
-      key: "404",
-      hide_in_menu: true,
-    },
   },
 ];
 

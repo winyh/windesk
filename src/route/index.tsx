@@ -50,7 +50,7 @@ const resultRoutes = [
 ];
 
 const saasRoutes = [...saasBaseRoutes, ...resultRoutes];
-const appRoutes = [...appBaseRoutes, ...resultRoutes];
+const appRoutes = [...appBaseRoutes];
 
 const routes = [
   {
@@ -60,7 +60,7 @@ const routes = [
       label: "主页",
       hide_in_menu: false,
     },
-    children: [],
+    children: resultRoutes,
   },
   {
     path: "saas",
