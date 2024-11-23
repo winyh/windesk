@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 const isTauri = () => {
   return Boolean(window?.__TAURI_INTERNALS__);
 };
@@ -159,6 +160,44 @@ const transBool2num = (field) => {
   return field ? 1 : 0;
 };
 
+// 表单初始值设置时间格式处理
+const setDayjsTrans = (values) => {
+  Object.keys(values).map((item) => {
+    if (
+      item === "created_at" ||
+      item === "expired_at" ||
+      item === "start_at" ||
+      item === "end_at" ||
+      item === "updated_at"
+    ) {
+      if (Array.isArray(values[item])) {
+        values.item = [dayjs(values[item][0]), dayjs(values[item][1])];
+      } else {
+        values[item] = dayjs(values[item]);
+      }
+    }
+  });
+  return values;
+};
+
+// 表单值获取时间格式处理
+const getDayjsTrans = (values, format) => {
+  Object.keys(values).map((item) => {
+    if (Array.isArray(values[item])) {
+      if (values[item][0].isDayjsObject && values[item][1].isDayjsObject) {
+        values.start_at = dayjs(values[item][0]).format(format);
+        values.end_at = dayjs(values[item][1]).format(format);
+        delete values[item];
+      }
+    } else {
+      if (values[item] && values[item].isDayjsObject) {
+        values[item] = dayjs(values[item]).format(format);
+      }
+    }
+  });
+  return values;
+};
+
 export {
   isTauri,
   getCurrentYear,
@@ -171,4 +210,6 @@ export {
   genOptions,
   transBool2Str,
   transBool2num,
+  setDayjsTrans,
+  getDayjsTrans,
 };

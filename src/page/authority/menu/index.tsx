@@ -62,11 +62,13 @@ const Menu = () => {
   }, []);
 
   const getAllMenus = async (params) => {
-    const { status, data } = await comGet("/admin/menus", { ...params });
+    const { status, data, msg } = await comGet("/admin/menus", { ...params });
     if (status) {
       setMenuData(data);
       const menuTree = genMenuToTree(data);
       setTreeData(menuTree);
+    } else {
+      message.warning(msg);
     }
   };
 
@@ -501,6 +503,86 @@ const Menu = () => {
                     <Col span={8}>
                       <Form.Item name="access_name">
                         <Input placeholder="请输入权限名称" />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                ) : null}
+
+                {menuType !== "directory" ? (
+                  <Row>
+                    <Col span={4}>权限描述：</Col>
+                    <Col span={8}>
+                      <Form.Item name="access_description">
+                        <Input placeholder="请输入权限描述" />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                ) : null}
+
+                {menuType !== "directory" ? (
+                  <Row>
+                    <Col span={4}>权限类型：</Col>
+                    <Col span={8}>
+                      <Form.Item name="access_type">
+                        <Select
+                          placeholder="请选择权限类型"
+                          options={[
+                            {
+                              label: "页面权限",
+                              value: "1",
+                            },
+                            {
+                              label: "操作权限",
+                              value: "2",
+                            },
+                            {
+                              label: "数据权限",
+                              value: "3",
+                            },
+                          ]}
+                        />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                ) : null}
+
+                {menuType === "button" ? (
+                  <Row>
+                    <Col span={4}>操作方法：</Col>
+                    <Col span={8}>
+                      <Form.Item name="access_method">
+                        <Select
+                          placeholder="请选择操作方法"
+                          options={[
+                            {
+                              label: "GET",
+                              value: "GET",
+                            },
+                            {
+                              label: "POST",
+                              value: "POST",
+                            },
+                            {
+                              label: "PUT",
+                              value: "PUT",
+                            },
+                            {
+                              label: "DELETE",
+                              value: "DELETE",
+                            },
+                          ]}
+                        />
+                      </Form.Item>
+                    </Col>
+                  </Row>
+                ) : null}
+
+                {menuType === "button" ? (
+                  <Row>
+                    <Col span={4}>访问资源：</Col>
+                    <Col span={8}>
+                      <Form.Item name="access_resource">
+                        <Input placeholder="请输入访问资源" />
                       </Form.Item>
                     </Col>
                   </Row>

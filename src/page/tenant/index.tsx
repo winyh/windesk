@@ -16,6 +16,7 @@ import { PlusOutlined } from "@ant-design/icons";
 import SuperForm from "@/component/SuperForm";
 import dayjs from "dayjs";
 import { clientPost, clientPut, clientDel, clientGetList } from "@/request";
+import { message } from "@/store/hooks";
 
 const { Search } = Input;
 
@@ -87,6 +88,9 @@ const Tenant = () => {
   const showDrawer = (bool, record) => {
     setAction(bool);
     setOpen(true);
+    if (record) {
+      record.expired_at = dayjs(record?.expired_at);
+    }
     setRecord(record);
   };
   const onClose = () => {
@@ -98,16 +102,18 @@ const Tenant = () => {
       .validateFields()
       .then(async (values) => {
         if (action) {
-          const res = await clientPost("tenant", values);
-          if (res.status) {
+          const { status, msg } = await clientPost("tenant", values);
+          if (status) {
             getData();
             setOpen(false);
+            message.success(msg);
           }
         } else {
           const res = await clientPut("tenant", { ...values, id: record.id });
-          if (res.status) {
+          if (status) {
             getData();
             setOpen(false);
+            message.success(msg);
           }
         }
       })
