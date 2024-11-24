@@ -198,6 +198,30 @@ const getDayjsTrans = (values, format) => {
   return values;
 };
 
+// 递归函数，用于将树形结构展平
+const flattenTree = (tree) => {
+  let result = [];
+
+  // 递归处理每个节点
+  const traverse = (node) => {
+    if (node) {
+      result.push(node); // 将当前节点添加到结果数组中
+      if (node.children && node.children.length > 0) {
+        for (let child of node.children) {
+          traverse(child); // 递归处理子节点
+        }
+      }
+    }
+  };
+
+  // 遍历树的根节点
+  for (let root of tree) {
+    traverse(root);
+  }
+
+  return result;
+};
+
 export {
   isTauri,
   getCurrentYear,
@@ -212,4 +236,5 @@ export {
   transBool2num,
   setDayjsTrans,
   getDayjsTrans,
+  flattenTree,
 };

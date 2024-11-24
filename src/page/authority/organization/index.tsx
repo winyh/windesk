@@ -16,7 +16,7 @@ import {
 import { PlusOutlined, ControlOutlined } from "@ant-design/icons";
 import SuperForm from "@/component/SuperForm";
 import dayjs from "dayjs";
-import { genOptions } from "@/utils";
+import { genOptions, flattenTree } from "@/utils";
 import {
   clientGetTree,
   clientPost,
@@ -40,7 +40,10 @@ const Organization = () => {
     current: 1,
     total: 10,
   });
+  const [flattenAll, setFlattenAll] = useState([]);
+  const [flattenCache, setFlattenCache] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
+  const [expandedRowKeys, setExpandedRowKeys] = useState([]);
   const [organizationOptions, setOrganizationOptions] = useState([]);
 
   useEffect(() => {
@@ -56,6 +59,8 @@ const Organization = () => {
       .then((res) => {
         if (res.status) {
           const { list, total, current, pageSize } = res.data;
+          const flatten = flattenTree(list);
+          setFlattenCache(flatten.map((item) => item.id));
           setPaginationMeta({
             pageSize: pageSize,
             current: current,
@@ -355,6 +360,24 @@ const Organization = () => {
 
   const onCancel = () => {};
 
+  const expandable = {
+    expandedRowKeys: flattenAll,
+    onExpand: (expanded, record) => {
+      console.log(expanded, record);
+    },
+    onExpandedRowsChange: (expandedRows) => {
+      const keys = flattenTree(expandedRows);
+      console.log({ expandedRows, keys });
+      setFlattenAll(keys);
+      setExpandedRowKeys(keys);
+    },
+  };
+
+  const onExpendFold = () => {
+    const bool = flattenAll.length > 0 ? false : true;
+    setFlattenAll(bool ? flattenCache : []);
+  };
+
   return (
     <>
       <Flex vertical gap="middle">
@@ -362,7 +385,9 @@ const Organization = () => {
           <Button icon={<PlusOutlined />} onClick={() => showDrawer(true)}>
             新增组织
           </Button>
-          <Button icon={<ControlOutlined />}>展开折叠</Button>
+          <Button icon={<ControlOutlined />} onClick={onExpendFold}>
+            {flattenAll.length > 0 ? "折叠" : "展开"}
+          </Button>
           {selectedRows.length > 0 ? (
             <Popconfirm
               title="系统提醒"
@@ -390,6 +415,7 @@ const Organization = () => {
           rowKey={(record) => record.id}
           dataSource={dataSource}
           columns={columns}
+          expandable={expandable}
           pagination={
             dataSource.length > 0 && {
               position: ["bottomCenter"],
