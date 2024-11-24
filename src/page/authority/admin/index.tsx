@@ -59,6 +59,7 @@ const Admin = () => {
   const [roles, setRoles] = useState([]);
   const [positions, setPositions] = useState([]);
   const [organizationOptions, setOrganizationOptions] = useState([]);
+  const [tenantOptions, setTenantOptions] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const { modal } = App.useApp();
 
@@ -70,6 +71,7 @@ const Admin = () => {
     getOrganizations();
     getPositions();
     getRoles();
+    getTenants();
   }, []);
 
   const getData = (params = {}) => {
@@ -110,6 +112,23 @@ const Admin = () => {
           const data = res.data;
           const tree = genOptions(data);
           setOrganizationOptions(tree);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {});
+  };
+
+  const getTenants = () => {
+    clientGetAll("tenant", {})
+      .then((res) => {
+        if (res.status) {
+          const data = res.data.map((item) => ({
+            label: item.name,
+            value: item.id,
+          }));
+          setTenantOptions(data);
         }
       })
       .catch((err) => {
@@ -179,12 +198,14 @@ const Admin = () => {
           if (res.status) {
             getData();
             setOpen(false);
+            message.success(res.msg);
           }
         } else {
           const res = await clientPut("admin", { ...values, id: record.id });
           if (res.status) {
             getData();
             setOpen(false);
+            message.success(res.msg);
           }
         }
       })
@@ -329,6 +350,14 @@ const Admin = () => {
       is: "Input",
       itemSpan: 24,
       placeholder: "请输入邮箱",
+    },
+    {
+      label: "租户",
+      name: "tenant_id",
+      is: "Select",
+      itemSpan: 24,
+      placeholder: "请选择租户",
+      options: tenantOptions,
     },
     {
       label: "组织部门",

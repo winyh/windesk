@@ -89,6 +89,15 @@ const LayoutBase = () => {
   const inputRef = useRef(null);
   const toggleTheme = useStore((state) => state.toggleTheme);
 
+  useEffect(() => {
+    // console.log(`路由变化监听：${location.pathname}`);
+    if (location.pathname === "/" || location.pathname === "/saas") {
+      navigate("/saas/dashboard");
+    } else {
+      onRouteChange();
+    }
+  }, [location.pathname]);
+
   const logout = async () => {
     try {
       const { data, status } = await logoutService();
@@ -179,15 +188,6 @@ const LayoutBase = () => {
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
   };
-
-  useEffect(() => {
-    // console.log(`路由变化监听：${location.pathname}`);
-    if (location.pathname === "/") {
-      navigate("/saas/dashboard");
-    } else {
-      onRouteChange();
-    }
-  }, [location.pathname]);
 
   /* 路由变化监听 */
   const onRouteChange = () => {

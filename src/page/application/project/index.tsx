@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   EditOutlined,
   DesktopOutlined,
@@ -34,7 +34,13 @@ import {
   Popconfirm,
 } from "antd";
 import SuperForm from "@/component/SuperForm";
-import { clientPost, clientPut, clientDel, clientGetList } from "@/request";
+import {
+  clientPost,
+  clientPut,
+  clientDel,
+  clientGetList,
+  clientGetAll,
+} from "@/request";
 import appLogo from "@/assets/react.svg";
 
 const { Paragraph, Text } = Typography;
@@ -43,6 +49,7 @@ const { Search } = Input;
 
 const Project = () => {
   const formRef = useRef();
+  const navigate = useNavigate();
   const [appType, setAppType] = useState("create");
   const [action, setAction] = useState(true);
   const [record, setRecord] = useState({});
@@ -51,6 +58,7 @@ const Project = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [tenantOptions, setTenantOptions] = useState([]);
   const [paginationMeta, setPaginationMeta] = useState({
     pageSize: 10,
     current: 1,
@@ -62,6 +70,7 @@ const Project = () => {
       current: 1,
       pageSize: 10,
     });
+    getTenants();
   }, []);
 
   const getData = (params = {}) => {
@@ -92,6 +101,23 @@ const Project = () => {
       });
   };
 
+  const getTenants = () => {
+    clientGetAll("tenant", {})
+      .then((res) => {
+        if (res.status) {
+          const data = res.data.map((item) => ({
+            label: item.name,
+            value: item.id,
+          }));
+          setTenantOptions(data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {});
+  };
+
   const onSearch = (value) => {
     getData({ name: value });
   };
@@ -104,6 +130,7 @@ const Project = () => {
 
   const onDesign = (item) => {
     console.log({ item });
+    navigate(`/app/${item.id}/dashboard`);
   };
 
   const onClose = () => {
@@ -161,32 +188,40 @@ const Project = () => {
 
   const formData = [
     {
-      label: "项目名称",
+      label: "应用名称",
       name: "name",
       is: "Input",
       itemSpan: 24,
-      placeholder: "请输入项目名称",
+      placeholder: "请输入应用名称",
     },
     {
-      label: "项目描述",
+      label: "应用描述",
       name: "description",
       is: "Input.TextArea",
       itemSpan: 24,
-      placeholder: "请输入项目描述",
+      placeholder: "请输入应用描述",
     },
     {
-      label: "项目标识",
+      label: "应用标识",
       name: "app_code",
       is: "Input",
       itemSpan: 24,
-      placeholder: "请输入项目标识",
+      placeholder: "请输入应用标识",
     },
     {
-      label: "项目域名",
+      label: "应用域名",
       name: "domain",
       is: "Input",
       itemSpan: 24,
       placeholder: "请输入自定义域名",
+    },
+    {
+      label: "所属租户",
+      name: "tenant_id",
+      is: "Select",
+      itemSpan: 24,
+      placeholder: "请选择租户",
+      options: tenantOptions,
     },
     {
       label: "数据库源",
@@ -258,7 +293,7 @@ const Project = () => {
     return [
       {
         key: "edit",
-        label: "项目配置",
+        label: "应用配置",
         icon: <SettingOutlined />,
         onClick: () => onAppConfig(item),
       },
@@ -267,7 +302,7 @@ const Project = () => {
       },
       {
         key: "export",
-        label: "项目导出",
+        label: "应用导出",
         icon: <ExportOutlined />,
         onClick: () => onAppExport(item),
       },
@@ -276,7 +311,7 @@ const Project = () => {
       },
       {
         key: "copy",
-        label: "项目复制",
+        label: "应用复制",
         icon: <DiffOutlined />,
         onClick: () => onAppCopy(item),
       },
@@ -297,12 +332,12 @@ const Project = () => {
         label: (
           <Popconfirm
             title="系统提醒"
-            description="您确认要删除项目吗?"
+            description="您确认要删除应用吗?"
             onConfirm={() => onAppDetete(item)}
             okText="确认"
             cancelText="取消"
           >
-            项目删除
+            应用删除
           </Popconfirm>
         ),
         icon: <DeleteOutlined />,
@@ -313,10 +348,10 @@ const Project = () => {
 
   const actions = (item) => {
     return [
-      <Tooltip key="design" title="项目设计">
+      <Tooltip key="design" title="应用设计">
         <DesktopOutlined onClick={() => onDesign(item)} />
       </Tooltip>,
-      <Tooltip key="setting" title="项目修改">
+      <Tooltip key="setting" title="应用修改">
         <EditOutlined onClick={() => showDrawer(false, item)} />
       </Tooltip>,
       <Dropdown
@@ -334,7 +369,7 @@ const Project = () => {
 
   const showModal = () => {
     modal.confirm({
-      title: "导入项目",
+      title: "导入应用",
       closable: true,
       maskClosable: true,
       icon: <span></span>,
@@ -348,7 +383,7 @@ const Project = () => {
               <InboxOutlined />
             </p>
             <p className="ant-upload-text">点击或拖动文件到此区域上传</p>
-            <p className="ant-upload-hint">可支持单项目或多项目文件同时导入</p>
+            <p className="ant-upload-hint">可支持单应用或多应用文件同时导入</p>
           </Dragger>
         </Flex>
       ),
@@ -375,10 +410,10 @@ const Project = () => {
       <Flex vertical gap="middle">
         <Space size="middle">
           <Button icon={<PlusOutlined />} onClick={() => showDrawer(true)}>
-            新建项目
+            新建应用
           </Button>
           <Button icon={<ImportOutlined />} onClick={showModal}>
-            导入项目
+            导入应用
           </Button>
           <Segmented
             options={[
@@ -395,7 +430,7 @@ const Project = () => {
             onChange={onSegmentedChange}
           />
           <Search
-            placeholder="搜索项目名称"
+            placeholder="搜索应用名称"
             loading={loading}
             allowClear
             onSearch={onSearch}
@@ -419,7 +454,7 @@ const Project = () => {
                   ></Badge>
                 }
               >
-                <Link to={`/app/${item.id}/dashboard`}>
+                <Link to={`http://${item.domain}`} target="_blank">
                   <Card.Meta
                     avatar={<img src={item.logo || appLogo} />}
                     description={
@@ -466,7 +501,7 @@ const Project = () => {
       </Flex>
 
       <Drawer
-        title={`${action ? "新增" : "编辑"}项目`}
+        title={`${action ? "新增" : "编辑"}应用`}
         onClose={onClose}
         open={open}
         footer={

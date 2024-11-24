@@ -15,7 +15,7 @@ const Analysis = () => {
   return (
     <Row gutter={24}>
       <Col span={6}>
-        <Card title="项目总数">
+        <Card title="应用总数">
           <p>数据分析-（内容可以暂时放控制台，多了再开放这个）</p>
           <p>Card content</p>
           <p>Card content</p>

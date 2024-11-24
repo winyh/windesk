@@ -199,7 +199,7 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
             />
 
             <Divider orientation="left" orientationMargin={0}>
-              项目参考
+              应用参考
             </Divider>
             <Flex gap={48} wrap>
               {stackList.map((item) => {

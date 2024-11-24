@@ -282,7 +282,7 @@ const Role = () => {
       });
       dispatch({
         type: "check",
-        bool: menuData.length > data.length ? false : true,
+        bool: menuData.length >= data.length ? false : true,
       });
     }
   };
@@ -597,7 +597,7 @@ const Role = () => {
     // 1.将选中的用户id 存入到 admin_role
     const { selectedRoleAdmin } = states;
     const { data, status, msg } = await comPut("/admin/role/admin_role", {
-      admin_ids: selectedRoleAdmin,
+      admin_ids: selectedRoleAdmin.map((item) => item.id),
       role_id: record.id,
     });
 
