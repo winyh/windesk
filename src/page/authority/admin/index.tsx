@@ -27,6 +27,7 @@ import {
 import SuperForm from "@/component/SuperForm";
 import dayjs from "dayjs";
 import { genOptions } from "@/utils";
+import { encryptData } from "@/utils/crypto";
 import {
   comPost,
   comDel,
@@ -229,6 +230,18 @@ const Admin = () => {
           return;
         }
         console.log({ values });
+        // 密码加密
+        const encryptPassword = encryptData(values?.password, "win");
+        const encryptNewPassword = encryptData(values?.new_password, "win");
+        const encryptConfirmPassword = encryptData(
+          values?.confirm_password,
+          "win"
+        );
+        values.password = encryptPassword;
+        values.new_password = encryptNewPassword;
+        values.confirm_password = encryptConfirmPassword;
+        // 密码加密
+
         comPost("/admin/password/change", {
           user_id: record.id,
           ...values,

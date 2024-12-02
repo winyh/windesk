@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, Button, Form, Input, theme, Image, App } from "antd";
 import { getAdminService, loginService } from "@/service/index";
+import { encryptData } from "@/utils/crypto";
 import { TranslationOutlined } from "@ant-design/icons";
 import logo from "@/assets/img/winbase.png";
 import "./style.css";
@@ -26,6 +27,10 @@ const Login = () => {
   const onFinish = async (values) => {
     try {
       setLoading(true);
+      // 密码加密
+      const encryptPassword = encryptData(values?.password, "win");
+      values.password = encryptPassword;
+      // 密码加密
       const { data, status, msg } = await loginService(values);
       if (status) {
         notification.success({

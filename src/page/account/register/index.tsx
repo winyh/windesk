@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, Button, Form, Input, Image, App, theme } from "antd";
 import { registerService } from "@/service/index";
+import { encryptData } from "@/utils/crypto";
 import logo from "@/assets/img/winbase.png";
 import "./style.css";
 
@@ -17,6 +18,16 @@ const Register = () => {
   const onFinish = async (values) => {
     try {
       setLoading(true);
+      // 密码加密
+      const encryptPassword = encryptData(values?.password, "win");
+      const encryptConfirmPassword = encryptData(
+        values?.confirm_password,
+        "win"
+      );
+      values.password = encryptPassword;
+      values.confirm_password = encryptConfirmPassword;
+      // 密码加密
+
       let { data, status, msg } = await registerService(values);
       if (status) {
         notification.success({
