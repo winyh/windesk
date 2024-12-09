@@ -150,11 +150,11 @@ const Page = () => {
       placeholder: "请输入页面名称",
     },
     {
-      label: "标识",
+      label: "页面标识",
       name: "page_code",
       is: "Input",
       itemSpan: 24,
-      placeholder: "请输入标识",
+      placeholder: "请输入页面标识",
     },
     {
       label: "页面描述",
@@ -162,6 +162,23 @@ const Page = () => {
       is: "Input.TextArea",
       itemSpan: 24,
       placeholder: "请输入页面描述",
+    },
+    {
+      label: "页面分类",
+      name: "page_type",
+      is: "Select",
+      itemSpan: 24,
+      placeholder: "请选择页面分类",
+      options: [
+        {
+          label: "后台页面",
+          value: "",
+        },
+        {
+          label: "小程序页面",
+          value: "",
+        },
+      ],
     },
     {
       label: "状态",

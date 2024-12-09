@@ -41,6 +41,9 @@ import {
   clientGetList,
   clientGetAll,
 } from "@/request";
+
+import { Storage } from "@/utils/storage";
+
 import appLogo from "@/assets/react.svg";
 
 const { Paragraph, Text } = Typography;
@@ -129,7 +132,7 @@ const Project = () => {
   };
 
   const onDesign = (item) => {
-    console.log({ item });
+    Storage.setItem("app", item);
     navigate(`/app/${item.id}/dashboard`);
   };
 

@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, Button, Form, Input, theme, Image, App } from "antd";
 import { getAdminService, loginService } from "@/service/index";
 import { encryptData } from "@/utils/crypto";
+import { Storage } from "@/utils/storage";
 import { TranslationOutlined } from "@ant-design/icons";
 import logo from "@/assets/img/winbase.png";
 import "./style.css";
@@ -19,7 +20,7 @@ const Login = () => {
   } = theme.useToken();
 
   useEffect(() => {
-    // localStorage.removeItem("token");
+    // Storage.removeItem("token");
   }, []);
 
   const pageRoute = redirect ? redirect : "/saas/dashboard";
@@ -39,7 +40,7 @@ const Login = () => {
             redirect ? "退出前页面" : "系统首页"
           }`,
         });
-        localStorage.setItem("token", data.token);
+        Storage.setItem("token", data.token);
         setTimeout(() => {
           setLoading(false);
           navigate(pageRoute);

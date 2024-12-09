@@ -1,5 +1,6 @@
 import { theme as config } from "antd";
-const themeMode = localStorage.getItem("themeMode");
+import { Storage } from "@/utils/storage";
+const themeMode = Storage.getItem("themeMode");
 let { darkAlgorithm, defaultAlgorithm } = config;
 let algorithm = themeMode === "dark" ? darkAlgorithm : defaultAlgorithm;
 

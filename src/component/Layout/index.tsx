@@ -52,6 +52,7 @@ import {
   getMenuSome,
 } from "@/utils/index";
 import { saasRoutes, appRoutes, routes } from "@/route/index";
+import { Storage } from "@/utils/storage";
 import winbaseLogo from "/winbase.png";
 import "./index.css";
 
@@ -102,7 +103,7 @@ const LayoutBase = () => {
     try {
       const { data, status } = await logoutService();
       if (status) {
-        localStorage.removeItem("token");
+        Storage.removeItem("token");
         const { pathname, search } = window.location;
         message.open({
           type: "loading",
@@ -201,10 +202,14 @@ const LayoutBase = () => {
 
     let someMenu = getMenuSome(routes);
     let breads: any[] = [];
-    var linkPath = "";
+    let linkPath = "";
+    let appInfo = Storage.getItem("app");
     keyPaths.map((key, _) => {
       linkPath = `${linkPath}/${key}`.replace(/\/\/+/g, "/");
-      const label = findObjByKey(someMenu, key, "key")?.label;
+      let label = findObjByKey(someMenu, key, "key")?.label;
+      if (!label && Number(key) === appInfo?.id) {
+        label = appInfo?.name;
+      }
       let curentPath = linkPath;
       breads.push({
         title: <Link to={`${curentPath}`}>{label}</Link>,
@@ -213,6 +218,8 @@ const LayoutBase = () => {
         },
       });
     });
+
+    console.log({ breads });
 
     setOpenKeys(keyPaths); // 初始展开
     setSelectedKeys(keyPaths); // 更新左侧导航选中
@@ -272,7 +279,7 @@ const LayoutBase = () => {
 
   const onSwitchMode = () => {
     let newMode = mode === "light" ? "dark" : "light";
-    localStorage.setItem("themeMode", newMode);
+    Storage.setItem("themeMode", newMode);
     setMode(newMode);
     toggleTheme(newMode);
   };

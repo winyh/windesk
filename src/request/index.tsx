@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Storage } from "@/utils/storage";
 import { notification, navigate } from "@/store/hooks";
 
 const { BASE_URL, VITE_HTTP_URL } = import.meta.env;
@@ -14,7 +15,7 @@ const instance = axios.create({
 // 添加请求拦截器
 instance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token") || "";
+    const token = Storage.getItem("token") || "";
     config.headers.Authorization = "Bearer " + token;
     // 在发送请求之前做些什么
     return config;
@@ -49,7 +50,7 @@ instance.interceptors.response.use(
         description: `${error.message}. 未授权，请联系管理员!`,
       });
 
-      localStorage.clear();
+      Storage.clear();
       let loginPath = `${BASE_URL}login`;
 
       setTimeout(() => {

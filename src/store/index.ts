@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { Storage } from "@/utils/storage";
 
 type Store = {
   count: number;
@@ -7,7 +8,7 @@ type Store = {
   toggleTheme: (mode: any) => void;
 };
 
-const themeMode = localStorage.getItem("themeMode") || "light"; // 默认light
+const themeMode = Storage.getItem("themeMode") || "light"; // 默认light
 
 const useStore = create<Store>()((set) => ({
   count: 1,

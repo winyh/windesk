@@ -13,6 +13,7 @@ import {
 } from "antd";
 
 import {
+  HomeOutlined,
   ApiOutlined,
   ReadOutlined,
   GithubOutlined,
@@ -28,7 +29,7 @@ import reactLogo from "@/assets/react.svg";
 import vueLogo from "@/assets/vue.svg";
 import angularLogo from "@/assets/angular.svg";
 
-const { Text } = Typography;
+const { Text, Link } = Typography;
 const { Meta } = Card;
 
 const { BASE_URL } = import.meta.env;
@@ -162,6 +163,18 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
             }
           >
             <Flex vertical gap={36}>
+              <Flex gap={24} justify="space-between">
+                <span>管理URL</span>
+                <Space>
+                  <Input value={appInfo.appUrl} style={{ width: 300 }} />
+                  <Button>
+                    <Link href="https://admin.winbase.io" target="_blank">
+                      <HomeOutlined />
+                    </Link>
+                  </Button>
+                </Space>
+              </Flex>
+
               <Flex gap={24} justify="space-between">
                 <span>应用URL</span>
                 <Space>
