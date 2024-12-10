@@ -133,7 +133,7 @@ const Project = () => {
 
   const onDesign = (item) => {
     Storage.setItem("app", item);
-    navigate(`/app/${item.id}/dashboard`);
+    navigate(`/app/${item.uid}/dashboard`);
   };
 
   const onClose = () => {

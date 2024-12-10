@@ -1,4 +1,4 @@
-const prefix = "/admin"
+const prefix = "/admin";
 
 const api = {
   menu: prefix + "/menus", // 菜单查询
@@ -9,7 +9,7 @@ const api = {
   logout: prefix + "/logout", // 退出登录
   dashboard: prefix + "/dashboard", // 看板数据,
   export: prefix + "/record/export", // 客户意向导出
-  records: prefix + "/records" // 客户意向列表-修改-详情
-}
+  records: prefix + "/records", // 客户意向列表-修改-详情,
+};
 
-export default api
+export default api;

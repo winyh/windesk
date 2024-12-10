@@ -44,6 +44,8 @@ import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import useStore from "@/store/index";
 import { logoutService } from "@/service/index";
+import { clientGetOneByUid, clientGetAll } from "@/request";
+
 import {
   isTauri,
   getCurrentYear,
@@ -61,8 +63,6 @@ const { BASE_URL } = import.meta.env;
 const { Header, Footer, Sider, Content } = Layout;
 const { Text } = Typography;
 
-let index = 0;
-
 const LayoutBase = () => {
   const {
     token: { colorBgContainer, colorText, borderRadiusLG },
@@ -74,6 +74,7 @@ const LayoutBase = () => {
   const { message } = App.useApp();
 
   const [menuItems, setMenuItems] = useState([]);
+  const [currentApp, setCurrentApp] = useState([]);
   const [breadcrumbItems, setBreadcrumbItems] = useState<any>([]);
   const [openKeys, setOpenKeys] = useState<any>([]);
   const [selectedKeys, setSelectedKeys] = useState<any>([]);
@@ -83,12 +84,16 @@ const LayoutBase = () => {
   const [isContentFull, setIsContentFull] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
 
-  const [applications, setApplications] = useState(["应用A", "应用B"]);
+  const [applications, setApplications] = useState([]);
   const [name, setName] = useState("");
   const [open, setOpen] = useState(false);
 
   const inputRef = useRef(null);
   const toggleTheme = useStore((state) => state.toggleTheme);
+
+  useEffect(() => {
+    getApps();
+  }, []);
 
   useEffect(() => {
     // console.log(`路由变化监听：${location.pathname}`);
@@ -98,6 +103,54 @@ const LayoutBase = () => {
       onRouteChange();
     }
   }, [location.pathname]);
+
+  const getApps = async (params) => {
+    const { status, data } = await clientGetAll("application", params);
+    if (status) {
+      console.log({ data });
+      setApplications(data);
+    }
+  };
+
+  const getCurrentApp = async () => {
+    // 获取当前应用信息
+
+    try {
+      // 1.判断当前应用UID是否存在
+      if (!params?.appId) {
+        return;
+      }
+
+      let appInfo = Storage.getItem("app");
+      // 2.本地app存在时，则比对参数，相同则不处理，不通则请求获取存本地
+      if (appInfo) {
+        if (appInfo?.uid !== params?.appId) {
+          const { status, data } = await clientGetOneByUid(
+            "application",
+            params.appId
+          );
+          if (status && data) {
+            Storage.setItem("app", data);
+            return data;
+          }
+        } else {
+          return appInfo;
+        }
+      } else {
+        // 3.本地app不存在时，则通过参数请求获取，然后把数据存本地
+        const { status, data } = await clientGetOneByUid(
+          "application",
+          params.appId
+        );
+        if (status && data) {
+          Storage.setItem("app", data);
+          return data;
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const logout = async () => {
     try {
@@ -179,11 +232,7 @@ const LayoutBase = () => {
 
   const addItem = (e) => {
     e.preventDefault();
-    setApplications([...applications, name || `新应用 ${index++}`]);
-    setName("");
-    setTimeout(() => {
-      inputRef.current?.focus();
-    }, 0);
+    navigate("/saas/project");
   };
 
   const toggleCollapsed = () => {
@@ -191,7 +240,7 @@ const LayoutBase = () => {
   };
 
   /* 路由变化监听 */
-  const onRouteChange = () => {
+  const onRouteChange = async () => {
     let curentRoutes = saasRoutes;
     if (location.pathname.includes("/app")) {
       curentRoutes = appRoutes;
@@ -203,11 +252,15 @@ const LayoutBase = () => {
     let someMenu = getMenuSome(routes);
     let breads: any[] = [];
     let linkPath = "";
-    let appInfo = Storage.getItem("app");
+
+    const appInfo = await getCurrentApp();
+
+    setCurrentApp(appInfo);
+
     keyPaths.map((key, _) => {
       linkPath = `${linkPath}/${key}`.replace(/\/\/+/g, "/");
       let label = findObjByKey(someMenu, key, "key")?.label;
-      if (!label && Number(key) === appInfo?.id) {
+      if (!label && appInfo && key === appInfo?.uid) {
         label = appInfo?.name;
       }
       let curentPath = linkPath;
@@ -218,8 +271,6 @@ const LayoutBase = () => {
         },
       });
     });
-
-    console.log({ breads });
 
     setOpenKeys(keyPaths); // 初始展开
     setSelectedKeys(keyPaths); // 更新左侧导航选中
@@ -303,6 +354,15 @@ const LayoutBase = () => {
     setOpen(false);
   };
 
+  const onAppChange = (key) => {
+    applications.map((item) => {
+      if (item?.id === key) {
+        setCurrentApp(item);
+        navigate(`/app/${item?.uid}/dashboard`);
+      }
+    });
+  };
+
   return (
     <Layout
       style={{
@@ -377,7 +437,8 @@ const LayoutBase = () => {
                     style={{
                       width: 180,
                     }}
-                    defaultValue="应用A"
+                    value={currentApp?.id}
+                    defaultValue={currentApp?.id}
                     placeholder="请选择应用"
                     dropdownRender={(menu) => (
                       <>
@@ -398,9 +459,10 @@ const LayoutBase = () => {
                       </>
                     )}
                     options={applications.map((item) => ({
-                      label: item,
-                      value: item,
+                      label: item?.name,
+                      value: item?.id,
                     }))}
+                    onChange={onAppChange}
                   />
                 )}
 

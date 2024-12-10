@@ -86,6 +86,39 @@ const Common = () => {
     },
   ];
 
+  const formFunction = [
+    {
+      label: "链接名",
+      name: "username",
+      is: "Input",
+      placeholder: "请输入链接名",
+    },
+    {
+      label: "主机",
+      name: "host",
+      is: "Input",
+      placeholder: "请输入主机",
+    },
+    {
+      label: "端口",
+      name: "port",
+      is: "Input",
+      placeholder: "请输入端口",
+    },
+    {
+      label: "账户名",
+      name: "username",
+      is: "Input",
+      placeholder: "请输入账户名",
+    },
+    {
+      label: "密码",
+      name: "password",
+      is: "Input.Password",
+      placeholder: "请输入密码",
+    },
+  ];
+
   const formStorage = [
     {
       label: "存储平台",
@@ -247,7 +280,7 @@ const Common = () => {
     {
       label: `云函数`,
       key: "function",
-      children: <div style={{ width: 500 }}> {form(formBase)}</div>,
+      children: <div style={{ width: 500 }}> {form(formFunction)}</div>,
     },
     {
       label: `文件存储`,

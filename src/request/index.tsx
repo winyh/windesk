@@ -115,6 +115,10 @@ const clientGetOne = (collection, recordId, params) => {
   return comGet(`${apiPrefix}/${collection}/${recordId}`, params);
 };
 
+const clientGetOneByUid = (collection, recordId, params) => {
+  return comGet(`${apiPrefix}/${collection}/uid/${recordId}`, params);
+};
+
 const clientGetAll = (collection, params) => {
   return comGet(`${apiPrefix}/${collection}`, params);
 };
@@ -152,6 +156,7 @@ export {
   comPut,
   comGetFile,
   clientGetOne,
+  clientGetOneByUid,
   clientGetAll,
   clientGetTree,
   clientGetList,
