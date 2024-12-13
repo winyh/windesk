@@ -36,6 +36,7 @@ import {
 import SuperForm from "@/component/SuperForm";
 import {
   clientPost,
+  comPost,
   clientPut,
   clientDel,
   clientGetList,
@@ -125,9 +126,10 @@ const Project = () => {
     getData({ name: value });
   };
 
-  const showDrawer = (bool, record) => {
+  const showDrawer = (bool, record = {}) => {
     setAction(bool);
     setOpen(true);
+    bool ? (record.status = "1") : null;
     setRecord(record);
   };
 
@@ -145,7 +147,7 @@ const Project = () => {
       .validateFields()
       .then(async (values) => {
         if (action) {
-          const res = await clientPost("application", values);
+          const res = await comPost("/admin/application", values);
           if (res.status) {
             getData();
             setOpen(false);
@@ -235,6 +237,55 @@ const Project = () => {
       placeholder: "请选择数据库",
     },
     {
+      label: "数据库类型",
+      name: "database_type",
+      is: "Select",
+      itemSpan: 24,
+      options: [
+        {
+          label: "MySQL",
+          value: "mysql",
+        },
+        {
+          label: "PostgreSQL",
+          value: "postgresql",
+        },
+        {
+          label: "MongoDB",
+          value: "mongodb",
+        },
+      ],
+      placeholder: "请选择数据库类型",
+    },
+    {
+      label: "用户名",
+      name: "database_user",
+      is: "Input",
+      itemSpan: 24,
+      placeholder: "请输入数据库用户名",
+    },
+    {
+      label: "密码",
+      name: "database_password",
+      is: "Input",
+      itemSpan: 24,
+      placeholder: "请输入数据库密码",
+    },
+    {
+      label: "主机",
+      name: "database_host",
+      is: "Input",
+      itemSpan: 24,
+      placeholder: "请输入数据库主机",
+    },
+    {
+      label: "端口",
+      name: "database_port",
+      is: "Input",
+      itemSpan: 24,
+      placeholder: "请输入数据库端口",
+    },
+    {
       label: "数据库名",
       name: "database",
       is: "Input",
@@ -242,11 +293,17 @@ const Project = () => {
       placeholder: "请输入数据库名",
     },
     {
-      label: "密码",
-      name: "database",
-      is: "Input",
+      label: "数据模型",
+      name: "schema",
+      is: "Select",
       itemSpan: 24,
-      placeholder: "请输入数据库密码",
+      options: [
+        {
+          label: "Public",
+          value: "public",
+        },
+      ],
+      placeholder: "请选择数据模型",
     },
     {
       label: "状态",
