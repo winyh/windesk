@@ -87,7 +87,7 @@ const Parameter = () => {
   const navigate = useNavigate();
   const { BASE_URL } = import.meta.env;
   const goHome = () => {
-    navigate(`${BASE_URL}dashboard`);
+    navigate(`${BASE_URL}saas`);
   };
   return (
     <>

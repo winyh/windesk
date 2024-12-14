@@ -10,7 +10,7 @@ const { BASE_URL } = import.meta.env;
 const Entry = () => {
   const navigate = useNavigate();
   const goHome = () => {
-    navigate(`${BASE_URL}dashboard`);
+    navigate(`${BASE_URL}saas`);
   };
 
   const onChange = (key) => {
