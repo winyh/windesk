@@ -107,7 +107,6 @@ const LayoutBase = () => {
   const getApps = async (params) => {
     const { status, data } = await clientGetAll("application", params);
     if (status) {
-      console.log({ data });
       setApplications(data);
     }
   };

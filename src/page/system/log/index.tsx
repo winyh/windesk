@@ -1,10 +1,19 @@
+import dayjs from "dayjs";
 import { useState, useEffect } from "react";
-import { Tabs, Table, Tag, Button } from "antd";
+import { Tabs, Table, Tag, Button, Typography, Popconfirm } from "antd";
+import { useNavigate } from "react-router-dom";
 import "./index.less";
 import { comGet } from "@/request";
-import dayjs from "dayjs";
+import { logoutService } from "@/service/index";
+import { Storage } from "@/utils/storage";
+import { message } from "@/store/hooks";
+
+const { Text } = Typography;
 const Log = () => {
+  const navigate = useNavigate();
+
   const [activeKey, setActiveKey] = useState("operate");
+  const [loading, setLoading] = useState(false);
   const [operateDataSource, setOperateDataSource] = useState([]);
   const [accountDataSource, setAccountDataSource] = useState([]);
   const [paginationMeta, setPaginationMeta] = useState({
@@ -22,78 +31,14 @@ const Log = () => {
   }, []);
 
   const getLogData = async (params) => {
+    setLoading(true);
     const res = await comGet("/admin/log/list", { ...params });
     if (res.status) {
       const { list, total, current, pageSize } = res.data;
-
       if (params.log === "operate") {
-        let data = list.map((item) => {
-          const [
-            timestamp,
-            type,
-            level,
-            device,
-            ip,
-            method,
-            path,
-            query,
-            browser,
-            os,
-            cpu,
-            time,
-            status,
-          ] = item.split(/\s+/);
-          return {
-            timestamp,
-            type,
-            level,
-            device,
-            ip,
-            method,
-            path,
-            query,
-            browser,
-            os,
-            cpu,
-            time,
-            status,
-          };
-        });
-        setOperateDataSource(data);
+        setOperateDataSource(list);
       } else {
-        let data = list.map((item) => {
-          const [
-            timestamp,
-            type,
-            level,
-            device,
-            ip,
-            method,
-            path,
-            query,
-            browser,
-            os,
-            cpu,
-            time,
-            status,
-          ] = item.split(/\s+/);
-          return {
-            timestamp,
-            type,
-            level,
-            device,
-            ip,
-            method,
-            path,
-            query,
-            browser,
-            os,
-            cpu,
-            time,
-            status,
-          };
-        });
-        setAccountDataSource(data);
+        setAccountDataSource(list);
       }
 
       setPaginationMeta({
@@ -101,6 +46,31 @@ const Log = () => {
         current: current,
         total: total,
       });
+      setLoading(false);
+    } else {
+      setLoading(false);
+    }
+  };
+
+  //  强制退出
+  const onForceLogout = async (row) => {
+    try {
+      const { data, status } = await logoutService();
+      if (status) {
+        Storage.removeItem("token");
+        const { pathname, search } = window.location;
+        message.open({
+          type: "loading",
+          content: "即将强制退出登录!",
+          duration: 0,
+        });
+        setTimeout(() => {
+          message.destroy();
+          navigate(`/login?redirect=${pathname}${search}`);
+        }, 1000);
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -121,14 +91,37 @@ const Log = () => {
     //   key: "module", // 登录、用户管理、系统日志等
     // },
     {
+      title: "操作地点",
+      dataIndex: "location",
+      key: "location",
+      render: (text) => (text ? text : "未知"),
+    },
+    {
       title: "操作 IP",
       dataIndex: "ip",
       key: "ip",
     },
     {
-      title: "操作地点",
-      dataIndex: "location",
-      key: "location",
+      title: "请求路径",
+      dataIndex: "path",
+      key: "path",
+    },
+    {
+      title: "请求方法",
+      dataIndex: "method",
+      key: "method",
+    },
+    {
+      title: "查询参数",
+      dataIndex: "query",
+      key: "query",
+      render: (text) => {
+        return (
+          <Text style={{ width: 100 }} ellipsis={{ tooltip: text }}>
+            {text}
+          </Text>
+        );
+      },
     },
     {
       title: "耗时",
@@ -150,7 +143,7 @@ const Log = () => {
       title: "状态",
       dataIndex: "status",
       key: "status", // 成功、失败
-      render: (text) => <Tag color="green">{text ? text : "未知"}</Tag>,
+      render: (text) => <Tag color={text > 300 ? "red" : "green"}>{text}</Tag>,
     },
     {
       title: "操作时间",
@@ -163,28 +156,33 @@ const Log = () => {
   const accountColumns = [
     {
       title: "会话编号",
-      dataIndex: "code",
-      key: "code",
+      dataIndex: "session",
+      key: "session",
     },
     {
-      title: "登录昵称",
-      dataIndex: "nick_name",
-      key: "nick_name",
+      title: "用户账号",
+      dataIndex: "username",
+      key: "username",
     },
     {
       title: "登录行为",
-      dataIndex: "action",
-      key: "action", // 账号登录、账号退出
+      dataIndex: "login",
+      key: "login", // 账号登录、账号退出
+      render: (text) => (
+        <Tag color={text === "账号登录" ? "green" : "yellow"}>{text}</Tag>
+      ),
     },
     {
       title: "登录 IP",
       dataIndex: "ip",
       key: "ip",
+      render: (text) => (text ? text : "未知"),
     },
     {
       title: "登录地点",
       dataIndex: "location",
       key: "location",
+      render: (text) => (text ? text : "未知"),
     },
     {
       title: "浏览器",
@@ -200,6 +198,7 @@ const Log = () => {
       title: "状态",
       dataIndex: "status",
       key: "status", // 成功、失败
+      render: (text) => <Tag color={text > 300 ? "red" : "green"}>{text}</Tag>,
     },
     {
       title: "登录时间",
@@ -214,9 +213,17 @@ const Log = () => {
       fixed: "right",
       width: 100,
       render: (text, row) => (
-        <Button type="text" danger>
-          强制退出
-        </Button>
+        <Popconfirm
+          title="系统提醒"
+          description="您确认要强制该用户退出登录吗?"
+          onConfirm={() => onForceLogout(row)}
+          okText="确认"
+          cancelText="取消"
+        >
+          <Button type="text" danger>
+            强制退出
+          </Button>
+        </Popconfirm>
       ),
     },
   ];
@@ -248,7 +255,8 @@ const Log = () => {
         <Table
           dataSource={operateDataSource}
           columns={operateColumns}
-          rowKey={(record) => record.timestamp}
+          rowKey={(record) => record?.session}
+          loading={loading}
           pagination={
             operateDataSource.length > 0 && {
               position: ["bottomCenter"],
@@ -271,7 +279,8 @@ const Log = () => {
         <Table
           dataSource={accountDataSource}
           columns={accountColumns}
-          rowKey={(record) => record.timestamp}
+          rowKey={(record) => record?.session}
+          loading={loading}
           pagination={
             accountDataSource.length > 0 && {
               position: ["bottomCenter"],

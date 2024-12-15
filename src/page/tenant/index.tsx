@@ -191,9 +191,9 @@ const Tenant = () => {
       width: "50%",
       content: (
         <div>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
-          <p>Some contents...</p>
+          <p>功能开发中</p>
+          <p>1.详情展示...</p>
+          <p>2.关联信息...</p>
         </div>
       ),
       onOk() {
@@ -335,7 +335,7 @@ const Tenant = () => {
             </Popconfirm>
           ) : null}
           <Search
-            placeholder="搜索租户"
+            placeholder="搜索租户名称"
             loading={loading}
             allowClear
             onSearch={onSearch}

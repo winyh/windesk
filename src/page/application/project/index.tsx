@@ -41,6 +41,7 @@ import {
   clientDel,
   clientGetList,
   clientGetAll,
+  comPut,
 } from "@/request";
 
 import { Storage } from "@/utils/storage";
@@ -336,8 +337,15 @@ const Project = () => {
     console.log(item);
   };
 
-  const onAppDefault = (item) => {
+  const onAppDefault = async (item) => {
     console.log(item);
+    const res = await comPut("/admin/application/default", {
+      id: item.id,
+    });
+    if (res.status) {
+      getData();
+      console.log({ res });
+    }
   };
 
   const onAppDetete = async (item) => {
@@ -515,20 +523,22 @@ const Project = () => {
                 }
               >
                 <Link to={`http://${item.domain}`} target="_blank">
-                  <Card.Meta
-                    avatar={<img src={item.logo || appLogo} />}
-                    description={
-                      <Paragraph
-                        ellipsis={{
-                          rows: 4,
-                          expandable: false,
-                        }}
-                        style={{ minHeight: 80 }}
-                      >
-                        {item.description}
-                      </Paragraph>
-                    }
-                  />
+                  <Tooltip title="访问应用">
+                    <Card.Meta
+                      avatar={<img src={item.logo || appLogo} />}
+                      description={
+                        <Paragraph
+                          ellipsis={{
+                            rows: 4,
+                            expandable: false,
+                          }}
+                          style={{ minHeight: 80 }}
+                        >
+                          {item.description}
+                        </Paragraph>
+                      }
+                    />
+                  </Tooltip>
                 </Link>
               </Card>
             );
