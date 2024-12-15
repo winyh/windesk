@@ -9,7 +9,7 @@ const apiPrefix = "/auto";
 // 生成请求实例
 const instance = axios.create({
   baseURL: VITE_HTTP_URL,
-  timeout: 5000,
+  timeout: 6000,
 });
 
 // 添加请求拦截器

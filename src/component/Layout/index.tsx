@@ -123,7 +123,7 @@ const LayoutBase = () => {
       let appInfo = Storage.getItem("app");
       // 2.本地app存在时，则比对参数，相同则不处理，不通则请求获取存本地
       if (appInfo) {
-        if (appInfo?.uid !== params?.appId) {
+        if (appInfo?.app_code !== params?.appId) {
           const { status, data } = await clientGetOneByUid(
             "application",
             params.appId
@@ -259,7 +259,7 @@ const LayoutBase = () => {
     keyPaths.map((key, _) => {
       linkPath = `${linkPath}/${key}`.replace(/\/\/+/g, "/");
       let label = findObjByKey(someMenu, key, "key")?.label;
-      if (!label && appInfo && key === appInfo?.uid) {
+      if (!label && appInfo && key === appInfo?.app_code) {
         label = appInfo?.name;
       }
       let curentPath = linkPath;
@@ -357,7 +357,7 @@ const LayoutBase = () => {
     applications.map((item) => {
       if (item?.id === key) {
         setCurrentApp(item);
-        navigate(`/app/${item?.uid}/dashboard`);
+        navigate(`/app/${item?.app_code}/dashboard`);
       }
     });
   };

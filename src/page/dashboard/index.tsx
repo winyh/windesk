@@ -20,6 +20,8 @@ import {
   RocketOutlined,
 } from "@ant-design/icons";
 
+import { useParams } from "react-router-dom";
+
 import HighLight from "@/component/HighLight";
 
 import { invoke } from "@tauri-apps/api/core";
@@ -35,6 +37,7 @@ const { Meta } = Card;
 const { BASE_URL } = import.meta.env;
 
 const Dashboard = () => {
+  const params = useParams();
   const [greetMsg, setGreetMsg] = useState("");
   const [appInfo, setAppInfo] = useState({});
   const [stackList, setStackList] = useState([]);
@@ -44,7 +47,8 @@ const Dashboard = () => {
   useEffect(() => {
     setAppInfo({
       appId: "1",
-      appUrl: "https://cwbtvnofqvimqiyznkbt.winbase.io",
+      adminUrl: `https://admin.${params.appId}.winbase.io`,
+      appUrl: `https://${params.appId}.winbase.io`,
       appKey: "I6IkpXVCJ9.pc3Mim4cCI6.dDAfslwOQyAXsM",
     });
 
@@ -100,7 +104,7 @@ const Dashboard = () => {
           code={`
 import { createClient } from '@winbase/winbase-js'
 
-const winbaseUrl = 'https://cwbtvnofqvimqiyznkbt.winbase.co'
+const winbaseUrl = 'https://${params.appId}.winbase.io'
 const winbaseKey = process.env.WINBASE_KEY
 const winbase = createClient(winbaseUrl, winbaseKey)`}
         />
@@ -133,7 +137,8 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
   return (
     <div>
       <Row gutter={24}>
-        <Col span={6}>
+        <Col span={6}></Col>
+        <Col span={12}>
           <form
             className="row"
             onSubmit={(e) => {
@@ -150,10 +155,8 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
               <Button htmlType="submit">Greet</Button>
             </Space>
           </form>
-
           <p>{greetMsg}</p>
-        </Col>
-        <Col span={12}>
+
           <Card
             title="应用访问方式"
             extra={
@@ -166,7 +169,7 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
               <Flex gap={24} justify="space-between">
                 <span>管理URL</span>
                 <Space>
-                  <Input value={appInfo.appUrl} style={{ width: 300 }} />
+                  <Input value={appInfo.adminUrl} style={{ width: 300 }} />
                   <Button>
                     <Link href="https://admin.winbase.io" target="_blank">
                       <HomeOutlined />

@@ -55,6 +55,8 @@ const { Search } = Input;
 const Project = () => {
   const formRef = useRef();
   const navigate = useNavigate();
+  const [disabled, setDisabled] = useState(false);
+  const [btnLoading, setBtnLoading] = useState(false);
   const [appType, setAppType] = useState("create");
   const [action, setAction] = useState(true);
   const [record, setRecord] = useState({});
@@ -136,7 +138,7 @@ const Project = () => {
 
   const onDesign = (item) => {
     Storage.setItem("app", item);
-    navigate(`/app/${item.uid}/dashboard`);
+    navigate(`/app/${item.app_code}/dashboard`);
   };
 
   const onClose = () => {
@@ -144,12 +146,16 @@ const Project = () => {
   };
 
   const onFinish = () => {
+    setBtnLoading(true);
     formRef?.current?.form
       .validateFields()
       .then(async (values) => {
         if (action) {
+          message.loading("应用创建中");
           const res = await comPost("/admin/application", values);
           if (res.status) {
+            message.success("应用创建成功");
+            setBtnLoading(false);
             getData();
             setOpen(false);
           }
@@ -159,12 +165,33 @@ const Project = () => {
             id: record.id,
           });
           if (res.status) {
+            message.destroy();
+            message.success("应用修改成功");
             getData();
+            setBtnLoading(false);
             setOpen(false);
           }
         }
       })
-      .catch(() => {});
+      .catch(() => {
+        message.destroy();
+        setBtnLoading(false);
+      });
+  };
+
+  const onCheckUnique = async (e) => {
+    setDisabled(false);
+    const { value } = e.target;
+    const { status, data } = await comPost(
+      "/admin/application/database/unique",
+      { database: value }
+    );
+    if (status) {
+      setDisabled(!data);
+      !data && message.warning("数据库名称已存在！");
+    } else {
+      setDisabled(true);
+    }
   };
 
   const props = {
@@ -208,13 +235,6 @@ const Project = () => {
       placeholder: "请输入应用描述",
     },
     {
-      label: "应用标识",
-      name: "app_code",
-      is: "Input",
-      itemSpan: 24,
-      placeholder: "请输入应用标识",
-    },
-    {
       label: "应用域名",
       name: "domain",
       is: "Input",
@@ -231,7 +251,7 @@ const Project = () => {
     },
     {
       label: "数据库源",
-      name: "database",
+      name: "database_resource",
       is: "Select",
       itemSpan: 24,
       options: [],
@@ -282,8 +302,9 @@ const Project = () => {
     {
       label: "端口",
       name: "database_port",
-      is: "Input",
+      is: "InputNumber",
       itemSpan: 24,
+      style: { width: "100%" },
       placeholder: "请输入数据库端口",
     },
     {
@@ -292,6 +313,7 @@ const Project = () => {
       is: "Input",
       itemSpan: 24,
       placeholder: "请输入数据库名",
+      onBlur: (e) => onCheckUnique(e),
     },
     {
       label: "数据模型",
@@ -578,7 +600,12 @@ const Project = () => {
           <Flex justify="flex-end">
             <Space>
               <Button onClick={onClose}>取消</Button>
-              <Button type="primary" onClick={onFinish}>
+              <Button
+                type="primary"
+                onClick={onFinish}
+                disabled={disabled}
+                loading={btnLoading}
+              >
                 确认
               </Button>
             </Space>

@@ -269,7 +269,7 @@ const Database = () => {
           code={`
 import { createClient } from '@winbase/winbase-js'
 
-const winbaseUrl = 'https://cwbtvnofqvimqiyznkbt.winbase.co'
+const winbaseUrl = 'https://cwbtvnofqvimqiyznkbt.winbase.io'
 const winbaseKey = process.env.WINBASE_KEY
 const winbase = createClient(winbaseUrl, winbaseKey)`}
         />
