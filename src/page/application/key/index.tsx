@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button, Table, Flex, Space, Drawer } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import SuperForm from "@/component/SuperForm";
-import { clientPost, clientPut, clientDel, clientGetList } from "@/request";
+import { clientPost, clientPut, clientDelete, clientGetList } from "@/request";
 
 const ApiKey = () => {
   const [open, setOpen] = useState(false);
@@ -47,7 +47,7 @@ const ApiKey = () => {
   const getData = (params = {}) => {
     setLoading(true);
     const { current, pageSize } = paginationMeta;
-    clientGetList("key", {
+    clientGetList("platform", "key", {
       current,
       pageSize,
       ...params,
@@ -86,13 +86,16 @@ const ApiKey = () => {
       .validateFields()
       .then(async (values) => {
         if (action) {
-          const res = await clientPost("tenant", values);
+          const res = await clientPost("platform", "tenant", values);
           if (res.status) {
             getData();
             setOpen(false);
           }
         } else {
-          const res = await clientPut("tenant", { ...values, id: record.id });
+          const res = await clientPut("platform", "tenant", {
+            ...values,
+            id: record.id,
+          });
           if (res.status) {
             getData();
             setOpen(false);

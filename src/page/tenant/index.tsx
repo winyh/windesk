@@ -15,7 +15,7 @@ import {
 import { PlusOutlined } from "@ant-design/icons";
 import SuperForm from "@/component/SuperForm";
 import dayjs from "dayjs";
-import { clientPost, clientPut, clientDel, clientGetList } from "@/request";
+import { clientPost, clientPut, clientDelete, clientGetList } from "@/request";
 import { message } from "@/store/hooks";
 
 const { Search } = Input;
@@ -46,7 +46,7 @@ const Tenant = () => {
   const getData = (params = {}) => {
     setLoading(true);
     const { current, pageSize } = paginationMeta;
-    clientGetList("tenant", {
+    clientGetList("platform", "tenant", {
       current,
       pageSize,
       ...params,
@@ -102,14 +102,21 @@ const Tenant = () => {
       .validateFields()
       .then(async (values) => {
         if (action) {
-          const { status, msg } = await clientPost("tenant", values);
+          const { status, msg } = await clientPost(
+            "platform",
+            "tenant",
+            values
+          );
           if (status) {
             getData();
             setOpen(false);
             message.success(msg);
           }
         } else {
-          const res = await clientPut("tenant", { ...values, id: record.id });
+          const res = await clientPut("platform", "tenant", {
+            ...values,
+            id: record.id,
+          });
           if (status) {
             getData();
             setOpen(false);
@@ -306,7 +313,7 @@ const Tenant = () => {
   };
 
   const onConfirm = async (record) => {
-    const res = await clientDel("tenant", { ids: record.id });
+    const res = await clientDelete("platform", "tenant", { ids: record.id });
     if (res.status) {
       getData();
       console.log({ res });

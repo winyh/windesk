@@ -21,7 +21,7 @@ import {
   clientGetTree,
   clientPost,
   clientPut,
-  clientDel,
+  clientDelete,
   clientGetList,
   clientGetListTree,
 } from "@/request";
@@ -51,7 +51,7 @@ const Organization = () => {
   }, []);
 
   const getData = (params) => {
-    clientGetListTree("organization", {
+    clientGetListTree("platform", "organization", {
       current: 1,
       pageSize: 10,
       name: params?.name,
@@ -79,7 +79,7 @@ const Organization = () => {
   };
 
   const getTreeData = (params) => {
-    clientGetTree("organization", params)
+    clientGetTree("platform", "organization", params)
       .then((res) => {
         if (res.status) {
           const data = res.data;
@@ -141,13 +141,13 @@ const Organization = () => {
       .validateFields()
       .then(async (values) => {
         if (action) {
-          const res = await clientPost("organization", values);
+          const res = await clientPost("platform", "organization", values);
           if (res.status) {
             getData();
             setOpen(false);
           }
         } else {
-          const res = await clientPut("organization", {
+          const res = await clientPut("platform", "organization", {
             ...values,
             id: record.id,
           });
@@ -351,7 +351,9 @@ const Organization = () => {
   };
 
   const onConfirm = async (record) => {
-    const res = await clientDel("organization", { ids: record.id });
+    const res = await clientDelete("platform", "organization", {
+      ids: record.id,
+    });
     if (res.status) {
       getData();
       console.log({ res });

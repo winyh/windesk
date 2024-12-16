@@ -1,18 +1,18 @@
-import { srvPost, srvGet } from "@/request"
+import { comPost, comGet } from "@/request";
 
 const apiUrls = {
   oss: "/backend/file/oss",
   ossList: "/backend/file/list",
   logout: "/user/logout",
-  userInfo: "/user/info"
-}
+  userInfo: "/user/info",
+};
 
-const uploadSrv = () => {
-  return srvPost(apiUrls.oss)
-}
+const uploadSrv = (data) => {
+  return comPost(apiUrls.oss, data);
+};
 
-const getFilesSrv = () => {
-  return srvGet(apiUrls.ossList)
-}
+const getFilesSrv = (params) => {
+  return comGet(apiUrls.ossList, params);
+};
 
-export { uploadSrv, getFilesSrv }
+export { uploadSrv, getFilesSrv };

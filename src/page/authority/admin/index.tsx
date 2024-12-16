@@ -30,10 +30,10 @@ import { genOptions } from "@/utils";
 import { encryptData } from "@/utils/crypto";
 import {
   comPost,
-  comDel,
+  comDelete,
   clientPost,
   clientPut,
-  clientDel,
+  clientDelete,
   clientGetList,
   clientGetAll,
   clientGetTree,
@@ -78,7 +78,7 @@ const Admin = () => {
   const getData = (params = {}) => {
     setLoading(true);
     const { current, pageSize } = paginationMeta;
-    clientGetList("admin", {
+    clientGetList("platform", "admin", {
       current,
       pageSize,
       ...params,
@@ -104,7 +104,7 @@ const Admin = () => {
   };
 
   const getOrganizations = () => {
-    clientGetTree("organization", {
+    clientGetTree("platform", "organization", {
       parent_field: "pid",
       level: 0,
     })
@@ -122,7 +122,7 @@ const Admin = () => {
   };
 
   const getTenants = () => {
-    clientGetAll("tenant", {})
+    clientGetAll("platform", "tenant", {})
       .then((res) => {
         if (res.status) {
           const data = res.data.map((item) => ({
@@ -139,7 +139,7 @@ const Admin = () => {
   };
 
   const getRoles = () => {
-    clientGetAll("role", {})
+    clientGetAll("platform", "role", {})
       .then((res) => {
         if (res.status) {
           const { data } = res;
@@ -153,7 +153,7 @@ const Admin = () => {
   };
 
   const getPositions = () => {
-    clientGetAll("position", {})
+    clientGetAll("platform", "position", {})
       .then((res) => {
         if (res.status) {
           const { data } = res;
@@ -195,14 +195,17 @@ const Admin = () => {
       .validateFields()
       .then(async (values) => {
         if (action) {
-          const res = await clientPost("admin", values);
+          const res = await clientPost("platform", "admin", values);
           if (res.status) {
             getData();
             setOpen(false);
             message.success(res.msg);
           }
         } else {
-          const res = await clientPut("admin", { ...values, id: record.id });
+          const res = await clientPut("platform", "admin", {
+            ...values,
+            id: record.id,
+          });
           if (res.status) {
             getData();
             setOpen(false);
@@ -609,7 +612,7 @@ const Admin = () => {
   };
 
   const deleteAdmin = async (ids) => {
-    const res = await comDel("/admin/delete", { ids });
+    const res = await comDelete("/admin/delete", { ids });
     if (res.status) {
       getData();
       console.log({ res });

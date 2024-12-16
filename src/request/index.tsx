@@ -4,7 +4,13 @@ import { notification, navigate } from "@/store/hooks";
 
 const { BASE_URL, VITE_HTTP_URL } = import.meta.env;
 
-const apiPrefix = "/auto";
+const apiPrefix = {
+  api: "/api",
+  admin: "/admin",
+  platform: "/platform",
+  project: "/project",
+  escape: "/escape",
+};
 
 // 生成请求实例
 const instance = axios.create({
@@ -72,23 +78,6 @@ instance.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-const srvGet = (url, params) => {
-  return instance({
-    url: url,
-    method: "get",
-    params,
-  });
-};
-
-const srvPost = (url, data) => {
-  return instance({
-    url: url,
-    method: "post",
-    data,
-  });
-};
-
 const comGet = (url, params) => {
   return instance.get(url, {
     params,
@@ -99,7 +88,7 @@ const comPost = (url, data) => {
   return instance.post(url, data);
 };
 
-const comDel = (url, params) => {
+const comDelete = (url, params) => {
   return instance.delete(url, { params });
 };
 
@@ -111,48 +100,67 @@ const comGetFile = (url, data) => {
   return instance.get(url, data);
 };
 
-const clientGetOne = (collection, recordId, params) => {
-  return comGet(`${apiPrefix}/${collection}/${recordId}`, params);
+const clientGetOne = (prefix, collection, recordId, params) => {
+  let url = `${apiPrefix[prefix]}/${collection}/${recordId}`;
+  if (prefix === "project") {
+    let { uid: project } = Storage.getItem("app");
+    console.log({ project });
+    url = `${apiPrefix[prefix]}/${project}/${collection}/${recordId}`;
+  }
+  return comGet(url, params);
 };
 
-const clientGetOneByUid = (collection, recordId, params) => {
-  return comGet(`${apiPrefix}/${collection}/uid/${recordId}`, params);
+const clientGetOneByUid = (prefix, collection, recordId, params) => {
+  return comGet(`${apiPrefix[prefix]}/${collection}/uid/${recordId}`, params);
 };
 
-const clientGetAll = (collection, params) => {
-  return comGet(`${apiPrefix}/${collection}`, params);
+const clientGetAll = (prefix, collection, params) => {
+  return comGet(`${apiPrefix[prefix]}/${collection}`, params);
 };
 
-const clientGetTree = (collection, params) => {
-  return comGet(`${apiPrefix}/${collection}/tree/data`, params);
+const clientGetTree = (prefix, collection, params) => {
+  return comGet(`${apiPrefix[prefix]}/${collection}/tree/data`, params);
 };
 
-const clientGetList = (collection, params) => {
-  return comGet(`${apiPrefix}/${collection}/list/paginate`, params);
+const clientGetList = (prefix, collection, params) => {
+  let url = `${apiPrefix[prefix]}/${collection}/list/paginate`;
+  if (prefix === "project") {
+    let { uid: project } = Storage.getItem("app");
+    url = `${apiPrefix[prefix]}/${project}/${collection}/list/paginate`;
+  }
+  return comGet(url, params);
 };
 
-const clientGetListTree = (collection, params) => {
-  return comGet(`${apiPrefix}/${collection}/list/tree/paginate`, params);
+const clientGetListTree = (prefix, collection, params) => {
+  return comGet(
+    `${apiPrefix[prefix]}/${collection}/list/tree/paginate`,
+    params
+  );
 };
 
-const clientPost = (collection, data) => {
-  return instance.post(`${apiPrefix}/${collection}`, data);
+const clientPost = (prefix, collection, data) => {
+  let url = `${apiPrefix[prefix]}/${collection}`;
+  if (prefix === "project") {
+    let { uid: project } = Storage.getItem("app");
+    url = `${apiPrefix[prefix]}/${project}/${collection}`;
+  }
+  return comPost(url, data);
 };
 
-const clientDel = (collection, params) => {
-  return instance.delete(`${apiPrefix}/${collection}`, { params });
+const clientDelete = (prefix, collection, params) => {
+  return comDelete(`${apiPrefix[prefix]}/${collection}`, {
+    ids: params.ids,
+  });
 };
 
-const clientPut = (collection, data) => {
-  return instance.put(`${apiPrefix}/${collection}`, data);
+const clientPut = (prefix, collection, data) => {
+  return comPut(`${apiPrefix[prefix]}/${collection}`, data);
 };
 
 export {
-  srvGet,
-  srvPost,
   comGet,
   comPost,
-  comDel,
+  comDelete,
   comPut,
   comGetFile,
   clientGetOne,
@@ -162,6 +170,6 @@ export {
   clientGetList,
   clientGetListTree,
   clientPost,
-  clientDel,
+  clientDelete,
   clientPut,
 };

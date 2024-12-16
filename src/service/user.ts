@@ -1,4 +1,4 @@
-import { srvPost, srvGet } from "@/request";
+import { comPost, comGet } from "@/request";
 
 const apiUrls = {
   register: "/user/register",
@@ -7,20 +7,20 @@ const apiUrls = {
   userInfo: "/user/info",
 };
 
-const registerSrv = () => {
-  return srvPost(apiUrls.register);
+const registerSrv = (data) => {
+  return comPost(apiUrls.register, data);
 };
 
-const loginSrv = () => {
-  return srvPost(apiUrls.login);
+const loginSrv = (data) => {
+  return comPost(apiUrls.login, data);
 };
 
-const logoutSrv = () => {
-  return srvGet(apiUrls.logout);
+const logoutSrv = (params) => {
+  return comGet(apiUrls.logout, params);
 };
 
-const getUserInfoSrv = () => {
-  return srvGet(apiUrls.userInfo);
+const getUserInfoSrv = (params) => {
+  return comGet(apiUrls.userInfo, params);
 };
 
 export { registerSrv, loginSrv, logoutSrv, getUserInfoSrv };

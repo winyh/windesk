@@ -38,7 +38,7 @@ import {
   clientPost,
   comPost,
   clientPut,
-  clientDel,
+  clientDelete,
   clientGetList,
   clientGetAll,
   comPut,
@@ -83,7 +83,7 @@ const Project = () => {
   const getData = (params = {}) => {
     setLoading(true);
     const { current, pageSize } = paginationMeta;
-    clientGetList("application", {
+    clientGetList("platform", "application", {
       current,
       pageSize,
       ...params,
@@ -109,7 +109,7 @@ const Project = () => {
   };
 
   const getTenants = () => {
-    clientGetAll("tenant", {})
+    clientGetAll("platform", "tenant", {})
       .then((res) => {
         if (res.status) {
           const data = res.data.map((item) => ({
@@ -132,13 +132,14 @@ const Project = () => {
   const showDrawer = (bool, record = {}) => {
     setAction(bool);
     setOpen(true);
+    setBtnLoading(false);
     bool ? (record.status = "1") : null;
     setRecord(record);
   };
 
   const onDesign = (item) => {
     Storage.setItem("app", item);
-    navigate(`/app/${item.app_code}/dashboard`);
+    navigate(`/app/${item.uid}/dashboard`);
   };
 
   const onClose = () => {
@@ -158,9 +159,12 @@ const Project = () => {
             setBtnLoading(false);
             getData();
             setOpen(false);
+          } else {
+            message.warning(res.msg);
+            setBtnLoading(false);
           }
         } else {
-          const res = await clientPut("application", {
+          const res = await clientPut("platform", "application", {
             ...values,
             id: record.id,
           });
@@ -371,8 +375,9 @@ const Project = () => {
   };
 
   const onAppDetete = async (item) => {
-    console.log(item);
-    const res = await clientDel("application", { ids: item.id });
+    const res = await clientDelete("platform", "application", {
+      ids: item.id,
+    });
     if (res.status) {
       getData();
       console.log({ res });

@@ -59,11 +59,11 @@ const appBaseRoutes = [
     },
   },
   {
-    path: "self",
+    path: "project",
     meta: {
       label: "应用管理",
       icon: <AppstoreOutlined />,
-      key: "self",
+      key: "project",
       hide_in_menu: false,
     },
     children: [

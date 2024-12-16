@@ -34,7 +34,7 @@ import {
   Popconfirm,
 } from "antd";
 import SuperForm from "@/component/SuperForm";
-import { clientPost, clientPut, clientDel, clientGetList } from "@/request";
+import { clientPost, clientPut, clientDelete, clientGetList } from "@/request";
 import appLogo from "@/assets/react.svg";
 
 const { Paragraph, Text } = Typography;
@@ -67,7 +67,7 @@ const Application = () => {
   const getData = (params = {}) => {
     setLoading(true);
     const { current, pageSize } = paginationMeta;
-    clientGetList("application", {
+    clientGetList("platform", "application", {
       current,
       pageSize,
       ...params,
@@ -115,13 +115,13 @@ const Application = () => {
       .validateFields()
       .then(async (values) => {
         if (action) {
-          const res = await clientPost("application", values);
+          const res = await clientPost("platform", "application", values);
           if (res.status) {
             getData();
             setOpen(false);
           }
         } else {
-          const res = await clientPut("application", {
+          const res = await clientPut("platform", "application", {
             ...values,
             id: record.id,
           });
@@ -176,7 +176,7 @@ const Application = () => {
     },
     {
       label: "应用标识",
-      name: "app_code",
+      name: "uid",
       is: "Input",
       itemSpan: 24,
       placeholder: "请输入应用标识",
@@ -247,7 +247,9 @@ const Application = () => {
 
   const onAppDetete = async (item) => {
     console.log(item);
-    const res = await clientDel("application", { ids: item.id });
+    const res = await clientDelete("platform", "application", {
+      ids: item.id,
+    });
     if (res.status) {
       getData();
       console.log({ res });

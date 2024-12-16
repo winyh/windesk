@@ -18,7 +18,7 @@ import {
 } from "antd";
 import dayjs from "dayjs";
 import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
-import { comPost, comGet, comDel, comPut } from "@/request";
+import { comPost, comGet, comDelete, comPut } from "@/request";
 import "./style.less";
 
 const { confirm } = Modal;
@@ -156,7 +156,7 @@ const SuperTable = (
    */
   const delSingle = async (record) => {
     const hide = messageApi.loading("正在删除");
-    const res = await comDel(url, {
+    const res = await comDelete(url, {
       ids: record[rowKey],
     });
     if (res.status) {
@@ -244,7 +244,7 @@ const SuperTable = (
       cancelText: "取消",
       onOk: async () => {
         const hide = messageApi.loading("正在批量删除");
-        const res = await comDel(delSomeUrl, {
+        const res = await comDelete(delSomeUrl, {
           ids: selectedRows.map((item) => item.id),
         });
         if (res.status) {

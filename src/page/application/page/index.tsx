@@ -20,7 +20,7 @@ import {
 } from "@ant-design/icons";
 import SuperForm from "@/component/SuperForm";
 import dayjs from "dayjs";
-import { clientPost, clientPut, clientDel, clientGetList } from "@/request";
+import { clientPost, clientPut, clientGetList } from "@/request";
 import { message } from "@/store/hooks";
 
 const { Search } = Input;
@@ -53,7 +53,7 @@ const Page = () => {
   const getData = (params = {}) => {
     setLoading(true);
     const { current, pageSize } = paginationMeta;
-    clientGetList("page", {
+    clientGetList("project", "page", {
       current,
       pageSize,
       ...params,
@@ -111,14 +111,14 @@ const Page = () => {
           application_id: Number(appId),
         };
         if (action) {
-          const { status, msg } = await clientPost("page", values);
+          const { status, msg } = await clientPost("project", "page", values);
           if (status) {
             getData();
             setOpen(false);
             message.success(msg);
           }
         } else {
-          const { status, msg } = await clientPut("page", {
+          const { status, msg } = await clientPut("project", "page", {
             ...values,
             id: record.id,
           });
@@ -163,23 +163,23 @@ const Page = () => {
       itemSpan: 24,
       placeholder: "请输入页面描述",
     },
-    {
-      label: "页面分类",
-      name: "page_type",
-      is: "Select",
-      itemSpan: 24,
-      placeholder: "请选择页面分类",
-      options: [
-        {
-          label: "后台页面",
-          value: "",
-        },
-        {
-          label: "小程序页面",
-          value: "",
-        },
-      ],
-    },
+    // {
+    //   label: "页面分类",
+    //   name: "page_type",
+    //   is: "Select",
+    //   itemSpan: 24,
+    //   placeholder: "请选择页面分类",
+    //   options: [
+    //     {
+    //       label: "后台页面",
+    //       value: "admin",
+    //     },
+    //     {
+    //       label: "小程序页面",
+    //       value: "mini",
+    //     },
+    //   ],
+    // },
     {
       label: "状态",
       name: "status",

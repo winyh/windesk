@@ -28,7 +28,7 @@ import {
   comGet,
   clientPost,
   clientPut,
-  clientDel,
+  clientDelete,
   clientGetList,
   comPost,
   comPut,
@@ -170,7 +170,7 @@ const Role = () => {
       bool: true,
     });
     const { current, pageSize } = states.dataSource;
-    clientGetList("role", {
+    clientGetList("platform", "role", {
       current,
       pageSize,
       ...params,
@@ -208,7 +208,7 @@ const Role = () => {
       bool: true,
     });
     const { current, pageSize } = states.dataSourceAdmin;
-    clientGetList("admin", {
+    clientGetList("platform", "admin", {
       current,
       pageSize,
       ...params,
@@ -259,7 +259,9 @@ const Role = () => {
 
   // 获取所有后台用户和角色关联数据
   const getAllRoleAdmin = async (params) => {
-    const { status, data } = await clientGetAll("admin_role", { ...params });
+    const { status, data } = await clientGetAll("platform", "admin_role", {
+      ...params,
+    });
     if (status) {
       dispatch({
         type: "selectedRoleAdmin",
@@ -271,7 +273,7 @@ const Role = () => {
   // 获取所有角色和权限关联数据
   const getAllRolePermission = async (params) => {
     const { menuData } = states;
-    const { status, data } = await clientGetAll("role_permission", {
+    const { status, data } = await clientGetAll("platform", "role_permission", {
       ...params,
     });
     if (status) {
@@ -354,7 +356,7 @@ const Role = () => {
       .validateFields()
       .then(async (values) => {
         if (action) {
-          const res = await clientPost("role", values);
+          const res = await clientPost("platform", "role", values);
           if (res.status) {
             getData();
             dispatch({
@@ -363,7 +365,10 @@ const Role = () => {
             });
           }
         } else {
-          const res = await clientPut("role", { ...values, id: record.id });
+          const res = await clientPut("platform", "role", {
+            ...values,
+            id: record.id,
+          });
           if (res.status) {
             getData();
             dispatch({
@@ -579,7 +584,7 @@ const Role = () => {
   };
 
   const onConfirm = async (record) => {
-    const res = await clientDel("role", { ids: record.id });
+    const res = await clientDelete("platform", "role", { ids: record.id });
     if (res.status) {
       getData();
     }

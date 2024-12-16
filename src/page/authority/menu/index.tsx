@@ -30,7 +30,7 @@ import { IconSelect } from "@/component/IconSelect";
 import {
   clientPost,
   clientPut,
-  clientDel,
+  clientDelete,
   clientGetList,
   comGet,
 } from "@/request";
@@ -266,7 +266,7 @@ const Menu = () => {
         };
 
         if (action) {
-          const res = await clientPost("menu", values);
+          const res = await clientPost("platform", "menu", values);
           if (res.status) {
             form.resetFields();
             getAllMenus();
@@ -274,7 +274,10 @@ const Menu = () => {
             message.success("新增成功");
           }
         } else {
-          const res = await clientPut("menu", { ...values, id: record.id });
+          const res = await clientPut("platform", "menu", {
+            ...values,
+            id: record.id,
+          });
           if (res.status) {
             form.resetFields();
             getAllMenus();
@@ -287,7 +290,7 @@ const Menu = () => {
   };
 
   const onDeleteMenu = () => {
-    clientDel("menu", { ids: record.id })
+    clientDelete("platform", "menu", { ids: record.id })
       .then((res) => {
         if (res.status) {
           form.resetFields();

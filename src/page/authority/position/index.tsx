@@ -14,7 +14,7 @@ import {
 import { PlusOutlined } from "@ant-design/icons";
 import SuperForm from "@/component/SuperForm";
 import dayjs from "dayjs";
-import { clientPost, clientPut, clientDel, clientGetList } from "@/request";
+import { clientPost, clientPut, clientDelete, clientGetList } from "@/request";
 
 const { Search } = Input;
 
@@ -40,7 +40,7 @@ const Position = () => {
 
   const getData = (params) => {
     setLoading(true);
-    clientGetList("position", {
+    clientGetList("platform", "position", {
       current: 1,
       pageSize: 10,
       name: params?.name,
@@ -95,13 +95,16 @@ const Position = () => {
       .validateFields()
       .then(async (values) => {
         if (action) {
-          const res = await clientPost("position", values);
+          const res = await clientPost("platform", "position", values);
           if (res.status) {
             getData();
             setOpen(false);
           }
         } else {
-          const res = await clientPut("position", { ...values, id: record.id });
+          const res = await clientPut("platform", "position", {
+            ...values,
+            id: record.id,
+          });
           if (res.status) {
             getData();
             setOpen(false);
@@ -274,7 +277,9 @@ const Position = () => {
 
   const onConfirm = async (record) => {
     console.log({ record });
-    const res = await clientDel("position", { ids: record.id });
+    const res = await clientDelete("platform", "position", {
+      ids: record.id,
+    });
     if (res.status) {
       getData();
       console.log({ res });
