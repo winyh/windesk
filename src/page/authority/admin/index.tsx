@@ -615,7 +615,6 @@ const Admin = () => {
     const res = await comDelete("/admin/delete", { ids });
     if (res.status) {
       getData();
-      console.log({ res });
     }
   };
 

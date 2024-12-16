@@ -316,7 +316,6 @@ const Tenant = () => {
     const res = await clientDelete("platform", "tenant", { ids: record.id });
     if (res.status) {
       getData();
-      console.log({ res });
     }
   };
 

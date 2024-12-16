@@ -282,7 +282,6 @@ const Position = () => {
     });
     if (res.status) {
       getData();
-      console.log({ res });
     }
   };
 

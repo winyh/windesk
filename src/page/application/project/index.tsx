@@ -370,7 +370,6 @@ const Project = () => {
     });
     if (res.status) {
       getData();
-      console.log({ res });
     }
   };
 
@@ -380,7 +379,6 @@ const Project = () => {
     });
     if (res.status) {
       getData();
-      console.log({ res });
     }
   };
 

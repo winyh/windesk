@@ -356,7 +356,6 @@ const Organization = () => {
     });
     if (res.status) {
       getData();
-      console.log({ res });
     }
   };
 
