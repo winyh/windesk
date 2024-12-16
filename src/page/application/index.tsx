@@ -246,7 +246,6 @@ const Application = () => {
   };
 
   const onAppDetete = async (item) => {
-    console.log(item);
     const res = await clientDelete("platform", "application", {
       ids: item.id,
     });

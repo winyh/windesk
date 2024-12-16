@@ -1,5 +1,6 @@
 import axios from "axios";
 import { Storage } from "@/utils/storage";
+import { apiRoute } from "@/utils/index";
 import { notification, navigate } from "@/store/hooks";
 
 const { BASE_URL, VITE_HTTP_URL } = import.meta.env;
@@ -101,60 +102,57 @@ const comGetFile = (url, data) => {
 };
 
 const clientGetOne = (prefix, collection, recordId, params) => {
-  let url = `${apiPrefix[prefix]}/${collection}/${recordId}`;
-  if (prefix === "project") {
-    let { uid: project } = Storage.getItem("app");
-    console.log({ project });
-    url = `${apiPrefix[prefix]}/${project}/${collection}/${recordId}`;
-  }
+  let project = apiRoute(prefix);
+  let url = `${apiPrefix[prefix]}${project}/${collection}/${recordId}`;
   return comGet(url, params);
 };
 
 const clientGetOneByUid = (prefix, collection, recordId, params) => {
-  return comGet(`${apiPrefix[prefix]}/${collection}/uid/${recordId}`, params);
+  let project = apiRoute(prefix);
+  let url = `${apiPrefix[prefix]}${project}/${collection}/uid/${recordId}`;
+  return comGet(url, params);
 };
 
 const clientGetAll = (prefix, collection, params) => {
-  return comGet(`${apiPrefix[prefix]}/${collection}`, params);
+  let project = apiRoute(prefix);
+  let url = `${apiPrefix[prefix]}${project}/${collection}`;
+  return comGet(url, params);
 };
 
 const clientGetTree = (prefix, collection, params) => {
-  return comGet(`${apiPrefix[prefix]}/${collection}/tree/data`, params);
+  let project = apiRoute(prefix);
+  let url = `${apiPrefix[prefix]}${project}/${collection}/tree/data`;
+  return comGet(url, params);
 };
 
 const clientGetList = (prefix, collection, params) => {
-  let url = `${apiPrefix[prefix]}/${collection}/list/paginate`;
-  if (prefix === "project") {
-    let { uid: project } = Storage.getItem("app");
-    url = `${apiPrefix[prefix]}/${project}/${collection}/list/paginate`;
-  }
+  let project = apiRoute(prefix);
+  let url = `${apiPrefix[prefix]}${project}/${collection}/list/paginate`;
   return comGet(url, params);
 };
 
 const clientGetListTree = (prefix, collection, params) => {
-  return comGet(
-    `${apiPrefix[prefix]}/${collection}/list/tree/paginate`,
-    params
-  );
+  let project = apiRoute(prefix);
+  let url = `${apiPrefix[prefix]}${project}/${collection}/list/tree/paginate`;
+  return comGet(url, params);
 };
 
 const clientPost = (prefix, collection, data) => {
-  let url = `${apiPrefix[prefix]}/${collection}`;
-  if (prefix === "project") {
-    let { uid: project } = Storage.getItem("app");
-    url = `${apiPrefix[prefix]}/${project}/${collection}`;
-  }
+  let project = apiRoute(prefix);
+  let url = `${apiPrefix[prefix]}${project}/${collection}`;
   return comPost(url, data);
 };
 
 const clientDelete = (prefix, collection, params) => {
-  return comDelete(`${apiPrefix[prefix]}/${collection}`, {
-    ids: params.ids,
-  });
+  let project = apiRoute(prefix);
+  let url = `${apiPrefix[prefix]}${project}/${collection}`;
+  return comDelete(url, { ids: params.ids });
 };
 
 const clientPut = (prefix, collection, data) => {
-  return comPut(`${apiPrefix[prefix]}/${collection}`, data);
+  let project = apiRoute(prefix);
+  let url = `${apiPrefix[prefix]}${project}/${collection}`;
+  return comPut(url, data);
 };
 
 export {

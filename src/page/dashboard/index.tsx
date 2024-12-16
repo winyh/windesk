@@ -30,6 +30,7 @@ import { isTauri } from "@/utils/index";
 import reactLogo from "@/assets/react.svg";
 import vueLogo from "@/assets/vue.svg";
 import angularLogo from "@/assets/angular.svg";
+import flutterLogo from "@/assets/flutter.svg";
 
 const { Text, Link } = Typography;
 const { Meta } = Card;
@@ -71,6 +72,13 @@ const Dashboard = () => {
         id: "3",
         logo: angularLogo,
         description: "基于Angular开始开发",
+        doc: "",
+        example: "",
+      },
+      {
+        id: "4",
+        logo: flutterLogo,
+        description: "基于Flutter开始开发",
         doc: "",
         example: "",
       },

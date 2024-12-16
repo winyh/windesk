@@ -10,18 +10,18 @@ const ApiKey = () => {
   const [dataSource, setDataSource] = useState([
     {
       key: "1",
-      name: "应用KEY",
-      token: "HSHJK-KKDALADLD-KADDKD-JSAJDKAD-JASJKDKAK",
-      limit: "60次 / 秒",
+      key_name: "小程序",
+      app_key: "HSHJK-KKDALADLD-KADDKD-JSAJDKAD-JASJKDKAK",
+      rate: "60次 / 秒",
       create_at: "2023-01-01",
       expire: "2025-01-01",
       status: "正常",
     },
     {
       key: "2",
-      name: "应用KEY",
-      token: "HKDJJ-JSAJJAJSSA-KADDKD-DKDKDLAU-JASJKDKAK",
-      limit: "60次 / 秒",
+      key_name: "App端",
+      app_key: "HKDJJ-JSAJJAJSSA-KADDKD-DKDKDLAU-JASJKDKAK",
+      rate: "60次 / 秒",
       create_at: "2023-01-01",
       expire: "2025-01-01",
       status: "正常",
@@ -161,18 +161,23 @@ const ApiKey = () => {
   const columns = [
     {
       title: "名称",
-      dataIndex: "name",
-      key: "name",
+      dataIndex: "key_name",
+      key: "key_name",
     },
     {
       title: "KEY",
-      dataIndex: "token",
-      key: "token",
+      dataIndex: "app_key",
+      key: "app_key",
+    },
+    {
+      title: "SECRET",
+      dataIndex: "app_secret",
+      key: "app_secret",
     },
     {
       title: "限流",
-      dataIndex: "limit",
-      key: "limit",
+      dataIndex: "rate",
+      key: "rate",
     },
     {
       title: "生成时间",
@@ -216,12 +221,7 @@ const ApiKey = () => {
   return (
     <Flex vertical gap={12}>
       <Flex align="center">
-        <Space>
-          <Button icon={<PlusOutlined />}>创建KEY</Button>
-          <div>
-            分为租户KEY可以通过接口管理整个后台-应用KEY 可以管理单个应用
-          </div>
-        </Space>
+        <Button icon={<PlusOutlined />}>创建KEY</Button>
       </Flex>
       <Table
         dataSource={dataSource}
@@ -259,7 +259,7 @@ const ApiKey = () => {
           ref={formRef}
           data={formData}
           layout={layout}
-          limit={6}
+          rate={6}
           initialValues={record}
           rulesValid={false}
           btnAction={false}

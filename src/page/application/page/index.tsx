@@ -20,8 +20,9 @@ import {
 } from "@ant-design/icons";
 import SuperForm from "@/component/SuperForm";
 import dayjs from "dayjs";
-import { clientPost, clientPut, clientGetList } from "@/request";
+import { clientPost, clientPut, clientGetList, clientDelete } from "@/request";
 import { message } from "@/store/hooks";
+import { genAlphabetId, genAlphabetFieldId } from "@/utils/index";
 
 const { Search } = Input;
 
@@ -108,6 +109,7 @@ const Page = () => {
       .then(async (values) => {
         values = {
           ...values,
+          uid: genAlphabetId(18),
           application_id: Number(appId),
         };
         if (action) {
@@ -132,7 +134,14 @@ const Page = () => {
       .catch(() => {});
   };
 
-  const onConfirm = () => {};
+  const onConfirm = async (item) => {
+    const res = await clientDelete("project", "page", {
+      ids: item.id,
+    });
+    if (res.status) {
+      getData();
+    }
+  };
 
   const onCancel = () => {};
 
@@ -264,7 +273,7 @@ const Page = () => {
             <Popconfirm
               title="系统提醒"
               description="您确定要删除当前页面吗?"
-              onConfirm={onConfirm}
+              onConfirm={() => onConfirm(record)}
               onCancel={onCancel}
             >
               <Button type="text" size="small" danger>

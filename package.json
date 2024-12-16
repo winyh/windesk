@@ -38,6 +38,7 @@
     "crypto-js": "^4.2.0",
     "dayjs": "^1.11.12",
     "less": "^4.2.0",
+    "nanoid": "^5.0.9",
     "normalize.css": "^8.0.1",
     "typescript": "^5.2.2",
     "vite": "^5.3.1"

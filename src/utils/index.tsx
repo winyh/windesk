@@ -1,4 +1,6 @@
 import dayjs from "dayjs";
+import { customAlphabet } from "nanoid";
+import { Storage } from "@/utils/storage";
 const isTauri = () => {
   return Boolean(window?.__TAURI_INTERNALS__);
 };
@@ -222,6 +224,49 @@ const flattenTree = (tree) => {
   return result;
 };
 
+const apiRoute = (prefix) => {
+  let project = "";
+  if (prefix === "project") {
+    project = `/${Storage.getItem("app")?.uid}`;
+  }
+
+  return project;
+};
+
+// 生成只包含[小写字母和数字]
+const genAlphabetId = (length = 10) => {
+  const nanoid = customAlphabet("1234567890abcdefghijklmnopqrstuvwxyz", length);
+  return nanoid();
+};
+
+// 生成只包含[小写字母]
+const genAlphabetMinId = (length = 18) => {
+  const nanoid = customAlphabet("abcdefghijklmnopqrstuvwxyz", length);
+  return nanoid();
+};
+
+// 生成只包含[大小写字母和数字]
+const genAlphabetMaxId = (length = 18) => {
+  const nanoid = customAlphabet(
+    "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+    length
+  );
+  return nanoid();
+};
+
+// 生成变量名
+const genAlphabetFieldId = (length = 6) => {
+  // 分别定义字母和字母加数字的字符集
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+  const allChars = `0123456789${letters}`;
+
+  // 创建两个不同的 alphabet 实例：一个用于首字符，另一个用于其余字符
+  const firstChar = customAlphabet(letters, 1);
+  const restChars = customAlphabet(allChars, length - 1);
+  // 拼接首字符和剩余字符来生成最终的 ID
+  return firstChar() + restChars();
+};
+
 export {
   isTauri,
   getCurrentYear,
@@ -237,4 +282,9 @@ export {
   setDayjsTrans,
   getDayjsTrans,
   flattenTree,
+  apiRoute,
+  genAlphabetId,
+  genAlphabetMinId,
+  genAlphabetMaxId,
+  genAlphabetFieldId,
 };
