@@ -60,6 +60,7 @@ const Publish = () => {
       name: "description",
       is: "Input.TextArea",
       itemSpan: 24,
+      rows: 3,
       placeholder: "请输入发布说明",
     },
   ];

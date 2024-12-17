@@ -267,6 +267,19 @@ const genAlphabetFieldId = (length = 6) => {
   return firstChar() + restChars();
 };
 
+// 生成 key
+const genAlphabetKey = (length = 64) => {
+  // 分别定义字母和字母加数字的字符集
+  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz$.";
+  const allChars = `0123456789${letters}`;
+
+  // 创建两个不同的 alphabet 实例：一个用于首字符，另一个用于其余字符
+  const firstChar = customAlphabet(letters, 1);
+  const restChars = customAlphabet(allChars, length - 1);
+  // 拼接首字符和剩余字符来生成最终的 ID
+  return firstChar() + restChars();
+};
+
 export {
   isTauri,
   getCurrentYear,
@@ -287,4 +300,5 @@ export {
   genAlphabetMinId,
   genAlphabetMaxId,
   genAlphabetFieldId,
+  genAlphabetKey,
 };
