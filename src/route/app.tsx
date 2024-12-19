@@ -17,7 +17,6 @@ import Dashboard from "@/page/dashboard";
 /* 应用管理 */
 
 import AppPage from "@/page/application/page";
-import AppNavigation from "@/page/application/navigation";
 import AppKey from "@/page/application/key";
 import AppPublish from "@/page/application/publish";
 
@@ -36,6 +35,7 @@ import Message from "@/page/user/message";
 import Admin from "@/page/authority/admin";
 import Role from "@/page/authority/role";
 import Menu from "@/page/authority/menu";
+import Navigation from "@/page/authority/menu/navigation";
 import Organization from "@/page/authority/organization";
 import Position from "@/page/authority/position";
 
@@ -73,15 +73,6 @@ const appBaseRoutes = [
         meta: {
           label: "页面管理",
           key: "page",
-          hide_in_menu: false,
-        },
-      },
-      {
-        path: "navigation",
-        element: <AppNavigation />,
-        meta: {
-          label: "导航管理",
-          key: "navigation",
           hide_in_menu: false,
         },
       },
@@ -214,11 +205,11 @@ const appBaseRoutes = [
         },
       },
       {
-        path: "menu",
-        element: <Menu />,
+        path: "navigation",
+        element: <Navigation />,
         meta: {
-          label: "菜单管理",
-          key: "menu",
+          label: "导航管理",
+          key: "navigation",
           hide_in_menu: false,
         },
       },

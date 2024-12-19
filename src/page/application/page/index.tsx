@@ -23,6 +23,7 @@ import dayjs from "dayjs";
 import { clientPost, clientPut, clientGetList, clientDelete } from "@/request";
 import { message } from "@/store/hooks";
 import { genAlphabetId, genAlphabetFieldId } from "@/utils/index";
+import { pageTypeEnum } from "@/config/enum";
 
 const { Search } = Input;
 
@@ -172,23 +173,35 @@ const Page = () => {
       itemSpan: 24,
       placeholder: "请输入页面描述",
     },
-    // {
-    //   label: "页面分类",
-    //   name: "page_type",
-    //   is: "Select",
-    //   itemSpan: 24,
-    //   placeholder: "请选择页面分类",
-    //   options: [
-    //     {
-    //       label: "后台页面",
-    //       value: "admin",
-    //     },
-    //     {
-    //       label: "小程序页面",
-    //       value: "mini",
-    //     },
-    //   ],
-    // },
+    {
+      label: "页面分类",
+      name: "page_type",
+      is: "Select",
+      itemSpan: 24,
+      placeholder: "请选择页面分类",
+      options: [
+        {
+          label: "后台页面",
+          value: "admin",
+        },
+        {
+          label: "web页面",
+          value: "web",
+        },
+        {
+          label: "H5页面",
+          value: "h5",
+        },
+        {
+          label: "小程序",
+          value: "mini",
+        },
+        {
+          label: "移动端",
+          value: "app",
+        },
+      ],
+    },
     {
       label: "状态",
       name: "status",
@@ -225,6 +238,12 @@ const Page = () => {
       title: "页面描述",
       dataIndex: "description",
       key: "description",
+    },
+    {
+      title: "页面分类",
+      dataIndex: "page_type",
+      key: "page_type",
+      render: (text) => pageTypeEnum[text],
     },
     {
       title: "创建时间",

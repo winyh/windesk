@@ -8,18 +8,23 @@ const Navigation = () => {
 
   const tabItems = [
     {
-      label: "桌面导航",
+      label: "PC 导航",
       key: "pc",
       children: <div>参考菜单管理 http://localhost:1420/authority/menu</div>,
     },
     {
-      label: "H5导航",
+      label: "H5 导航",
       key: "mobile",
       children: <div>22</div>,
     },
     {
-      label: "移动端导航",
+      label: "App 导航",
       key: "app",
+      children: <div>22</div>,
+    },
+    {
+      label: "Mini 导航",
+      key: "mini",
       children: <div>22</div>,
     },
     {
