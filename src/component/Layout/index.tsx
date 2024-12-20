@@ -96,11 +96,13 @@ const LayoutBase = () => {
   }, [params.appId]);
 
   useEffect(() => {
-    // console.log(`路由变化监听：${location.pathname}`);
     if (location.pathname === "/" || location.pathname === "/saas") {
       navigate("/saas/dashboard");
+    } else if (location.pathname === `/app/${params.appId}`) {
+      navigate(`/app/${params.appId}/dashboard`);
     } else {
       onRouteChange();
+      // console.log(`路由变化监听：${location.pathname}`);
     }
   }, [location.pathname]);
 
@@ -269,12 +271,15 @@ const LayoutBase = () => {
         label = appInfo?.name;
       }
       let curentPath = linkPath;
-      breads.push({
-        title: <Link to={`${curentPath}`}>{label}</Link>,
-        onClick: () => {
-          navigate(`${curentPath}`);
-        },
-      });
+      console.log({ key });
+      if (key !== "app") {
+        breads.push({
+          title: <Link to={`${curentPath}`}>{label}</Link>,
+          onClick: () => {
+            navigate(`${curentPath}`);
+          },
+        });
+      }
     });
 
     setOpenKeys(keyPaths); // 初始展开

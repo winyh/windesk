@@ -712,7 +712,7 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
             rowHoverable={false}
             rowClassName={(record, index) => onRowClassName(record, index)}
             virtual
-            scroll={{ y: 800 }}
+            scroll={{ y: 720 }}
             pagination={false}
           />
         </Flex>

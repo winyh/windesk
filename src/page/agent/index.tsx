@@ -577,12 +577,21 @@ const Agent = () => {
         {/* 🌟 输入框 */}
         <Sender
           value={content}
+          allowSpeech
           header={senderHeader}
           onSubmit={onSubmit}
           onChange={setContent}
           prefix={attachmentsNode}
           loading={agent.isRequesting()}
           className={styles.sender}
+          styles={{
+            input: {
+              color:
+                antdThemeMode === "dark"
+                  ? token.colorWhite
+                  : token.colorBgSpotlight,
+            },
+          }}
         />
       </div>
     </div>

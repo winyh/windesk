@@ -34,7 +34,6 @@ import Message from "@/page/user/message";
 /* 权限管理 */
 import Admin from "@/page/authority/admin";
 import Role from "@/page/authority/role";
-import Menu from "@/page/authority/menu";
 import Navigation from "@/page/authority/menu/navigation";
 import Organization from "@/page/authority/organization";
 import Position from "@/page/authority/position";
