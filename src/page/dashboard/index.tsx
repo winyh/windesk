@@ -20,7 +20,7 @@ import {
   RocketOutlined,
 } from "@ant-design/icons";
 
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 
 import HighLight from "@/component/HighLight";
 
@@ -31,14 +31,16 @@ import reactLogo from "@/assets/react.svg";
 import vueLogo from "@/assets/vue.svg";
 import angularLogo from "@/assets/angular.svg";
 import flutterLogo from "@/assets/flutter.svg";
+import nuxtLogo from "@/assets/nuxt.svg";
 
-const { Text, Link } = Typography;
+const { Text } = Typography;
 const { Meta } = Card;
 
-const { BASE_URL } = import.meta.env;
+const { BASE_URL, VITE_WIN_SAAS_HOST } = import.meta.env;
 
 const Dashboard = () => {
   const params = useParams();
+  const navigate = useNavigate();
   const [greetMsg, setGreetMsg] = useState("");
   const [appInfo, setAppInfo] = useState({});
   const [stackList, setStackList] = useState([]);
@@ -72,6 +74,13 @@ const Dashboard = () => {
         id: "3",
         logo: angularLogo,
         description: "基于Angular开始开发",
+        doc: "",
+        example: "",
+      },
+      {
+        id: "3",
+        logo: nuxtLogo,
+        description: "基于Nuxt开始开发",
         doc: "",
         example: "",
       },
@@ -155,6 +164,10 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
             }}
           >
             <Space>
+              <Button icon={<RocketOutlined />}>
+                <Link to={`${VITE_WIN_SAAS_HOST}/saas/dashboard`}>Saas</Link>
+              </Button>
+
               <Input
                 id="greet-input"
                 onChange={(e) => setName(e.currentTarget.value)}
@@ -179,7 +192,7 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
                 <Space>
                   <Input value={appInfo.adminUrl} style={{ width: 300 }} />
                   <Button>
-                    <Link href="https://admin.winbase.io" target="_blank">
+                    <Link to="https://admin.winbase.io" target="_blank">
                       <HomeOutlined />
                     </Link>
                   </Button>

@@ -17,6 +17,7 @@ import {
   Tag,
   Alert,
   Typography,
+  Form,
 } from "antd";
 import { useParams } from "react-router-dom";
 import {
@@ -28,15 +29,40 @@ import {
   SendOutlined,
   SettingOutlined,
   DeleteOutlined,
+  SwapOutlined,
+  FontSizeOutlined,
+  UpCircleOutlined,
+  LockOutlined,
+  MailOutlined,
+  LinkOutlined,
+  ReadOutlined,
+  CalendarOutlined,
+  FileZipOutlined,
+  OrderedListOutlined,
+  ShareAltOutlined,
+  ExpandOutlined,
+  BorderlessTableOutlined,
 } from "@ant-design/icons";
-import SuperForm from "@/component/SuperForm";
+import useStore from "@/store/index";
+import {
+  clientPost,
+  clientPut,
+  clientGetList,
+  clientDelete,
+  comGet,
+} from "@/request";
 import HighLight from "@/component/HighLight";
 import WinCode from "@/component/Code";
+
+import "./index.css";
 
 const { Search } = Input;
 const { Text } = Typography;
 
 const Database = () => {
+  const themeMode = useStore((state) => state.themeMode);
+
+  const [form] = Form.useForm();
   const formRef = useRef();
   const { appId } = useParams();
   const [mode, setMode] = useState("table");
@@ -48,15 +74,140 @@ const Database = () => {
   const [docType, setDocType] = useState("api");
   const [searchLoading, setSearchLoading] = useState(false);
   const [dataSearchLoading, setDataSearchLoading] = useState(false);
+  const [tableColumns, setTableColumns] = useState([]);
   const [paginationMeta, setPaginationMeta] = useState({
     pageSize: 10,
     current: 1,
     total: 10,
   });
+  const [pageMeta, setPageMeta] = useState({
+    list: [],
+    pageSize: 10,
+    current: 1,
+    total: 10,
+  });
+  const [loading, setLoading] = useState(false);
+  const [tables, setTables] = useState([]);
   const [record, setRecord] = useState({});
-  const data = ["user", "article", "role", "admin", "category"];
+  const [selectedRowIndex, setSelectedRowIndex] = useState(null);
+  const [selectedRow, setSelectedRow] = useState({ name: "默认页" });
 
-  console.log({ appId });
+  useEffect(() => {
+    getDataTable();
+  }, []);
+
+  const getDataTable = async (params = {}) => {
+    await comGet(`/project/${appId}/meta/table/names`, params)
+      .then((res) => {
+        if (res.status) {
+          const data = res.data;
+          const first = data[0];
+          setTables(data);
+          if (first) {
+            getDataColumns({ table_name: first.table_name });
+            setSelectedRowIndex(0);
+            getTableDataList(first.table_name);
+          }
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {});
+  };
+
+  const getDataColumns = (params = {}) => {
+    comGet(`/project/${appId}/meta/table/columns`, params)
+      .then((res) => {
+        if (res.status) {
+          setTableColumns(
+            res.data
+              .sort((a, b) => {
+                if (a.COLUMN_NAME === "id") return -1;
+                if (b.COLUMN_NAME === "id") return 1;
+                if (a.COLUMN_NAME.includes("id")) return -1;
+                if (b.COLUMN_NAME.includes("id")) return 1;
+                if (a.COLUMN_NAME.includes("_at")) return 1;
+                if (b.COLUMN_NAME.includes("_at")) return -1;
+                return 0;
+              })
+              .map((item) => ({
+                dataIndex: item.COLUMN_NAME,
+                key: item.COLUMN_NAME,
+                width: 200,
+                fixed: item.COLUMN_NAME === "id" ? "left" : null,
+                title: (_, record) => (
+                  <Flex justify="space-between">
+                    {item.COLUMN_NAME}
+                    <Space>
+                      <Button
+                        size="small"
+                        type="text"
+                        icon={<EditOutlined />}
+                        onClick={() => editColumn(record)}
+                      ></Button>
+                      <Popconfirm
+                        title="确定删除吗?"
+                        onConfirm={() => deleteColumn(record.id)}
+                      >
+                        <Button
+                          size="small"
+                          type="text"
+                          danger
+                          icon={<DeleteOutlined />}
+                        ></Button>
+                      </Popconfirm>
+                    </Space>
+                  </Flex>
+                ),
+                render: (text) => {
+                  if (String(text).length > 120) {
+                    return (
+                      <Text style={{ width: 200 }} ellipsis={{ tooltip: text }}>
+                        {text}
+                      </Text>
+                    );
+                  } else {
+                    return text;
+                  }
+                },
+              }))
+          );
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {});
+  };
+
+  const getTableDataList = (collection, params = {}) => {
+    setLoading(true);
+    const { current, pageSize } = pageMeta;
+    clientGetList("project", collection, {
+      current,
+      pageSize,
+      ...params,
+    })
+      .then((res) => {
+        if (res.status) {
+          const { list, total, current, pageSize } = res.data;
+          setPageMeta({
+            list,
+            pageSize,
+            current,
+            total,
+          });
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
 
   const showDrawer = (bool, record) => {
     setAction(bool);
@@ -122,50 +273,31 @@ const Database = () => {
 
   const onPaginationChange = (current, pageSize) => {
     setPaginationMeta((pre) => ({ ...pre, current, pageSize }));
-    getData({ current, pageSize });
+    getDataTable({ current, pageSize });
   };
 
   const onShowSizeChange = (current, pageSize) => {
     setPaginationMeta((pre) => ({ ...pre, current, pageSize }));
-    getData({ current, pageSize });
+    getDataTable({ current, pageSize });
   };
 
-  const layout = {
-    labelCol: { span: 6 },
-    wrapperCol: { span: 18 },
+  const onRowClassName = (record, index) => {
+    return selectedRowIndex === index
+      ? themeMode === "dark"
+        ? "high-bg-dark"
+        : "high-bg-light"
+      : "";
   };
 
-  const formData = [
-    {
-      label: "数据表名称",
-      name: "table_name",
-      is: "Input",
-      itemSpan: 24,
-      placeholder: "请输入数据表名称",
-    },
-    {
-      label: "数据表描述",
-      name: "description",
-      is: "Input.TextArea",
-      itemSpan: 24,
-      placeholder: "请输入数据表描述",
-    },
-  ];
-
-  const dataSource = [
-    {
-      key: "1",
-      name: "胡彦斌",
-      age: 32,
-      address: "西湖区湖底公园1号",
-    },
-    {
-      key: "2",
-      name: "胡彦祖",
-      age: 42,
-      address: "西湖区湖底公园1号",
-    },
-  ];
+  // 行点击事件处理函数
+  const onRowClick = (record, index) => {
+    setSelectedRow(record);
+    setSelectedRowIndex(index);
+    getDataColumns({
+      table_name: record?.table_name,
+    });
+    getTableDataList(record?.table_name, {});
+  };
 
   const columns = [
     {
@@ -237,11 +369,16 @@ const Database = () => {
     },
   ];
 
-  const onSearch = () => {
+  const onSearch = (value) => {
     setSearchLoading(false);
+    getDataTable({ table_name: value });
   };
 
-  const onDataSearch = () => {};
+  const onDataSearch = (value) => {
+    getTableDataList({
+      value,
+    });
+  };
 
   const onModeChange = (value) => {
     setMode(value);
@@ -421,44 +558,164 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
     },
   ];
 
+  const columnsLeft = [
+    {
+      title: "表名",
+      dataIndex: "table_name",
+      key: "table_name",
+    },
+    {
+      title: "操作",
+      dataIndex: "operate",
+      key: "operate",
+      render: (text, record) => (
+        <Space>
+          <Button
+            size="small"
+            type="text"
+            onClick={() => showDrawer(false, record)}
+          >
+            修改
+          </Button>
+          <Popconfirm
+            title="您确认要删除这条记录吗？"
+            onConfirm={() => deleteRecord(record.key)}
+            okText="确认"
+            cancelText="取消"
+          >
+            <Button size="small" type="text" danger>
+              删除
+            </Button>
+          </Popconfirm>
+        </Space>
+      ),
+    },
+  ];
+
+  const columnsTable = [
+    {
+      title: "字段",
+      dataIndex: "field",
+      key: "field",
+    },
+    {
+      title: "类型",
+      dataIndex: "type",
+      key: "type",
+    },
+    {
+      title: "操作",
+      dataIndex: "operate",
+      key: "operate",
+    },
+  ];
+
+  const itemsFieldType = [
+    {
+      label: "UID 唯一id",
+      key: "uid",
+      icon: <BorderlessTableOutlined />,
+      onClick: () => showDrawer(false, {}),
+    },
+    {
+      label: "Plain Text 文本",
+      key: "plain",
+      icon: <EditOutlined />,
+      onClick: () => showDrawer(false, {}),
+    },
+    {
+      label: "Rich Editor 富文本",
+      key: "rich",
+      icon: <ReadOutlined />,
+      onClick: () => showDrawer(false, {}),
+    },
+    {
+      label: "Number 数字",
+      key: "number",
+      icon: <FontSizeOutlined />,
+    },
+    {
+      label: "Bool 布尔值",
+      key: "bool",
+      icon: <SwapOutlined />,
+    },
+    {
+      label: "Email 邮箱",
+      key: "email",
+      icon: <MailOutlined />,
+    },
+    {
+      label: "Url 网址",
+      key: "url",
+      icon: <LinkOutlined />,
+    },
+    {
+      label: "Password 密码",
+      key: "pasword",
+      icon: <LockOutlined />,
+    },
+    {
+      label: "DateTime 日期时间",
+      key: "datetime",
+      icon: <CalendarOutlined />,
+    },
+    {
+      label: "AutoDate 自动日期",
+      key: "autodate",
+      icon: <UpCircleOutlined />,
+    },
+    {
+      label: "Enumeration 枚举",
+      key: "enumeration",
+      icon: <OrderedListOutlined />,
+    },
+    {
+      label: "File 文件",
+      key: "file",
+      icon: <FileZipOutlined />,
+    },
+    {
+      label: "Relation 关联",
+      key: "relation",
+      icon: <ShareAltOutlined />,
+    },
+    {
+      label: "JSON 格式",
+      key: "json",
+      icon: <ExpandOutlined />,
+    },
+  ];
+
   return (
     <Row gutter={24} style={{ height: "100%" }}>
       <Col span={4}>
-        <List
-          header={
+        <Flex vertical gap="middle" style={{ height: "100%" }}>
+          <Space>
+            <Button icon={<PlusOutlined />} onClick={() => showDrawer(true)}>
+              新增数据表
+            </Button>
             <Search
               placeholder="搜索数据表"
               loading={searchLoading}
               allowClear
               onSearch={onSearch}
             />
-          }
-          footer={
-            <Button
-              type="text"
-              block
-              icon={<PlusOutlined />}
-              onClick={() => showDrawer(true)}
-            >
-              新增数据表
-            </Button>
-          }
-          bordered
-          dataSource={data}
-          renderItem={(item) => (
-            <List.Item key={item}>
-              <List.Item.Meta title={item} />
-              <Dropdown
-                menu={{
-                  items,
-                }}
-                placement="bottomLeft"
-              >
-                <Button type="text" icon={<MoreOutlined />}></Button>
-              </Dropdown>
-            </List.Item>
-          )}
-        />
+          </Space>
+
+          <Table
+            size="middle"
+            dataSource={tables}
+            columns={columnsLeft}
+            onRow={(record, index) => ({
+              onClick: () => onRowClick(record, index), // 绑定点击事件
+            })}
+            rowHoverable={false}
+            rowClassName={(record, index) => onRowClassName(record, index)}
+            virtual
+            scroll={{ y: 800 }}
+            pagination={false}
+          />
+        </Flex>
       </Col>
       <Col span={20}>
         <Flex vertical gap="middle" style={{ height: "100%" }}>
@@ -480,6 +737,11 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
                 value={mode}
                 onChange={onModeChange}
               ></Segmented>
+
+              {mode === "table" ? (
+                <Button icon={<PlusOutlined />}>新增列</Button>
+              ) : null}
+
               {mode === "table" ? (
                 <Space>
                   {selectedRows.length > 0 ? (
@@ -541,22 +803,25 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
 
           {mode === "table" ? (
             <Table
+              size="middle"
               rowSelection={{
                 ...rowSelection,
               }}
               rowKey={(record) => record.key}
-              dataSource={dataSource}
-              columns={columns}
+              dataSource={pageMeta.list}
+              columns={tableColumns}
+              scroll={{ x: "max-content" }}
+              loading={loading}
               pagination={
-                dataSource.length > 0 && {
+                pageMeta.list.length > 0 && {
                   position: ["bottomCenter"],
                   showSizeChanger: true,
                   showQuickJumper: true,
                   onChange: onPaginationChange,
                   onShowSizeChange: onShowSizeChange,
-                  pageSize: paginationMeta.pageSize, // 每页显示记录数
-                  current: paginationMeta.current, // 当前页码
-                  total: paginationMeta.total, // 总记录数
+                  pageSize: pageMeta.pageSize, // 每页显示记录数
+                  current: pageMeta.current, // 当前页码
+                  total: pageMeta.total, // 总记录数
                 }
               }
             />
@@ -574,6 +839,7 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
         title={`${action ? "新增" : "编辑"}数据表`}
         onClose={onClose}
         open={open}
+        width="40%"
         footer={
           <Flex justify="flex-end">
             <Space>
@@ -585,15 +851,42 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
           </Flex>
         }
       >
-        <SuperForm
-          ref={formRef}
-          data={formData}
-          layout={layout}
-          limit={6}
-          initialValues={record}
-          rulesValid={false}
-          btnAction={false}
-        ></SuperForm>
+        <Form
+          name="databse"
+          form={form}
+          labelCol={{ span: 4 }}
+          wrapperCol={{ span: 20 }}
+        >
+          <Form.Item name="table_name" label="数据表名">
+            <Input placeholder="请输入数据表名" />
+          </Form.Item>
+
+          <Form.Item name="description" label="数据表描述">
+            <Input.TextArea placeholder="请输入数据表描述" />
+          </Form.Item>
+        </Form>
+
+        <Row gutter={16}>
+          <Col offset={4} span={20}>
+            <Table
+              size="small"
+              bordered
+              dataSource={[]}
+              columns={columnsTable}
+            />
+          </Col>
+          <Col offset={4} span={20}>
+            <Dropdown
+              menu={{ items: itemsFieldType }}
+              placement="bottom"
+              arrow={{ pointAtCenter: true }}
+            >
+              <Button icon={<PlusOutlined />} block style={{ marginTop: 16 }}>
+                新增字段
+              </Button>
+            </Dropdown>
+          </Col>
+        </Row>
       </Drawer>
     </Row>
   );

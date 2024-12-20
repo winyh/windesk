@@ -280,6 +280,13 @@ const Page = () => {
               设计
             </Link>
             <Divider type="vertical" />
+            <Link
+              to={`${ENGINE_HOST}/app/${appId}/page/${record.uid}/runtime`}
+              target="_blank"
+            >
+              运行
+            </Link>
+            <Divider type="vertical" />
             <Button
               type="text"
               size="small"
