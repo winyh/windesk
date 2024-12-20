@@ -28,6 +28,18 @@ import {
 import { createStyles } from "antd-style";
 import OpenAI from "openai";
 
+import markdownit from "markdown-it";
+import hljs from "highlight.js";
+import javascript from "highlight.js/lib/languages/javascript";
+import python from "highlight.js/lib/languages/python";
+import json from "highlight.js/lib/languages/json";
+
+hljs.registerLanguage("javascript", javascript);
+hljs.registerLanguage("python", python);
+hljs.registerLanguage("json", json);
+
+import useStore from "@/store/index";
+
 import winbaseLogo from "/winbase.png";
 
 const renderTitle = (icon, title) => (
@@ -221,6 +233,36 @@ const roles = {
         borderRadius: 16,
       },
     },
+    messageRender: (item: string) => {
+      // Actual default values
+      const md = markdownit({
+        html: true,
+        linkify: true,
+        typographer: true,
+        highlight: function (str, lang) {
+          if (lang && hljs.getLanguage(lang)) {
+            try {
+              return (
+                '<pre><code class="hljs">' +
+                hljs.highlight(str, { language: lang, ignoreIllegals: true })
+                  .value +
+                "</code></pre>"
+              );
+            } catch (__) {}
+          }
+
+          return (
+            '<pre><code class="hljs">' +
+            md.utils.escapeHtml(str) +
+            "</code></pre>"
+          );
+        },
+      });
+
+      const result = md.render(item);
+
+      return <div dangerouslySetInnerHTML={{ __html: result }}></div>;
+    },
   },
   local: {
     placement: "end",
@@ -228,9 +270,11 @@ const roles = {
   },
 };
 
-const { VITE_AGENT_BASE_URL, VITE_AGENT_API_KEY } = import.meta.env;
+const { VITE_AGENT_BASE_URL, VITE_AGENT_API_KEY, BASE_URL } = import.meta.env;
 
 const Agent = () => {
+  const antdThemeMode = useStore((state) => state.themeMode);
+
   // ==================== Style ====================
   const { styles } = useStyle();
 
@@ -295,6 +339,23 @@ const Agent = () => {
 
   useEffect(() => {
     if (activeKey !== undefined) {
+      let linkTarget = document.getElementById("hljs");
+      let github = "github"; // 这里设置没生效-github-dark可以设置深色
+      if (antdThemeMode === "dark") {
+        github = "github-dark";
+      }
+
+      if (linkTarget) {
+        document.head.removeChild(linkTarget);
+      }
+
+      const linkElement = document.createElement("link");
+      linkElement.id = "hljs";
+      linkElement.rel = "stylesheet";
+      linkElement.href = `${BASE_URL}css/${github}.min.css`;
+      document.head.appendChild(linkElement);
+
+      hljs.highlightAll();
       setMessages([]);
     }
   }, [activeKey]);
