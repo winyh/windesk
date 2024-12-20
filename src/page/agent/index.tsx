@@ -13,7 +13,16 @@ import {
   SmileOutlined,
 } from "@ant-design/icons";
 
-import { Row, Col, theme, Badge, Button, Space } from "antd";
+import {
+  Row,
+  Col,
+  theme,
+  Badge,
+  Button,
+  Space,
+  ConfigProvider,
+  Card,
+} from "antd";
 
 import {
   Attachments,
@@ -55,13 +64,6 @@ const defaultConversationsItems = [
   },
 ];
 
-const messages = [
-  {
-    content: "Hello, Ant Design X!",
-    role: "user",
-  },
-];
-
 const useStyle = createStyles(({ token, css }) => {
   return {
     layout: css`
@@ -72,7 +74,6 @@ const useStyle = createStyles(({ token, css }) => {
       display: flex;
       background: ${token.colorBgContainer};
       font-family: AlibabaPuHuiTi, ${token.fontFamily}, sans-serif;
-
       .ant-prompts {
         color: ${token.colorText};
       }
@@ -102,6 +103,7 @@ const useStyle = createStyles(({ token, css }) => {
     `,
     messages: css`
       flex: 1;
+      background: ${token.colorBgContainer};
     `,
     placeholder: css`
       padding-top: 32px;
@@ -276,7 +278,8 @@ const Agent = () => {
   const antdThemeMode = useStore((state) => state.themeMode);
 
   // ==================== Style ====================
-  const { styles } = useStyle();
+  const { token } = theme.useToken();
+  const { styles } = useStyle(token);
 
   // ==================== State ====================
   const [headerOpen, setHeaderOpen] = useState(false);
@@ -391,31 +394,59 @@ const Agent = () => {
   // ==================== Nodes ====================
   const placeholderNode = (
     <Space direction="vertical" size={16} className={styles.placeholder}>
-      <Welcome
-        variant="borderless"
-        icon="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp"
-        title="你好, 我是 winbase"
-        description="基于通义千问大模型机器人"
-        extra={
-          <Space>
-            <Button icon={<ShareAltOutlined />} />
-            <Button icon={<EllipsisOutlined />} />
-          </Space>
-        }
-      />
-      <Prompts
-        title="你想问?"
-        items={placeholderPromptsItems}
-        styles={{
-          list: {
-            width: "100%",
-          },
-          item: {
-            flex: 1,
-          },
+      <ConfigProvider
+        theme={{
+          algorithm: theme.defaultAlgorithm,
         }}
-        onItemClick={onPromptsItemClick}
-      />
+      >
+        <Welcome
+          style={{
+            backgroundImage: "linear-gradient(97deg, #f2f9fe 0%, #f7f3ff 100%)",
+            borderStartStartRadius: 4,
+            minWidth: 680,
+          }}
+          icon="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp"
+          title="你好, 我是 winbase"
+          description="基于通义千问大模型机器人"
+        />
+      </ConfigProvider>
+
+      <ConfigProvider
+        theme={{
+          algorithm: theme.defaultAlgorithm,
+        }}
+      >
+        <Prompts
+          title="你想问?"
+          items={placeholderPromptsItems}
+          styles={{
+            title: {
+              color:
+                antdThemeMode === "dark"
+                  ? token.colorWhite
+                  : token.colorBgSpotlight,
+            },
+            list: {
+              width: "100%",
+            },
+            item: {
+              flex: "none",
+              width: "calc(30% - 6px)",
+              backgroundImage: `linear-gradient(137deg, #e5f4ff 0%, #efe7ff 100%)`,
+              border: 0,
+            },
+            subItem: {
+              background: "rgba(255,255,255,0.45)",
+              border: "1px solid #FFF",
+              color:
+                antdThemeMode === "dark"
+                  ? token.colorBgBase
+                  : token.colorBgSpotlight,
+            },
+          }}
+          onItemClick={onPromptsItemClick}
+        />
+      </ConfigProvider>
     </Space>
   );
   const items = messages.map(({ id, message, status }) => ({
@@ -423,6 +454,16 @@ const Agent = () => {
     loading: status === "loading",
     role: status === "local" ? "local" : "ai",
     content: message,
+    variant: antdThemeMode === "dark" ? "shadow" : "filled",
+    shape: "corner",
+    styles: {
+      content: {
+        background:
+          antdThemeMode === "dark"
+            ? token.colorInfoActive
+            : token.colorBorderSecondary,
+      },
+    },
   }));
   const attachmentsNode = (
     <Badge dot={attachedFiles.length > 0 && !headerOpen}>
@@ -441,6 +482,7 @@ const Agent = () => {
       styles={{
         content: {
           padding: 0,
+          backgroundImage: "linear-gradient(97deg, #f2f9fe 0%, #f7f3ff 100%)",
         },
       }}
     >
@@ -481,6 +523,7 @@ const Agent = () => {
           type="link"
           className={styles.addBtn}
           icon={<PlusOutlined />}
+          style={{ borderRadius: 6 }}
         >
           开启新对话
         </Button>
@@ -489,6 +532,14 @@ const Agent = () => {
           items={conversationsItems}
           className={styles.conversations}
           activeKey={activeKey}
+          styles={{
+            item: {
+              backgroundImage:
+                "linear-gradient(97deg, #f2f9fe 0%, #f7f3ff 100%)",
+              borderRadius: "6px",
+              border: "1px solid #eee",
+            },
+          }}
           onActiveChange={onConversationClick}
         />
       </div>
@@ -501,7 +552,8 @@ const Agent = () => {
               : [
                   {
                     content: placeholderNode,
-                    variant: "borderless",
+                    variant: antdThemeMode === "dark" ? "shadow" : "borderless",
+                    shape: "corner",
                   },
                 ]
           }
@@ -509,7 +561,19 @@ const Agent = () => {
           className={styles.messages}
         />
         {/* 🌟 提示词 */}
-        <Prompts items={senderPromptsItems} onItemClick={onPromptsItemClick} />
+        <Prompts
+          styles={{
+            item: {
+              backgroundImage: `linear-gradient(137deg, #e5f4ff 0%, #efe7ff 100%)`,
+              color:
+                antdThemeMode === "dark"
+                  ? token.colorBgBase
+                  : token.colorBgSpotlight,
+            },
+          }}
+          items={senderPromptsItems}
+          onItemClick={onPromptsItemClick}
+        />
         {/* 🌟 输入框 */}
         <Sender
           value={content}
