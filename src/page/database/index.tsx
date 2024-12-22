@@ -22,6 +22,7 @@ import {
 } from "antd";
 import { useParams } from "react-router-dom";
 import {
+  SaveOutlined,
   PlusOutlined,
   InteractionOutlined,
   EditOutlined,
@@ -42,6 +43,7 @@ import {
   OrderedListOutlined,
   ShareAltOutlined,
   ExpandOutlined,
+  CloudSyncOutlined,
   BorderlessTableOutlined,
 } from "@ant-design/icons";
 import useStore from "@/store/index";
@@ -69,7 +71,7 @@ const Database = () => {
   const [form] = Form.useForm();
   const formRef = useRef();
   const { appId } = useParams();
-  const [mode, setMode] = useState("table");
+  const [mode, setMode] = useState("schema");
   const [selectedRows, setSelectedRows] = useState([]);
   const [open, setOpen] = useState(false);
   const [docOpen, setDocOpen] = useState(false);
@@ -421,6 +423,9 @@ const Database = () => {
     setActiveKey(activeKey);
   };
 
+  // 保存模型-并更新 schema
+  const onSaveSchema = async () => {};
+
   const tabContent = [
     {
       label: "JavaScript",
@@ -749,6 +754,11 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
               <Segmented
                 options={[
                   {
+                    label: "Schema",
+                    value: "schema",
+                    icon: <InteractionOutlined />,
+                  },
+                  {
                     label: "Table",
                     value: "table",
                     icon: <TableOutlined />,
@@ -757,11 +767,6 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
                     label: "SQL",
                     value: "sql",
                     icon: <CodeOutlined />,
-                  },
-                  {
-                    label: "Schema",
-                    value: "schema",
-                    icon: <InteractionOutlined />,
                   },
                 ]}
                 value={mode}
@@ -803,12 +808,14 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
               ) : null}
             </Space>
             <Space size="middle">
-              {mode === "table" ? (
+              {mode === "table" && (
                 <Space>
                   <Button onClick={onDocShow}>API / GraphQL</Button>
                   <Button icon={<PlusOutlined />}>新增记录</Button>
                 </Space>
-              ) : (
+              )}
+
+              {mode === "sql" && (
                 <Space>
                   <Button icon={<DeleteOutlined />} onClick={onClearCode}>
                     清空数据
@@ -824,6 +831,14 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
                     onClick={() => executeNativeSql(false)}
                   >
                     仅执行
+                  </Button>
+                </Space>
+              )}
+
+              {mode === "schema" && (
+                <Space>
+                  <Button icon={<CloudSyncOutlined />} onClick={onSaveSchema}>
+                    更新模型
                   </Button>
                 </Space>
               )}
@@ -855,7 +870,7 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
             <Tabs tabPosition="left" items={tabItems} />
           </Drawer>
 
-          {mode === "table" ? (
+          {mode === "table" && (
             <Table
               size="middle"
               rowSelection={{
@@ -879,7 +894,9 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
                 }
               }
             />
-          ) : (
+          )}
+
+          {mode === "sql" && (
             <Row gutter={24}>
               <Col span={16}>
                 <WinCode
@@ -894,6 +911,19 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
                   initialValue={initialValueJson}
                   options={{ useWorker: false }}
                   mode="json"
+                />
+              </Col>
+            </Row>
+          )}
+
+          {mode === "schema" && (
+            <Row gutter={24}>
+              <Col span={24}>
+                <WinCode
+                  initialValue="model user { }"
+                  options={{ useWorker: false }}
+                  mode="sql"
+                  onChange={onCodeChange}
                 />
               </Col>
             </Row>
