@@ -42,7 +42,8 @@ const Storage = () => {
   const [open, setOpen] = useState(false);
   const [action, setAction] = useState(true);
   const [searchLoading, setSearchLoading] = useState(false);
-  const [paginationMeta, setPaginationMeta] = useState({
+  const [pageMeta, setPageMeta] = useState({
+    list: [],
     pageSize: 10,
     current: 1,
     total: 10,
@@ -331,12 +332,12 @@ const Storage = () => {
   };
 
   const onPaginationChange = (current, pageSize) => {
-    setPaginationMeta((pre) => ({ ...pre, current, pageSize }));
+    setPageMeta((pre) => ({ ...pre, current, pageSize }));
     getData({ current, pageSize });
   };
 
   const onShowSizeChange = (current, pageSize) => {
-    setPaginationMeta((pre) => ({ ...pre, current, pageSize }));
+    setPageMeta((pre) => ({ ...pre, current, pageSize }));
     getData({ current, pageSize });
   };
 
@@ -436,18 +437,18 @@ const Storage = () => {
           ...rowSelection,
         }}
         rowKey={(record) => record.key}
-        dataSource={dataSource}
+        dataSource={pageMeta.list}
         columns={columns}
         pagination={
-          dataSource.length > 0 && {
+          pageMeta.total > pageMeta.pageSize && {
             position: ["bottomCenter"],
             showSizeChanger: true,
             showQuickJumper: true,
             onChange: onPaginationChange,
             onShowSizeChange: onShowSizeChange,
-            pageSize: paginationMeta.pageSize, // 每页显示记录数
-            current: paginationMeta.current, // 当前页码
-            total: paginationMeta.total, // 总记录数
+            pageSize: pageMeta.pageSize, // 每页显示记录数
+            current: pageMeta.current, // 当前页码
+            total: pageMeta.total, // 总记录数
           }
         }
       />

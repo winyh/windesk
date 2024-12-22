@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Typography, Button } from "antd";
-import { ReadOutlined } from "@ant-design/icons";
 import "./index.css";
 
 import useStore from "@/store/index";

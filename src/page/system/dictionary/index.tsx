@@ -18,7 +18,8 @@ const { Search } = Input;
 
 const Dictionary = () => {
   const [selectedRows, setSelectedRows] = useState([]);
-  const [paginationMeta, setPaginationMeta] = useState({
+  const [pageMeta, setPageMeta] = useState({
+    list: [], // 初始值加入 list
     pageSize: 10,
     current: 1,
     total: 10,
@@ -53,12 +54,12 @@ const Dictionary = () => {
   ];
 
   const onPaginationChange = (current, pageSize) => {
-    setPaginationMeta((pre) => ({ ...pre, current, pageSize }));
+    setPageMeta((pre) => ({ ...pre, current, pageSize }));
     getData({ current, pageSize });
   };
 
   const onShowSizeChange = (current, pageSize) => {
-    setPaginationMeta((pre) => ({ ...pre, current, pageSize }));
+    setPageMeta((pre) => ({ ...pre, current, pageSize }));
     getData({ current, pageSize });
   };
 
@@ -198,18 +199,18 @@ const Dictionary = () => {
               ...rowSelection,
             }}
             rowKey={(record) => record.id}
-            dataSource={dataSource}
+            dataSource={pageMeta.list}
             columns={columns}
             pagination={
-              dataSource.length > 0 && {
+              pageMeta.total > pageMeta.pageSize && {
                 position: ["bottomCenter"],
                 showSizeChanger: true,
                 showQuickJumper: true,
                 onChange: onPaginationChange,
                 onShowSizeChange: onShowSizeChange,
-                pageSize: paginationMeta.pageSize, // 每页显示记录数
-                current: paginationMeta.current, // 当前页码
-                total: paginationMeta.total, // 总记录数
+                pageSize: pageMeta.pageSize, // 每页显示记录数
+                current: pageMeta.current, // 当前页码
+                total: pageMeta.total, // 总记录数
               }
             }
           />

@@ -14,9 +14,8 @@ const Log = () => {
 
   const [activeKey, setActiveKey] = useState("operate");
   const [loading, setLoading] = useState(false);
-  const [operateDataSource, setOperateDataSource] = useState([]);
-  const [accountDataSource, setAccountDataSource] = useState([]);
-  const [paginationMeta, setPaginationMeta] = useState({
+  const [pageMeta, setPageMeta] = useState({
+    list: [],
     pageSize: 10,
     current: 1,
     total: 10,
@@ -35,13 +34,8 @@ const Log = () => {
     const res = await comGet("/admin/log/list", { ...params });
     if (res.status) {
       const { list, total, current, pageSize } = res.data;
-      if (params.log === "operate") {
-        setOperateDataSource(list);
-      } else {
-        setAccountDataSource(list);
-      }
-
-      setPaginationMeta({
+      setPageMeta({
+        list: list,
         pageSize: pageSize,
         current: current,
         total: total,
@@ -75,21 +69,6 @@ const Log = () => {
   };
 
   const operateColumns = [
-    // {
-    //   title: "操作人",
-    //   dataIndex: "username",
-    //   key: "username",
-    // },
-    // {
-    //   title: "操作内容",
-    //   dataIndex: "action",
-    //   key: "action", // 用户退出、查询树列表、分页查询列表等
-    // },
-    // {
-    //   title: "所属模块",
-    //   dataIndex: "module",
-    //   key: "module", // 登录、用户管理、系统日志等
-    // },
     {
       title: "操作地点",
       dataIndex: "location",
@@ -238,12 +217,12 @@ const Log = () => {
   };
 
   const onPaginationChange = (current, pageSize) => {
-    setPaginationMeta((pre) => ({ ...pre, current, pageSize }));
+    setPageMeta((pre) => ({ ...pre, current, pageSize }));
     getLogData({ current, pageSize, log: activeKey });
   };
 
   const onShowSizeChange = (current, pageSize) => {
-    setPaginationMeta((pre) => ({ ...pre, current, pageSize }));
+    setPageMeta((pre) => ({ ...pre, current, pageSize }));
     getLogData({ current, pageSize, log: activeKey });
   };
 
@@ -253,20 +232,20 @@ const Log = () => {
       key: "operate",
       children: (
         <Table
-          dataSource={operateDataSource}
+          dataSource={pageMeta.list}
           columns={operateColumns}
           rowKey={(record) => record?.session}
           loading={loading}
           pagination={
-            operateDataSource.length > 0 && {
+            pageMeta.total > pageMeta.pageSize && {
               position: ["bottomCenter"],
               showSizeChanger: true,
               showQuickJumper: true,
               onChange: onPaginationChange,
               onShowSizeChange: onShowSizeChange,
-              pageSize: paginationMeta.pageSize, // 每页显示记录数
-              current: paginationMeta.current, // 当前页码
-              total: paginationMeta.total, // 总记录数
+              pageSize: pageMeta.pageSize, // 每页显示记录数
+              current: pageMeta.current, // 当前页码
+              total: pageMeta.total, // 总记录数
             }
           }
         />
@@ -277,20 +256,20 @@ const Log = () => {
       key: "login",
       children: (
         <Table
-          dataSource={accountDataSource}
+          dataSource={pageMeta.list}
           columns={accountColumns}
           rowKey={(record) => record?.session}
           loading={loading}
           pagination={
-            accountDataSource.length > 0 && {
+            pageMeta.total > pageMeta.pageSize && {
               position: ["bottomCenter"],
               showSizeChanger: true,
               showQuickJumper: true,
               onChange: onPaginationChange,
               onShowSizeChange: onShowSizeChange,
-              pageSize: paginationMeta.pageSize, // 每页显示记录数
-              current: paginationMeta.current, // 当前页码
-              total: paginationMeta.total, // 总记录数
+              pageSize: pageMeta.pageSize, // 每页显示记录数
+              current: pageMeta.current, // 当前页码
+              total: pageMeta.total, // 总记录数
             }
           }
         />

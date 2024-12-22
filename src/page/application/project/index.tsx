@@ -66,7 +66,8 @@ const Project = () => {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [tenantOptions, setTenantOptions] = useState([]);
-  const [paginationMeta, setPaginationMeta] = useState({
+  const [pageMeta, setPageMeta] = useState({
+    list: [],
     pageSize: 10,
     current: 1,
     total: 10,
@@ -82,7 +83,7 @@ const Project = () => {
 
   const getData = (params = {}) => {
     setLoading(true);
-    const { current, pageSize } = paginationMeta;
+    const { current, pageSize } = pageMeta;
     clientGetList("platform", "application", {
       current,
       pageSize,
@@ -91,7 +92,8 @@ const Project = () => {
       .then((res) => {
         if (res.status) {
           const { list, total, current, pageSize } = res.data;
-          setPaginationMeta({
+          setPageMeta({
+            list: list,
             pageSize: pageSize,
             current: current,
             total: total,
@@ -530,7 +532,7 @@ const Project = () => {
           />
         </Space>
         <Flex gap="middle" align="start" wrap>
-          {appItems.map((item) => {
+          {pageMeta.list.map((item) => {
             const child = (
               <Card
                 title={item.name}
@@ -580,20 +582,22 @@ const Project = () => {
         </Flex>
       </Flex>
 
-      {appItems.length === 0 && (
+      {pageMeta.list.length === 0 && (
         <Flex justify="center">
           <Empty />
         </Flex>
       )}
 
-      <Flex justify="center">
-        <Pagination
-          showQuickJumper
-          current={paginationMeta.current}
-          total={paginationMeta.total}
-          onChange={onChange}
-        />
-      </Flex>
+      {pageMeta.total > pageMeta.pageSize && (
+        <Flex justify="center">
+          <Pagination
+            showQuickJumper
+            current={pageMeta.current}
+            total={pageMeta.total}
+            onChange={onChange}
+          />
+        </Flex>
+      )}
 
       <Drawer
         title={`${action ? "新增" : "编辑"}应用`}

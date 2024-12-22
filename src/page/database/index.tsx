@@ -18,16 +18,17 @@ import {
   Alert,
   Typography,
   Form,
+  Select,
 } from "antd";
 import { useParams } from "react-router-dom";
 import {
   PlusOutlined,
-  MoreOutlined,
+  InteractionOutlined,
   EditOutlined,
   CodeOutlined,
   TableOutlined,
   SendOutlined,
-  SettingOutlined,
+  CloudDownloadOutlined,
   DeleteOutlined,
   SwapOutlined,
   FontSizeOutlined,
@@ -50,11 +51,14 @@ import {
   clientGetList,
   clientDelete,
   comGet,
+  comPost,
+  comDelete,
 } from "@/request";
 import HighLight from "@/component/HighLight";
 import WinCode from "@/component/Code";
 
 import "./index.css";
+import { message } from "@/store/hooks";
 
 const { Search } = Input;
 const { Text } = Typography;
@@ -75,11 +79,8 @@ const Database = () => {
   const [searchLoading, setSearchLoading] = useState(false);
   const [dataSearchLoading, setDataSearchLoading] = useState(false);
   const [tableColumns, setTableColumns] = useState([]);
-  const [paginationMeta, setPaginationMeta] = useState({
-    pageSize: 10,
-    current: 1,
-    total: 10,
-  });
+  const [columnOptions, setColumnOptions] = useState([]);
+
   const [pageMeta, setPageMeta] = useState({
     list: [],
     pageSize: 10,
@@ -89,6 +90,9 @@ const Database = () => {
   const [loading, setLoading] = useState(false);
   const [tables, setTables] = useState([]);
   const [record, setRecord] = useState({});
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [sqlCode, setSqlCode] = useState({});
+  const [initialValueJson, setInitialValueJson] = useState("");
   const [selectedRowIndex, setSelectedRowIndex] = useState(null);
   const [selectedRow, setSelectedRow] = useState({ name: "默认页" });
 
@@ -106,6 +110,7 @@ const Database = () => {
           if (first) {
             getDataColumns({ table_name: first.table_name });
             setSelectedRowIndex(0);
+            setRecord(first);
             getTableDataList(first.table_name);
           }
         }
@@ -120,6 +125,12 @@ const Database = () => {
     comGet(`/project/${appId}/meta/table/columns`, params)
       .then((res) => {
         if (res.status) {
+          setColumnOptions(
+            res.data.map((item) => ({
+              label: item.COLUMN_NAME,
+              value: item.COLUMN_NAME,
+            }))
+          );
           setTableColumns(
             res.data
               .sort((a, b) => {
@@ -148,7 +159,7 @@ const Database = () => {
                       ></Button>
                       <Popconfirm
                         title="确定删除吗?"
-                        onConfirm={() => deleteColumn(record.id)}
+                        onConfirm={() => deleteColumn(item)}
                       >
                         <Button
                           size="small"
@@ -209,6 +220,49 @@ const Database = () => {
       });
   };
 
+  const executeNativeSql = (isQuery) => {
+    comPost(`/project/${appId}/meta/table/sql`, {
+      sql: sqlCode,
+      isQuery,
+    })
+      .then((res) => {
+        const { status, data } = res;
+        if (status) {
+          console.log({ data });
+          setInitialValueJson(JSON.stringify(data, null, 2));
+          message.success("执行成功");
+        } else {
+          message.error(`执行失败：${data}`);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {});
+  };
+
+  const deleteColumn = async (col) => {
+    const { status, data } = await comDelete(
+      `/project/${appId}/meta/table/columns`,
+      {
+        table_name: record?.table_name,
+        table_column: col?.COLUMN_NAME,
+      }
+    );
+
+    if (status) {
+      message.success("删除成功");
+      getDataTable();
+    } else {
+      message.warning("删除失败");
+    }
+  };
+
+  const onClearCode = () => {
+    setInitialValueJson("");
+    message.success("清空成功");
+  };
+
   const showDrawer = (bool, record) => {
     setAction(bool);
     setOpen(true);
@@ -240,27 +294,6 @@ const Database = () => {
       .catch(() => {});
   };
 
-  const items = [
-    {
-      label: "修改",
-      key: "1",
-      icon: <EditOutlined />,
-      onClick: () => showDrawer(false, {}),
-    },
-    {
-      label: "配置",
-      key: "2",
-      icon: <SettingOutlined />,
-    },
-    {
-      label: "删除",
-      key: "3",
-      icon: <DeleteOutlined />,
-      danger: true,
-      disabled: true,
-    },
-  ];
-
   const rowSelection = {
     onChange: (selectedRowKeys, selectedRows) => {
       setSelectedRows(selectedRows);
@@ -272,12 +305,12 @@ const Database = () => {
   };
 
   const onPaginationChange = (current, pageSize) => {
-    setPaginationMeta((pre) => ({ ...pre, current, pageSize }));
+    setPageMeta((pre) => ({ ...pre, current, pageSize }));
     getDataTable({ current, pageSize });
   };
 
   const onShowSizeChange = (current, pageSize) => {
-    setPaginationMeta((pre) => ({ ...pre, current, pageSize }));
+    setPageMeta((pre) => ({ ...pre, current, pageSize }));
     getDataTable({ current, pageSize });
   };
 
@@ -292,55 +325,13 @@ const Database = () => {
   // 行点击事件处理函数
   const onRowClick = (record, index) => {
     setSelectedRow(record);
+    setRecord(record);
     setSelectedRowIndex(index);
     getDataColumns({
       table_name: record?.table_name,
     });
     getTableDataList(record?.table_name, {});
   };
-
-  const columns = [
-    {
-      title: "文件名",
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: "文件ID",
-      dataIndex: "hash",
-      key: "hash",
-    },
-    {
-      title: "文件后缀",
-      dataIndex: "suffix",
-      key: "suffix",
-    },
-    {
-      title: "大小",
-      dataIndex: "size",
-      key: "size",
-    },
-    {
-      title: "类型",
-      dataIndex: "type",
-      key: "type",
-    },
-    {
-      title: "状态",
-      dataIndex: "status",
-      key: "status",
-    },
-    {
-      title: "创建时间",
-      dataIndex: "created_at",
-      key: "created_at",
-    },
-    {
-      title: "操作",
-      dataIndex: "action",
-      key: "action",
-    },
-  ];
 
   const paramsColumns = [
     {
@@ -375,9 +366,14 @@ const Database = () => {
   };
 
   const onDataSearch = (value) => {
-    getTableDataList({
-      value,
+    getTableDataList(record?.table_name, {
+      [searchKeyword]: value,
     });
+  };
+
+  const onKeywordChange = (value) => {
+    console.log({ value });
+    setSearchKeyword(value);
   };
 
   const onModeChange = (value) => {
@@ -386,9 +382,38 @@ const Database = () => {
 
   const onCodeChange = (delta, content) => {
     // console.log({ delta, content });
+    setSqlCode(content);
   };
 
-  const onConfirm = () => {};
+  const onConfirm = async () => {
+    const ids = selectedRows.map((item) => item.id).join(",");
+    const { status, data } = await clientDelete("project", "page", {
+      ids: ids,
+    });
+
+    if (status) {
+      message.success("删除成功");
+      getTableDataList({ table_name: record?.table_name });
+    } else {
+      message.warning("删除失败");
+    }
+  };
+
+  const deleteTable = async (record) => {
+    const { status, data } = await comDelete(
+      `/project/${appId}/meta/table/names`,
+      {
+        table_names: record?.table_name,
+      }
+    );
+
+    if (status) {
+      message.success("删除成功");
+      getDataTable();
+    } else {
+      message.warning("删除失败");
+    }
+  };
 
   const onCancel = () => {};
 
@@ -578,8 +603,8 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
             修改
           </Button>
           <Popconfirm
-            title="您确认要删除这条记录吗？"
-            onConfirm={() => deleteRecord(record.key)}
+            title="您确认要删除数据表吗？"
+            onConfirm={() => deleteTable(record)}
             okText="确认"
             cancelText="取消"
           >
@@ -733,6 +758,11 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
                     value: "sql",
                     icon: <CodeOutlined />,
                   },
+                  {
+                    label: "Schema",
+                    value: "schema",
+                    icon: <InteractionOutlined />,
+                  },
                 ]}
                 value={mode}
                 onChange={onModeChange}
@@ -747,7 +777,7 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
                   {selectedRows.length > 0 ? (
                     <Popconfirm
                       title="系统提醒"
-                      description="您确认要删除数据表吗?"
+                      description="您确认要删除数据吗?"
                       onConfirm={onConfirm}
                       onCancel={onCancel}
                       okText="确认"
@@ -756,11 +786,19 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
                       <Button danger>批量删除</Button>
                     </Popconfirm>
                   ) : null}
-                  <Search
-                    placeholder="搜索数据"
-                    loading={dataSearchLoading}
-                    onSearch={onDataSearch}
-                  />
+                  <Space>
+                    <Select
+                      options={columnOptions}
+                      style={{ width: 160 }}
+                      onChange={onKeywordChange}
+                    ></Select>
+                    <Search
+                      placeholder="搜索数据"
+                      loading={dataSearchLoading}
+                      allowClear
+                      onSearch={onDataSearch}
+                    />
+                  </Space>
                 </Space>
               ) : null}
             </Space>
@@ -771,7 +809,23 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
                   <Button icon={<PlusOutlined />}>新增记录</Button>
                 </Space>
               ) : (
-                <Button icon={<SendOutlined />}>运行脚本</Button>
+                <Space>
+                  <Button icon={<DeleteOutlined />} onClick={onClearCode}>
+                    清空数据
+                  </Button>
+                  <Button
+                    icon={<CloudDownloadOutlined />}
+                    onClick={() => executeNativeSql(true)}
+                  >
+                    执行返回
+                  </Button>
+                  <Button
+                    icon={<SendOutlined />}
+                    onClick={() => executeNativeSql(false)}
+                  >
+                    仅执行
+                  </Button>
+                </Space>
               )}
             </Space>
           </Flex>
@@ -807,7 +861,7 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
               rowSelection={{
                 ...rowSelection,
               }}
-              rowKey={(record) => record.key}
+              rowKey={(record) => record.id}
               dataSource={pageMeta.list}
               columns={tableColumns}
               scroll={{ x: "max-content" }}
@@ -826,12 +880,23 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
               }
             />
           ) : (
-            <WinCode
-              initialValue="SELECT * FROM users"
-              options={{ useWorker: false }}
-              mode="sql"
-              onChange={onCodeChange}
-            />
+            <Row gutter={24}>
+              <Col span={16}>
+                <WinCode
+                  initialValue="SELECT * FROM page"
+                  options={{ useWorker: false }}
+                  mode="sql"
+                  onChange={onCodeChange}
+                />
+              </Col>
+              <Col span={8}>
+                <WinCode
+                  initialValue={initialValueJson}
+                  options={{ useWorker: false }}
+                  mode="json"
+                />
+              </Col>
+            </Row>
           )}
         </Flex>
       </Col>

@@ -406,7 +406,7 @@ const Agent = () => {
             minWidth: 680,
           }}
           icon="https://mdn.alipayobjects.com/huamei_iwk9zp/afts/img/A*s5sNRo5LjfQAAAAAAAAAAAAADgCCAQ/fmt.webp"
-          title="你好, 我是 winbase"
+          title="你好, 我是 win"
           description="基于通义千问大模型机器人"
         />
       </ConfigProvider>
@@ -507,7 +507,7 @@ const Agent = () => {
   const logoNode = (
     <div className={styles.logo}>
       <img src={winbaseLogo} draggable={false} alt="logo" />
-      <span>winbase</span>
+      <span>win</span>
     </div>
   );
 

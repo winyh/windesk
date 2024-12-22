@@ -22,16 +22,15 @@ const { Search } = Input;
 
 const Tenant = () => {
   const formRef = useRef();
-  const [dataSource, setDataSource] = useState([]);
-  const [open, setOpen] = useState(false);
-  const [action, setAction] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const [paginationMeta, setPaginationMeta] = useState({
+  const [pageMeta, setPageMeta] = useState({
+    list: [], // 初始值加入 list
     pageSize: 10,
     current: 1,
     total: 10,
   });
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [action, setAction] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [record, setRecord] = useState({});
   const [selectedRows, setSelectedRows] = useState([]);
   const { modal } = App.useApp();
@@ -45,7 +44,7 @@ const Tenant = () => {
 
   const getData = (params = {}) => {
     setLoading(true);
-    const { current, pageSize } = paginationMeta;
+    const { current, pageSize } = pageMeta;
     clientGetList("platform", "tenant", {
       current,
       pageSize,
@@ -54,12 +53,12 @@ const Tenant = () => {
       .then((res) => {
         if (res.status) {
           const { list, total, current, pageSize } = res.data;
-          setPaginationMeta({
+          setPageMeta({
+            list, // 更新 list
             pageSize: pageSize,
             current: current,
             total: total,
           });
-          setDataSource(list);
           setLoading(false);
         }
       })
@@ -76,12 +75,12 @@ const Tenant = () => {
   };
 
   const onPaginationChange = (current, pageSize) => {
-    setPaginationMeta((pre) => ({ ...pre, current, pageSize }));
+    setPageMeta((pre) => ({ ...pre, current, pageSize }));
     getData({ current, pageSize });
   };
 
   const onShowSizeChange = (current, pageSize) => {
-    setPaginationMeta((pre) => ({ ...pre, current, pageSize }));
+    setPageMeta((pre) => ({ ...pre, current, pageSize }));
     getData({ current, pageSize });
   };
 
@@ -353,18 +352,18 @@ const Tenant = () => {
           }}
           loading={loading}
           rowKey={(record) => record.id}
-          dataSource={dataSource}
+          dataSource={pageMeta.list} // 替换成 pageMeta.list
           columns={columns}
           pagination={
-            dataSource.length > 0 && {
+            pageMeta.total > pageMeta.pageSize && {
               position: ["bottomCenter"],
               showSizeChanger: true,
               showQuickJumper: true,
               onChange: onPaginationChange,
               onShowSizeChange: onShowSizeChange,
-              pageSize: paginationMeta.pageSize, // 每页显示记录数
-              current: paginationMeta.current, // 当前页码
-              total: paginationMeta.total, // 总记录数
+              pageSize: pageMeta.pageSize, // 每页显示记录数
+              current: pageMeta.current, // 当前页码
+              total: pageMeta.total, // 总记录数
             }
           }
         />
