@@ -271,7 +271,6 @@ const LayoutBase = () => {
         label = appInfo?.name;
       }
       let curentPath = linkPath;
-      console.log({ key });
       if (key !== "app") {
         breads.push({
           title: <Link to={`${curentPath}`}>{label}</Link>,

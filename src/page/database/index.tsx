@@ -59,13 +59,17 @@ import {
 import HighLight from "@/component/HighLight";
 import WinCode from "@/component/Code";
 
-import "./index.css";
 import { message } from "@/store/hooks";
+import { formatSchema, findModelLine } from "@/utils/index";
+
+import "./index.css";
 
 const { Search } = Input;
 const { Text } = Typography;
 
 const Database = () => {
+  const editorRef = useRef(null);
+
   const themeMode = useStore((state) => state.themeMode);
 
   const [form] = Form.useForm();
@@ -93,13 +97,17 @@ const Database = () => {
   const [tables, setTables] = useState([]);
   const [record, setRecord] = useState({});
   const [searchKeyword, setSearchKeyword] = useState("");
-  const [sqlCode, setSqlCode] = useState({});
+  const [sqlCode, setSqlCode] = useState("{}");
+  const [schemaCode, setSchemaCode] = useState("{}");
+  const [schemaLoading, setSchemaLoading] = useState(false);
+  const [targetRow, setTargetRow] = useState(1);
   const [initialValueJson, setInitialValueJson] = useState("");
   const [selectedRowIndex, setSelectedRowIndex] = useState(null);
   const [selectedRow, setSelectedRow] = useState({ name: "默认页" });
 
   useEffect(() => {
     getDataTable();
+    getSchemaContent();
   }, []);
 
   const getDataTable = async (params = {}) => {
@@ -260,6 +268,21 @@ const Database = () => {
     }
   };
 
+  const getSchemaContent = async () => {
+    const { status, data } = await comGet(
+      `/project/${appId}/schema/content/query`
+    );
+
+    if (status) {
+      setSchemaCode(formatSchema(data));
+      if (editorRef.current) {
+        editorRef.current.setCode(formatSchema(data));
+      }
+    } else {
+      message.warning("获取失败");
+    }
+  };
+
   const onClearCode = () => {
     setInitialValueJson("");
     message.success("清空成功");
@@ -329,6 +352,8 @@ const Database = () => {
     setSelectedRow(record);
     setRecord(record);
     setSelectedRowIndex(index);
+    const line = findModelLine(schemaCode, record?.table_name);
+    setTargetRow(line);
     getDataColumns({
       table_name: record?.table_name,
     });
@@ -424,7 +449,26 @@ const Database = () => {
   };
 
   // 保存模型-并更新 schema
-  const onSaveSchema = async () => {};
+  const onSaveSchema = async () => {
+    setSchemaLoading(true);
+    let schemaText = "";
+    if (editorRef.current) {
+      schemaText = editorRef.current.getCode();
+    }
+    const { status, data } = await comPost(
+      `/project/${appId}/schema/content/update`,
+      { schemaText }
+    );
+
+    if (status) {
+      getSchemaContent();
+      setSchemaLoading(false);
+      message.success("更新成功");
+    } else {
+      message.warning("更新失败");
+      setSchemaLoading(false);
+    }
+  };
 
   const tabContent = [
     {
@@ -837,7 +881,11 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
 
               {mode === "schema" && (
                 <Space>
-                  <Button icon={<CloudSyncOutlined />} onClick={onSaveSchema}>
+                  <Button
+                    icon={<CloudSyncOutlined />}
+                    onClick={onSaveSchema}
+                    loading={schemaLoading}
+                  >
                     更新模型
                   </Button>
                 </Space>
@@ -920,10 +968,14 @@ const winbase = createClient(winbaseUrl, winbaseKey)`}
             <Row gutter={24}>
               <Col span={24}>
                 <WinCode
-                  initialValue="model user { }"
-                  options={{ useWorker: false }}
-                  mode="sql"
-                  onChange={onCodeChange}
+                  ref={editorRef}
+                  initialValue={schemaCode}
+                  options={{
+                    useWorker: false,
+                    minHeight: 800,
+                    targetRow: targetRow,
+                  }}
+                  mode="prisma"
                 />
               </Col>
             </Row>

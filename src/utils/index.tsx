@@ -280,6 +280,50 @@ const genAlphabetKey = (length = 64) => {
   return firstChar() + restChars();
 };
 
+const formatSchema = (schemaText) => {
+  const lines = schemaText.split("\n");
+  let indentLevel = 0;
+  const formattedLines = [];
+  const indentSize = 2;
+
+  for (const line of lines) {
+    const trimmedLine = line.trim();
+    if (
+      trimmedLine.startsWith("model") ||
+      trimmedLine.startsWith("generator") ||
+      trimmedLine.startsWith("datasource")
+    ) {
+      formattedLines.push(trimmedLine);
+      indentLevel++;
+    } else if (trimmedLine.startsWith("}")) {
+      indentLevel--;
+      formattedLines.push("}".padStart(indentSize * indentLevel + 1, " "));
+    } else if (trimmedLine === "") {
+      formattedLines.push("");
+    } else {
+      formattedLines.push(" ".repeat(indentSize * indentLevel) + trimmedLine);
+    }
+  }
+
+  return formattedLines.join("\n");
+};
+
+const findModelLine = (schemaText, modelName) => {
+  if (modelName === "casbin_rule") {
+    modelName = "CasbinRule"; // 兼容处理
+  }
+
+  modelName = `${modelName} {`;
+
+  const lines = schemaText.split("\n");
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].includes(modelName)) {
+      return i;
+    }
+  }
+  return 1;
+};
+
 export {
   isTauri,
   getCurrentYear,
@@ -301,4 +345,6 @@ export {
   genAlphabetMaxId,
   genAlphabetFieldId,
   genAlphabetKey,
+  formatSchema,
+  findModelLine,
 };
