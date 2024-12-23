@@ -17,6 +17,7 @@ import Dashboard from "@/page/dashboard";
 /* 应用管理 */
 
 import AppPage from "@/page/application/page";
+import AppForm from "@/page/application/form";
 import AppKey from "@/page/application/key";
 import AppPublish from "@/page/application/publish";
 
@@ -72,6 +73,15 @@ const appBaseRoutes = [
         meta: {
           label: "页面管理",
           key: "page",
+          hide_in_menu: false,
+        },
+      },
+      {
+        path: "form",
+        element: <AppForm />,
+        meta: {
+          label: "表单管理",
+          key: "form",
           hide_in_menu: false,
         },
       },
