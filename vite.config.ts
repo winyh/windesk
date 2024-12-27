@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import svgr from "vite-plugin-svgr";
 import path from "path";
 
 // @ts-expect-error process is a nodejs global
@@ -8,7 +9,7 @@ const host = process.env.TAURI_DEV_HOST;
 // https://vitejs.dev/config/
 export default defineConfig(async ({ mode }) => ({
   // base: mode === "development" ? "/" : "/winsax/", // https://cn.vitejs.dev/guide/static-deploy#github-pages
-  plugins: [react()],
+  plugins: [react(), svgr({ svgrOptions: { icon: true } })],
   resolve: {
     alias: {
       // eslint-disable-next-line no-undef

@@ -20,7 +20,15 @@ import {
 } from "@ant-design/icons";
 import SuperForm from "@/component/SuperForm";
 import dayjs from "dayjs";
-import { clientPost, clientPut, clientGetList, clientDelete } from "@/request";
+import {
+  clientPost,
+  clientPut,
+  clientGetList,
+  clientDelete,
+  comPost,
+  comPut,
+  comDelete,
+} from "@/request";
 import { message } from "@/store/hooks";
 import { genAlphabetId, genAlphabetFieldId } from "@/utils/index";
 import { pageTypeEnum } from "@/config/enum";
@@ -36,7 +44,6 @@ const Form = () => {
 
   const [dataSource, setDataSource] = useState([]);
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [paginationMeta, setPaginationMeta] = useState({
     pageSize: 10,
@@ -114,17 +121,23 @@ const Form = () => {
           application_id: Number(appId),
         };
         if (action) {
-          const { status, msg } = await clientPost("project", "form", values);
+          const { status, msg } = await comPost(
+            `/project/${appId}/form/model/create`,
+            values
+          );
           if (status) {
             getData();
             setOpen(false);
             message.success(msg);
           }
         } else {
-          const { status, msg } = await clientPut("project", "form", {
-            ...values,
-            id: record.id,
-          });
+          const { status, msg } = await comPut(
+            `/project/${appId}/form/model/update`,
+            {
+              ...values,
+              id: record.id,
+            }
+          );
           if (status) {
             getData();
             setOpen(false);
@@ -136,8 +149,9 @@ const Form = () => {
   };
 
   const onConfirm = async (item) => {
-    const res = await clientDelete("project", "form", {
+    const res = await comDelete(`/project/${appId}/form/model/delete`, {
       ids: item.id,
+      model: item.model,
     });
     if (res.status) {
       getData();
@@ -160,11 +174,11 @@ const Form = () => {
       placeholder: "请输入表单名称",
     },
     {
-      label: "表单标识",
-      name: "page_code",
+      label: "数据表名",
+      name: "model",
       is: "Input",
       itemSpan: 24,
-      placeholder: "请输入表单标识",
+      placeholder: "请输入数据表名",
     },
     {
       label: "表单描述",
@@ -175,7 +189,7 @@ const Form = () => {
     },
     {
       label: "表单分类",
-      name: "page_type",
+      name: "form_type",
       is: "Select",
       itemSpan: 24,
       placeholder: "请选择表单分类",

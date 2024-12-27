@@ -18,4 +18,5 @@
 .icon-content-blank {
   height: 50vh;
   width: 100%;
+  min-width: 300px;
 }

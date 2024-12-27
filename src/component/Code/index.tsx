@@ -59,7 +59,7 @@ const Code = forwardRef(
         };
 
         // 定位到第2行（行索引从0开始）
-        var targetRow = options.targetRow; // 第2行
+        var targetRow = options?.targetRow; // 第2行
         var targetColumn = 0; // 列可以从0开始
 
         // 调用封装的函数定位到第2行
@@ -70,7 +70,7 @@ const Code = forwardRef(
           onChange && onChange(delta, content);
         });
       }
-    }, [antdThemeMode, initialValue, options.targetRow]);
+    }, [antdThemeMode, initialValue, options?.targetRow]);
 
     const getCode = () => {
       return editorRef.current.getValue();
